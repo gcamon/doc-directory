@@ -114,20 +114,60 @@ $(document).ready(function (e) {
 	});
 });
 
-
 	/*---------------------------------------
 			 AUTO COMPLETE 
 	-----------------------------------------*/
 
 	 $(function() {
             var availableTutorials = [
-               "ActionScript",
-               "Boostrap",
-               "C",
-               "C++",
+               "Enugu",
+               "Awka",
+               "Uyo",
+               "Lagos",
+			   "Aba",
+			   "onitsha",
+			   "Abuja",
+			   "Zaria",
+			   "Oshogbo",
+			   "Benin",
+			   "Calabar",
+			   "Ibadan",
+			   "Abakaliki",
+			   "Afikpo",
+			   "Ikeja",
+			   "Akure",
+			   "Port-Harcourt",
+			   "Owerri",
+			   "yenuguo"
             ];
             $( "#autocom" ).autocomplete({
                source: availableTutorials,
                autoFocus:true
             });
     });
+
+		/*---------------------------------------
+				FORM SUBMIT 
+		-----------------------------------------*/
+		
+
+		/*$( "#searchForm" ).submit(function( event ) {
+ 
+		// Stop form from submitting normally
+		event.preventDefault();
+		
+		// Get some values from elements on the page:
+		var $form = $( this ),
+			term = $form.find( "input[name='s']" ).val(),
+			url = $form.attr( "action" );
+		
+		// Send the data using post
+		var posting = $.post( url, { s: term } );
+		
+		// Put the results in a div
+		posting.done(function( data ) {
+			var content = $( data ).find( "#content" );
+			$( "#result" ).empty().append( content );
+		});*/
+
+		
