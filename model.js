@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var myModel = function () {
 
 	var patientSchema = new Schema({
-	  patient_id: String,
+	  	patient_id: String,
 		firstname: String,
 		lastname: String,
 		age: Number,
@@ -47,7 +47,8 @@ var myModel = function () {
 			data: Date,
 			amount: Number,
 			transactions: Array
-		}
+		},
+		admin: Boolean
 	},{
 		collection: 'specialistInfo'
 	});
@@ -108,7 +109,7 @@ var myModel = function () {
 
 	var models = {};
 
-	//model
+	//models
 	models.newSpecialist = mongoose.model('specialistInfo', specialistSchema);
 	models.newPatient = mongoose.model('patientsInfo', patientSchema);
 	models.newHospital = mongoose.model('hospital', hospitalSchema);

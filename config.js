@@ -3,23 +3,49 @@ var express = require('express');
 var multer = require('multer');
 var bodyParser = require('body-parser');
 var router = express.Router();
+var session = require('express-session');
+var passport = require('passport');
+var localStrategy = require('passport-local').Strategy;
+var flash = require('connect-flash');
+var cookieParser = require("cookie-parser");
 
 
-var configuration = function (app){
+var configuration = function (app) {
 	//config
 	app.set('view engine', 'ejs');
-	app.set('views', __dirname + '/views');    
-
-
-	//middleware	
+	app.set('views', __dirname + '/views');
+	
+	//middleware
+	app.use(session({
+	  secret: 'keyboard cat',
+	  resave: false,	  
+	  saveUninitialized: true,
+	}));	
 	app.use('/assets',express.static(__dirname + '/public'));
 	app.use(bodyParser.urlencoded({ extended: false }));
-	app.use(bodyParser.json())
-	app.use('/',router)
+	app.use(bodyParser.json());
+	app.use(cookieParser());
+	app.use('/',router);
+	app.use(flash());
+	app.use(passport.initialize());
+	app.use(passport.session());
+}
+
+function setUserSession(newUser){
+	passport.serializeUser(function(user, done) {
+	done(null, user._id);
+	});
+	
+	passport.deserializeUser(function(id, done) {
+		newUser.findById(id, function(err, user) {
+			done(err, user);
+		});
+	});
 
 }
 
 module.exports = {
 	configuration: configuration,
-	router: router
+	router: router,
+	passport: setUserSession
 }
