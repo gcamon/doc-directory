@@ -171,6 +171,9 @@
 							<h2>Account created Successfully!!</h2>
                             <p style="color:red"> A link has been sent to your email.
                             Go to the email you used for registration to confirm and connect to your account.</p>
+							
+							<h3><a href="/user/profile">Edit Your profile</a></h3>
+							<h3><a href="/user/dashboard">View Your profile</a></h3>
 						</div>
 						<div class="col-md-4 col-sm-12">
 							<div class="tg-contentbox">
@@ -178,6 +181,11 @@
 									<h2><%= message.firstname %> nice step!</h2>
 									<h3><%= message.firstname %> <%= message.lastname %> There are a lot o benefit<span> you can 
                                     enjoy in this platform</h3>
+									<h4>Your login details</h4>
+									<ul>
+										<li>username: <%= message.email %></li>
+										<li>password: <%= message.user_id %></li>
+									</ul>
 								</div>
 								<div class="tg-description">
 										<p><%= message.typeOfUser %> go ahead to enjoy reaching out to thousands of patients i just one click away!</p>

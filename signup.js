@@ -1,266 +1,74 @@
 "use strict";
+var passport = require('passport');
+var LocalStrategy = require("passport-local").Strategy;
 var path = require('path');
-var route = require('./config');
+var chance = require("chance").Chance();
+var config = require('./config');
 var salt = require('./salt');
-var router = route.router;
+var router = config.router;
+
 
 var signupRoute = function(model) {
-    router.post ("/signup",function (req,res) {   
-        switch (req.body.typeOfUser) {
-        case "Doctor":
-        model.newSpecialist.findOne({"email": req.body.email},function(err,user){
-            if(err) throw err;
-            if(user){
-                res.render('index',{"message" : "username already exist"})
-            } else {
-                var user_id = saltId();
-                console.log(user_id);
-                var data = model.newSpecialist({
-                    location: req.body.city,
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    username: req.body.username,
-                    user_id: user_id,
-                    email: req.body.email,
-                    phone: req.body.phone,
-                });
-                data.save(function(err){
-                    if(err) throw err;
-                    console.log("specialist save");                   
-                    success();                   
-                });
-            }
-        })
-        break;
-        case "Patient":
-        model.newPatient.findOne({"email": req.body.email},function(err,user){
-            if(err) throw err;
-            if(user){
-                res.render('index',{"message" : "username already exist"})
-            } else {
-                var user_id = saltId();
-                console.log(user_id);
-                var data = model.newSpecialist({
-                    location: req.body.city,
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    username: req.body.username,
-                    user_id: user_id,
-                    email: req.body.email,
-                    phone: req.body.phone,
-                });
-                data.save(function(err){
-                    if(err) throw err;
-                    console.log("specialist save");                   
-                    success();                   
-                })
-            }
-        })
-        break;
-        case "Hospital":
-        model.newHospital.findOne({"email": req.body.email},function(err,user){
-            if(err) throw err;
-            if(user){
-                res.render('index',{"message" : "username already exist"})
-            } else {
-                var user_id = saltId();
-                console.log(user_id);
-                var data = model.newSpecialist({
-                    location: req.body.city,
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    username: req.body.username,
-                    user_id: user_id,
-                    email: req.body.email,
-                    phone: req.body.phone,
-                });
-                data.save(function(err){
-                    if(err) throw err;
-                    console.log("specialist save");                   
-                    success();                   
-                })
-            }
-        })
-        break;
-        case "Clinic":
-        model.newClinic.findOne({"email": req.body.email},function(err,user){
-            if(err) throw err;
-            if(user){
-                res.render('index',{"message" : "username already exist"})
-            } else {
-                var user_id = saltId();
-                console.log(user_id);
-                var data = model.newSpecialist({
-                    location: req.body.city,
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    username: req.body.username,
-                    user_id: user_id,
-                    email: req.body.email,
-                    phone: req.body.phone,
-                });
-                data.save(function(err){
-                    if(err) throw err;
-                    console.log("specialist save");                   
-                    success();                   
-                })
-            }
-        })
-        break;
-        case "Pharmacy":
-        model.newPharmacy.findOne({"email": req.body.email},function(err,user){
-            if(err) throw err;
-            if(user){
-                res.render('index',{"message" : "username already exist"})
-            } else {
-                var user_id = saltId();
-                console.log(user_id);
-                var data = model.newSpecialist({
-                    location: req.body.city,
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    username: req.body.username,
-                    user_id: user_id,
-                    email: req.body.email,
-                    phone: req.body.phone,
-                });
-                data.save(function(err){
-                    if(err) throw err;
-                    console.log("specialist save");                   
-                    success();                   
-                })
-            }
-        })
-        break;
-        case "Radiology Center":
-        model.newRadiology.findOne({"email": req.body.email},function(err,user){
-            if(err) throw err;
-            if(user){
-                res.render('index',{"message" : "username already exist"})
-            } else {
-                var user_id = saltId();
-                console.log(user_id);
-                var data = model.newSpecialist({
-                    location: req.body.city,
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    username: req.body.username,
-                    user_id: user_id,
-                    email: req.body.email,
-                    phone: req.body.phone,
-                });
-                data.save(function(err){
-                    if(err) throw err;
-                    console.log("specialist save");                   
-                    success();                   
-                })
-            }
-        })
-        break;
-        case "Laboratory Center":
-        model.newLaboratory.findOne({"email": req.body.email},function(err,user){
-            if(err) throw err;
-            if(user){
-                res.render('index',{"message" : "username already exist"})
-            } else {
-                var user_id = saltId();
-                console.log(user_id);
-                var data = model.newSpecialist({
-                    location: req.body.city,
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    username: req.body.username,
-                    user_id: user_id,
-                    email: req.body.email,
-                    phone: req.body.phone,
-                });
-                data.save(function(err){
-                    if(err) throw err;
-                    console.log("specialist save");                   
-                    success();                   
-                })
-            }
-        })
-        break;
-        case "Fitness Center":
-        model.newFitness.findOne({"email": req.body.email},function(err,user){
-            if(err) throw err;
-            if(user){
-                res.render('index',{"message" : "username already exist"})
-            } else {
-                var user_id = saltId();
-                console.log(user_id);
-                var data = model.newSpecialist({
-                    location: req.body.city,
-                    firstname: req.body.firstname,
-                    lastname: req.body.lastname,
-                    username: req.body.username,
-                    user_id: user_id,
-                    email: req.body.email,
-                    phone: req.body.phone,
-                });
-                data.save(function(err){
-                    if(err) throw err;
-                    console.log("specialist save");                   
-                    success();                   
-                })
-            }
-        })
-        break;
-        default:
-            res.send('error : user not identified');        
-        }
 
-            function success() {
-                var msgObj = userObjectToBeSent();
-                res.render("success",{"message": msgObj});
-            }
-
-            function newUser(email,user) {
-                var getLastString = email.split("@");
-                var random = Math.floor(Math.random() * 1000);
-                switch (user) {
-                    case "Doctor":
-                        return getLastString[0] + random + "d";
-                    case "Patient":
-                        return getLastString[0] + random + "p";                        
-                    case "Hospital":
-                        return getLastString[0] + random + "h";                        
-                    case "Clinic":
-                        return getLastString[0] + random + "c";
-                    case "Pharmacy":
-                        return getLastString[0] + random + "f";                        
-                    case "Radiology Center":
-                        return getLastString[0] + random + "r";                        
-                    case "Laboratory Center":
-                        return getLastString[0] + random + "l";                        
-                    case "Fitness Center":
-                        return getLastString[0] + random + "ft";                        
-                    default:
-                        return null;                    
-                }
-            }
-
-            function userObjectToBeSent() {
-                var user_id = createId();
-                return {
+passport.use('signup', new LocalStrategy({
+	usernameField : 'email',
+    passwordField : 'password',
+    passReqToCallback : true 
+},
+function(req,email,password,done){
+	process.nextTick(function(){	
+		model.user.findOne({email:email},function(err,user){
+			if(err) return done(err);
+			if(user){
+				console.log("user exist")
+				return done(null, false, req.flash('signupMessage', 'That email has already been use please find another one'));	
+			} else {											
+					var User = new model.user({
+					email: email,
+					user_id: genId(req.body.email),
+                    password: salt.createHash(password),
+                    phone: req.body.phone,
+                    admin: false,
+                    type: req.body.typeOfUser,
+                    location: req.body.city,
                     firstname: req.body.firstname,
                     lastname: req.body.lastname,
-                    email: req.body.email,
-                    user_id: user_id,
-                    typeOfUser: req.body.typeOfUser
-                }
-            }
+                    username: req.body.username,
+					profile_pic: {
+						filename:""
+					}					
+				});			
+				User.save(function(err){
+					if(err) throw err;					
+					return done(null,User);
+				})
+			}
+		})
 
-            function createId() {
-                var userId = newUser(req.body.email,req.body.typeOfUser);
-                return userId;
-            }
+		function genId(userId) {
+			var getRandomString = chance.string(userId);
+			return getRandomString;
+		}
+	})
+}));
 
-            function saltId() {
-                return salt.createHash(createId());
-            }
-    })
+router.post('/user/signup', function(req, res, next) {    
+  passport.authenticate('signup', function(err, user, info) {
+
+    if (err) {
+      return next(err); // will generate a 500 error
+    }
+    // Generate a JSON response reflecting signup
+    if (!user) {
+    	console.log("user already exist")	
+      	res.send(false);
+    } else {
+    	res.send(true);
+    }
+
+  })(req, res, next);
+})
+ 
 }
 
 module.exports = signupRoute;

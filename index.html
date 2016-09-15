@@ -32,7 +32,7 @@
         <!--************************************
                         Wrapper Start
         *************************************-->
-        <div id="wrapper" class="tg-haslayout">
+        
             <!--************************************
                             Header Start
             *************************************-->
@@ -58,10 +58,15 @@
                                             <a href="index.html">Home</a>                                           
                                         </li>
                                         <li>
-                                            <a href="#">doctors</a>
-                                            <ul>                                                
-                                                <li><a href="doctor-gridview2.html">Grid View 2</a></li>                                               
-                                                <li><a href="doctor-detail2.html">Doctor Detail 2</a></li>
+                                            <a href="#">Top Ranking</a>
+                                            <ul> 
+                                                <li><a href="doctor-gridview2.html">Doctors</a></li>                                                     
+                                                <li><a href="doctor-gridview2.html">Hospitals</a></li>
+                                                <li><a href="doctor-gridview2.html">Pharmacists</a></li>
+                                                <li><a href="doctor-gridview2.html">Laboratory Scientists</a></li>
+                                                <li><a href="doctor-gridview2.html">Radiographers</a></li>
+                                                <li><a href="doctor-gridview2.html">Physician</a></li>                                                                           
+                                                <!--<li><a href="doctor-detail2.html">Doctor Detail 2</a></li>-->
                                             </ul>
                                         </li>
                                         <li>
@@ -119,7 +124,7 @@
                                                     <i class="icon-FirstAidKit"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">doctor</span>
-                                                        <span class="tg-category-doctores">540 Specialists</span>
+                                                        <span class="tg-category-doctores">0 Specialists</span>
                                                     </span>
                                                 </a>
                                             </li>
@@ -128,7 +133,7 @@
                                                     <i class=" icon-Hospitalmedicalsignalofacrossinacircle"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">hospital</span>
-                                                        <span class="tg-category-doctores">540 Specialists</span>
+                                                        <span class="tg-category-doctores">0 Specialists</span>
                                                     </span>
                                                 </a>
                                             </li>
@@ -137,7 +142,7 @@
                                                     <i class=" icon-Clinichistorymedicalpaperonclipboard"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">clinic</span>
-                                                        <span class="tg-category-doctores">540 Specialists</span>
+                                                        <span class="tg-category-doctores">0 Specialists</span>
                                                     </span>
                                                 </a>
                                             </li>
@@ -146,7 +151,7 @@
                                                     <i class="icon-Pills"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">Pharmacy</span>
-                                                        <span class="tg-category-doctores">540 Specialists</span>
+                                                        <span class="tg-category-doctores">0 Specialists</span>
                                                     </span>
                                                 </a>
                                             </li>
@@ -155,7 +160,7 @@
                                                     <i class="icon-BloodDonation"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">Radiology Center</span>
-                                                        <span class="tg-category-doctores">540 Specialists</span>
+                                                        <span class="tg-category-doctores">0 Specialists</span>
                                                     </span>
                                                 </a>
                                             </li>
@@ -164,7 +169,7 @@
                                                     <i class="icon-hairs"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">Laboratories</span>
-                                                        <span class="tg-category-doctores">540 Specialists</span>
+                                                        <span class="tg-category-doctores">0 Specialists</span>
                                                     </span>
                                                 </a>
                                             </li>
@@ -173,7 +178,7 @@
                                                     <i class="icon-hairs"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">Fitness & SPA</span>
-                                                        <span class="tg-category-doctores">540 Specialists</span>
+                                                        <span class="tg-category-doctores">0 Specialists</span>
                                                     </span>
                                                 </a>
                                             </li>
@@ -189,7 +194,7 @@
                                                         <div class="row">
                                                             <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
                                                                 <div class="form-group" class="ui-widget">
-                                                                    <input type="text" id="autocom" class="form-control" placeholder="Address">
+                                                                    <input type="text" id="autocom" class="form-control" placeholder="City name">
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <span class="select">
@@ -830,6 +835,7 @@
         <!--************************************
                 Sign In Sign Up Light Box Start
         *************************************-->
+        href="#" data-toggle="modal" data-target=".tg-user-modal"
         <div class="modal fade tg-user-modal" tabindex="-1" role="dialog">
             <div class="tg-modal-content">
                 <ul class="tg-modaltabs-nav" role="tablist">
@@ -861,14 +867,16 @@
                         </form>
                     </div>
                     <div role="tabpanel" class="tab-pane tg-haslayout" id="tg-signup-formarea">
-                        <form class="tg-form-modal tg-form-signup">
+                        <form class="tg-form-modal tg-form-signup" action="/signup" method="POST">
                             <fieldset>
                                 <div class="form-group">
-                                    <span class="select">
+                                    <span class="select">                                
                                         <select>
-                                            <option>Doctor one</option>
-                                            <option>Doctor two</option>
-                                            <option>Doctor three</option>
+                                            <option>Doctor</option>
+                                            <option>Laboratory scientist</option>
+                                            <option>Radiographer</option>
+                                            <option>Physician</option>
+                                            <option>Nurse</option>
                                         </select>
                                     </span>
                                 </div>
@@ -882,25 +890,43 @@
                                     </span>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="First Name">
+                                    <span class="select">                                       
+                                        <select>
+                                            <option>Hospital</option>
+                                            <option>Clinic</option>
+                                            <option>Pharmarcitical</option>
+                                            <option>Radiological center</option>
+                                            <option>Laboratory center</option>
+                                            <option>Fitness center</option>
+                                        </select>
+                                    </span>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="last Name">
+                                    <input type="text" class="form-control" name="office_address" placeholder="Office Adress">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="Phone Number">
+                                    <input type="text" class="form-control" name="firstname" placeholder="First Name">
                                 </div>
                                 <div class="form-group">
-                                    <input type="email" class="form-control" placeholder="Email">
+                                    <input type="text" class="form-control" name="lastname" placeholder="last Name">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control" placeholder="ZIP Code">
+                                    <input type="text" class="form-control" name="phone" placeholder="Phone Number">
+                                </div>
+                                <div class="form-group">
+                                    <input type="email" class="form-control" name= password placeholder="Email">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="zip_code" placeholder="ZIP Code">
                                 </div>
                                 <div class="form-group tg-checkbox">
                                     <label>
                                         <input type="checkbox" class="form-control">
                                         I agree with the terms and conditions
                                     </label>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" name="typeOfUser" value="specialist">
                                 </div>
                                 <button class="tg-btn tg-btn-lg">Create an Account</button>
                             </fieldset>

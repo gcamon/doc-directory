@@ -25,7 +25,7 @@
         <link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
         <script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
     </head>
-    <body>
+    <body ng-app= "myApp">
         <!--[if lt IE 8]>
                 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
@@ -82,21 +82,7 @@
                                         <li>
                                             <a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a>
                                             <span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
-                                        </li>
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-navicon"></i>
-                                                <i>pages</i>
-                                            </a>
-                                            <ul>
-                                                <li><a href="404.html">404</a></li>
-                                                <li><a href="comming-soon.html">comming soon</a></li>
-                                                <li><a href="dashboard.html">dashboard</a></li>
-                                                <li><a href="dashboard-profile.html">dashboard profile</a></li>
-                                                <li><a href="dashboard-schedule.html">dashboard schedule</a></li>
-                                                <li><a href="dashboard-myaccount.html">dashboard account</a></li>
-                                            </ul>
-                                        </li>
+                                        </li>                                        
                                     </ul>
                                 </div>
                             </nav>
@@ -844,15 +830,16 @@
                     <li role="presentation"><a href="#tg-signup-formarea" aria-controls="tg-signup-formarea" role="tab" data-toggle="tab">sign up</a></li>
                 </ul>
                 <div class="tab-content tg-haslayout">
-                    <div role="tabpanel" class="tab-pane tg-haslayout active" id="tg-signin-formarea">
+                    <div role="tabpanel" class="tab-pane tg-haslayout active" id="tg-signin-formarea" ng-controller="loginController">
                         <form class="tg-form-modal tg-form-signin">
+                        <span style="color:red">{{error}}</span>
                             <fieldset>
                                 <div class="form-group">
-                                    <input type="email" class="form-control" placeholder="Email Address">
+                                    <input type="email" class="form-control" placeholder="Email Address" name="email" ng-model="login.email">
                                 </div>
                                 <div class="form-group">
-                                    <input type="password" class="form-control" placeholder="Password">
-                                </div>
+                                    <input type="password" class="form-control" placeholder="Password" name="password" ng-model="login.password">
+                                </div>                                
                                 <div class="form-group tg-checkbox">
                                     <label>
                                         <input type="checkbox" class="form-control">
@@ -863,21 +850,23 @@
                                         <i class="fa fa-question-circle"></i>
                                     </a>
                                 </div>
-                                <button class="tg-btn tg-btn-lg">LOGIN now</button>
+                                <button class="tg-btn tg-btn-lg" ng-click="send()">LOGIN now</button>
                             </fieldset>
                         </form>
                     </div>
-                    <div role="tabpanel" class="tab-pane tg-haslayout" id="tg-signup-formarea">
-                        <form class="tg-form-modal tg-form-signup" action="/signup" method="POST">
+                    <div role="tabpanel" class="tab-pane tg-haslayout" id="tg-signup-formarea" ng-controller="signupController">
+                        <form class="tg-form-modal tg-form-signup">
+                            <span style="color:red">{{error}}</span>
                             <fieldset>
                                 <div class="form-group">
                                     <span class="select">                                
-                                        <select id="select-type" name="typeOfUser">
+                                        <select id="select-type" name="typeOfUser" ng-model="user.typeOfUser">
                                             <option>You are?</option>
                                             <option>Doctor</option>
                                             <option>Patient</options>
                                             <option>Hospital</option>
                                             <option>Clinic</option>
+                                            <option>Pharmacy</option>
                                             <option>Radiology Center</option>
                                             <option>Laboratory Center</option>
                                             <option>Fitness Center</option>
@@ -886,7 +875,7 @@
                                 </div>
                                 <div class="form-group" id="specialization">
                                     <span class="select">
-                                        <select>
+                                        <select  ng-model="user.specializtion">
                                             <option>Select Specialty</option>
                                             <option>Specialty</option>
                                             <option>Specialty two</option>
@@ -896,7 +885,7 @@
                                 </div>
                                 <div class="form-group" id="category-of-type">
                                     <span class="select">                                       
-                                        <select>
+                                        <select  ng-model="category_of_type">
                                             <option>Select Category</option>
                                             <option>Tertiary</option>
                                             <option>Secondary</option>
@@ -906,45 +895,42 @@
                                     </span>
                                 </div>                                
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" name="firstname" placeholder="First Name*" id="firstname">
+                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname">
                                 </div>                                
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" name="firstname" placeholder="Name*" id="name">
+                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="name" ng-model="user.lastname">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" name="lastname" placeholder="last Name*" id="lastname">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Name*" id="lastname" ng-model="user.name">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" name="Address" placeholder="Address*">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" name="city" placeholder="City/Town*" id="firstname">
+                                    <input type="text" class="form-control placeholder-color" placeholder="City/Town*" id="firstname" ng-model="user.city">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" name="phone" placeholder="Phone Number*" id="phone">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" name="phone" placeholder="website url" id="website">
+                                    <input type="text" class="form-control placeholder-color" placeholder="website url" id="website" ng-model="user.website">
                                 </div>
                                 <div class="form-group">
-                                    <input type="email" class="form-control placeholder-color" name= "email" placeholder="Email*" id="firstname">
+                                    <input type="email" class="form-control placeholder-color" placeholder="Email*" id="firstname" ng-model="user.email">
                                 </div>
                                 <div class="form-group">
-                                    <input type="password" class="form-control placeholder-color" name= "password" placeholder="Password*"id="firstname">
-                                </div>
+                                    <input type="password" class="form-control" placeholder="Password" ng-model="user.password">
+                                </div>                                                   
                                 <div class="form-group">
-                                    <input type="password" class="form-control placeholder-color" name= "confirm-password" placeholder="confirm Password" id="firstname">
-                                </div>
-                                <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" name="zip_code" placeholder="ZIP Code">
+                                    <input type="text" class="form-control placeholder-color" name="zip_code" placeholder="ZIP Code" ng-model="user.zip_code">
                                 </div>
                                 <div class="form-group tg-checkbox">
                                     <label>
-                                        <input type="checkbox" class="form-control">
+                                        <input type="checkbox" class="form-control" ng-model="user.check">
                                         I agree with the terms and conditions
                                     </label>
                                 </div>                                
-                                <button class="tg-btn tg-btn-lg">Create an Account</button>
+                                <button class="tg-btn tg-btn-lg" ng-click="submit()">Create an Account</button>
                             </fieldset>
                         </form>
                     </div>
@@ -961,13 +947,7 @@
                 var phone = document.getElementById("phone");
                 var category_of_type = document.getElementById("category-of-type");               
                 var website = document.getElementById("website");                
-                category_of_type.style.display = "none";
-                name.style.display = "none";
-                firstname.style.display = "none";
-                lastname.style.display = "none";
-                phone.style.display = "none";
-                website.style.display = "none";
-                specialization.style.display = "none";
+                initForm(); 
                 function setType() {                    
                     switch(type.value) {
                         case "Doctor":
@@ -986,33 +966,51 @@
                             specialization.style.display = "none";
                             website.style.display = "none";
                             name.style.display = "none";
+                            category_of_type.style.display = "none";             
                             break;
                         case "Hospital":                                                    
                             category_of_type.style.display = "block";                            
                             website.style.display = "block";
                             name.style.display = "block";
                             specialization.style.display = "none";
+                            firstname.style.display = "none";
+                            lastname.style.display = "none";
                             break;
                         case "Clinic":                                                       
                             category_of_type.style.display = "block";
                             website.style.display = "block";
                             name.style.display = "block";
-                            specialization.style.display = "none";                            
+                            specialization.style.display = "none";
+                            firstname.style.display = "none";
+                            lastname.style.display = "none";                            
                             break;
                         case "Radiology Center":
                             name.style.display = "block";
                             specialization.style.display = "none"; 
-                            category_of_type.style.display = "none";                                                     
+                            category_of_type.style.display = "none";
+                            firstname.style.display = "none";
+                            lastname.style.display = "none";                                                     
                             break;
                         case "Laboratory Center":
                             name.style.display = "block";
                             specialization.style.display = "none"; 
-                            category_of_type.style.display = "none";                                                       
+                            category_of_type.style.display = "none";
+                            firstname.style.display = "none";
+                            lastname.style.display = "none";                                                       
+                            break;
+                        case "Pharmacy":
+                            name.style.display = "block";
+                            specialization.style.display = "none"; 
+                            category_of_type.style.display = "none";
+                            firstname.style.display = "none";
+                            lastname.style.display = "none";                                                       
                             break;
                         case "Fitness Center":
                             name.style.display = "block";
                             specialization.style.display = "none";
-                            category_of_type.style.display = "none";                                                     
+                            category_of_type.style.display = "none";
+                            firstname.style.display = "none";
+                            lastname.style.display = "none";                                                     
                             break;
                         default:
                             alert("You did not identify who you are!");
@@ -1020,6 +1018,15 @@
                     }
                 }
 
+                function initForm() {
+                    category_of_type.style.display = "none";
+                    name.style.display = "none";
+                    firstname.style.display = "none";
+                    lastname.style.display = "none";
+                    phone.style.display = "none";
+                    website.style.display = "none";
+                    specialization.style.display = "none";
+                }
                 type.addEventListener('change',setType,false)
             }, false)
         </script>
@@ -1028,6 +1035,9 @@
         *************************************-->
         <script src="/assets/js/vendor/jquery-library.js"></script>
         <script src="/assets/js/vendor/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/assets/js/source.js"></script>
+        <script type="text/javascript" src="/assets/js/angularclient.js"></script>
+        <!--<script type="text/javascript" src="/assets/js/ngroute.js"></script>-->
         <script src="/assets/js/jquery-ui.js"></script>
         <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
         <script src="/assets/js/map/jquery.gomap.js"></script>

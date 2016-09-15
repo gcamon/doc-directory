@@ -14,8 +14,13 @@ var express = require('express'),
 app.listen(port);
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://127.0.0.1:27017/medicalmull");
-config.configuration(app);
+config.configuration(app,model);
 route(model);
 signupRoute(model);
 loginRoute(model);
+
+
+
+
+
 
