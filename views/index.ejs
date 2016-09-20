@@ -832,7 +832,7 @@
                 <div class="tab-content tg-haslayout">
                     <div role="tabpanel" class="tab-pane tg-haslayout active" id="tg-signin-formarea" ng-controller="loginController">
                         <form class="tg-form-modal tg-form-signin">
-                        <span style="color:red">{{error}}</span>
+                        <span style="color:red" ng-cloak>{{error}}</span>
                             <fieldset>
                                 <div class="form-group">
                                     <input type="email" class="form-control" placeholder="Email Address" name="email" ng-model="login.email">
@@ -856,14 +856,14 @@
                     </div>
                     <div role="tabpanel" class="tab-pane tg-haslayout" id="tg-signup-formarea" ng-controller="signupController">
                         <form class="tg-form-modal tg-form-signup">
-                            <span style="color:red">{{error}}</span>
+                            <span style="color:red" ng-cloak>{{error}}</span>
                             <fieldset>
                                 <div class="form-group">
-                                    <span class="select">                                
-                                        <select id="select-type" name="typeOfUser" ng-model="user.typeOfUser">
-                                            <option>You are?</option>
+                                    <span class="select">
+                                        <label>Select who you are?</label>                                
+                                        <select id="select-type"  ng-model="user.typeOfUser">                                            
                                             <option>Doctor</option>
-                                            <option>Patient</options>
+                                            <option>Patient</option>
                                             <option>Hospital</option>
                                             <option>Clinic</option>
                                             <option>Pharmacy</option>
@@ -875,18 +875,18 @@
                                 </div>
                                 <div class="form-group" id="specialization">
                                     <span class="select">
-                                        <select  ng-model="user.specializtion">
-                                            <option>Select Specialty</option>
-                                            <option>Specialty</option>
+                                        <label>Select your specialization</label> 
+                                        <select  ng-model="user.specializtion">                                            
+                                            <option>Eye specialist</option>
                                             <option>Specialty two</option>
                                             <option>Specialty three</option>
                                         </select>
                                     </span>
                                 </div>
                                 <div class="form-group" id="category-of-type">
-                                    <span class="select">                                       
-                                        <select  ng-model="category_of_type">
-                                            <option>Select Category</option>
+                                    <span class="select">
+                                        <label>What category? </label>                                        
+                                        <select  ng-model="category_of_type">                                            
                                             <option>Tertiary</option>
                                             <option>Secondary</option>
                                             <option>Primary</option>
@@ -898,10 +898,10 @@
                                     <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname">
                                 </div>                                
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="name" ng-model="user.lastname">
+                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="lastname" ng-model="user.lastname">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Name*" id="lastname" ng-model="user.name">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Name*" id="name" ng-model="user.name">
                                 </div>
                                 <div class="form-group">
                                     <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">

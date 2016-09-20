@@ -35,77 +35,69 @@
 		<!--************************************
 				Header Start
 		*************************************-->
-		<header id="header" class="tg-haslayout tg-inner-header">
-			<div class="container">
-				<div class="row">
-					<div class="col-xs-12">
-						<div class="tg-navigationarea tg-haslayout">
-							<strong class="logo">
-								<a href="/"><img src="/assets/images/logo.png" alt="image description"></a>
-							</strong>
-							<nav id="tg-nav" class="tg-nav">
-								<div class="navbar-header">
-									<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#tg-navigation" aria-expanded="false">
-										<span class="sr-only">Toggle navigation</span>
-										<span class="icon-bar"></span>
-										<span class="icon-bar"></span>
-										<span class="icon-bar"></span>
-									</button>
-								</div>
-								<div class="collapse navbar-collapse" id="tg-navigation">
-								<ul>
-									<li>
-										<a href="#">Home</a>
-										<ul>
-											<li><a href="/">Home 1</a></li>											
-										</ul>
-									</li>
-									<li>
-										<a href="#">doctors</a>
-										<ul>
-											<li><a href="/topview/doctors">Doctors</a></li>                                                     
-                                            <li><a href="/topview/hospitals">Hospitals</a></li>
-                                            <li><a href="/topview/pharmacy">Pharmacy</a></li>
-                                            <li><a href="/topview/laboratories">Laboratory Centers</a></li>
-                                            <li><a href="/topview/radiology">Radiology Centers</a></li>
-                                            <li><a href="/topview/fitness">fitness Centers</a></li>        
-										</ul>
-									</li>
-									<li>
-										<a href="#">Blog</a>
-										<ul>
-											<li><a href="blog-list.html">Blog List</a></li>
-											<li><a href="blog-grid.html">Blog Grid</a></li>
-											<li><a href="blog-detail.html">Blog Detail</a></li>
-										</ul>
-									</li>
-									<li><a href="packages.html">packages</a></li>
-									<li><a href="contactus.html">Contact</a></li>
-									<li>
-										<a href="#" data-toggle="modal" data-target=".tg-user-modal"><i class="fa fa-user-plus"></i></a>
-										<span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
-										</li>
-									<li>
-										<a href="#">
-											<i class="fa fa-navicon"></i>
-											<i>pages</i>
-										</a>
-										<ul>											
-											<li><a href="comming-soon.html">comming soon</a></li>
-											<li><a href="dashboard.html">dashboard</a></li>
-											<li><a href="dashboard-profile.html">dashboard profile</a></li>
-											<li><a href="dashboard-schedule.html">dashboard schedule</a></li>
-											<li><a href="dashboard-myaccount.html">dashboard account</a></li>
-										</ul>
-									</li>
-								</ul>
-							</div>
-							</nav>
-						</div>
-					</div>
-				</div>
-			</div>
-		</header>
+		<header id="header" class="tg-haslayout">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <strong class="logo">
+                                <a href="/"><img src="/assets/images/logo.png" alt="image description"></a>
+                            </strong>
+                            <nav id="tg-nav" class="tg-nav">
+                                <div class="navbar-header">
+                                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#tg-navigation" aria-expanded="false">
+                                        <span class="sr-only">Toggle navigation</span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </button>
+                                </div>
+                                <div class="collapse navbar-collapse" id="tg-navigation">
+                                    <ul>
+                                        <li>
+                                            <a href="/">Home</a>                                           
+                                        </li>
+                                        <li>
+                                            <a href="#">Top Ranking</a>
+                                            <ul> 
+                                                <li><a href="/topview/doctors">Doctors</a></li>                                                     
+                                                <li><a href="/topview/hospitals">Hospitals</a></li>
+                                                <li><a href="/topview/pharmacy">Pharmacy</a></li>
+                                                <li><a href="/topview/laboratories">Laboratory Centers</a></li>
+                                                <li><a href="/topview/radiology">Radiology Centers</a></li>
+                                                <li><a href="/topview/fitness">fitness Centers</a></li>                                                                           
+                                                <!--<li><a href="doctor-detail2.html">Doctor Detail 2</a></li>-->
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <a href="#">Blog</a>
+                                            <ul>
+                                                <li><a href="blog-list.html">Blog List</a></li>
+                                                <li><a href="blog-grid.html">Blog Grid</a></li>
+                                                <li><a href="blog-detail.html">Blog Detail</a></li>
+                                            </ul>
+                                        </li>
+                                        <li><a href="packages.html">packages</a></li>
+                                        <li><a href="contactus.html">Contact</a></li>                                        
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-navicon"></i>
+                                                <i>pages</i>
+                                            </a>
+                                            <ul>                                                                                            
+                                                <li><a href="/user/dashboard">dashboard</a></li>
+                                                <li><a href="/user/user-update" class="active">update profile</a></li>
+                                                <li><a href="/user/user-schedule">My schedule</a></li>
+                                                <li><a href="dashboard-myaccount.html">dashboard account</a></li>
+                                                <li><a href="/user/logout">Log out</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </header>
 		<!--************************************
 				Header End
 		*************************************-->
@@ -172,7 +164,7 @@
                             <p style="color:red"> A link has been sent to your email.
                             Go to the email you used for registration to confirm and connect to your account.</p>
 							
-							<h3><a href="/user/profile">Edit Your profile</a></h3>
+							<h3><a href="/user/user-update">Edit Your profile</a></h3>
 							<h3><a href="/user/dashboard">View Your profile</a></h3>
 						</div>
 						<div class="col-md-4 col-sm-12">

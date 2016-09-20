@@ -26,7 +26,7 @@ var myModel = function () {
 		marital_status: String,
 		medications: [],
 		date: Date,
-		profileUrl: String,
+		profile_url: String,
 		dashboardUrl: String,
 		ewallet: {
 			data: Date,
@@ -46,7 +46,8 @@ var myModel = function () {
 			size: Number
 		},
 		files:[],
-		rating: Number
+		rating: Number,
+		profile_pic_url: String
 	},{
 		collections: "userinfos"
 	})

@@ -83,7 +83,7 @@
                                                 <i class="fa fa-navicon"></i>
                                                 <i>pages</i>
                                             </a>
-                                            <ul>                                                
+                                            <ul>                                               
                                                 <li><a href="/user/dashboard" class="active">dashboard</a></li>
                                                 <li><a href="/user/user-update">Update profile</a></li>
                                                 <li><a href="/user/user-schedule">My schedule</a></li>
@@ -372,11 +372,11 @@
 							<div class="tg-widget tg-widget-doctor">
 								<figure class="tg-docprofile-img">
 									<figcaption>
-										<h4>Dr.<%= person.firstname %><%= person.lastname %></h4>
+										<h4>Dr.<%= person.firstname %> <%= person.lastname %></h4>
 										<span>Senior Eye Doctor</span>
 									</figcaption>
 									<span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
-									<a href="#"><img alt="image description" src="/download/profile_pic"></a>
+									<a href="#"><img alt="image description" src="<%= person.profile_pic_url %>"></a>									
 								</figure>
 							</div>
 							<div class="tg-widget tg-widget-accordions">

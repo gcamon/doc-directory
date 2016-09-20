@@ -22,10 +22,11 @@ function(req,email,password,done){
 			if(user){
 				console.log("user exist")
 				return done(null, false, req.flash('signupMessage', 'That email has already been use please find another one'));	
-			} else {											
+			} else {
+					var uid = genId(req.body.email);											
 					var User = new model.user({
 					email: email,
-					user_id: genId(req.body.email),
+					user_id: uid,
                     password: salt.createHash(password),
                     phone: req.body.phone,
                     admin: false,
@@ -34,9 +35,12 @@ function(req,email,password,done){
                     firstname: req.body.firstname,
                     lastname: req.body.lastname,
                     username: req.body.username,
+					address: req.body.address,
 					profile_pic: {
 						filename:""
-					}					
+					},
+					profile_url: "/ranking/views/" + uid,
+					profile_pic_url: "/download/profile_pic/nopic"					
 				});			
 				User.save(function(err){
 					if(err) throw err;					
@@ -46,8 +50,8 @@ function(req,email,password,done){
 		})
 
 		function genId(userId) {
-			var getRandomString = chance.string(userId);
-			return getRandomString;
+			var getRandomNumber = Math.floor(Math.random() * 199999999);
+			return getRandomNumber;
 		}
 	})
 }));

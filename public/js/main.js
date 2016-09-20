@@ -150,6 +150,31 @@ $(document).ready(function (e) {
 				FORM SUBMIT 
 		-----------------------------------------*/
 		
+		/*$("#ajaxform").submit(function(e)
+{
+    var postData = $(this).serializeArray();
+    var formURL = $(this).attr("action");
+    $.ajax(
+    {
+        url : formURL,
+        type: "POST",
+        data : postData,
+        success:function(data, textStatus, jqXHR) 
+        {
+            console.log(data)//data: return data from server
+			
+        },
+        error: function(jqXHR, textStatus, errorThrown) 
+        {
+            //if fails      
+        }
+    });
+    e.preventDefault();//STOP default action
+    e.unbind(); //unbind. to stop multiple form submit.
+});
+ 
+$("#ajaxform").submit(); //Submit  the FORM*/
+
 
 		/*$( "#searchForm" ).submit(function( event ) {
  

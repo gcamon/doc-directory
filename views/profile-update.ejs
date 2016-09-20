@@ -511,16 +511,16 @@
 							<div class="tg-widget tg-widget-doctor">
 								<figure class="tg-docprofile-img">
 									<figcaption>
-										<h4>Dr. jhon doe, md</h4>
+										<h4>Dr. <%= person.firstname %> <%= person.lastname %> </h4>
 										<span>Senior Eye Doctor</span>
 									</figcaption>
 									<span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
-									<a href="#"><img alt="image description" src="/download/profile_pic"></a>
+									<a href="#"><img alt="image description" src="<%= person.profile_pic_url %>"></a>
 								</figure>
 							</div>
 							<div class="tg-widget tg-widget-accordions">
 								<input type="file" name="file" id="file" class="inputfile" ng-model = "user.profilepic"/>
-								<label for="file">Choose a photo</label>
+								<label for="file">Dashboard</label>
 								<ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 									<li class="panel panel-default active">
 										<div class="tg-panel-heading" role="tab" id="headingOne">
@@ -530,7 +530,7 @@
 										</div>
 										<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
 											<div class="panel-body">
-												<p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
+												<p>Dynamic content</p>
 											</div>
 										</div>
 									</li>
@@ -542,7 +542,7 @@
 										</div>
 										<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
 											<div class="panel-body">
-												<p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
+												<p>Dynamic content</p>
 											</div>
 										</div>
 									</li>
@@ -554,7 +554,7 @@
 										</div>
 										<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
 											<div class="panel-body">
-												<p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
+												<p>Dynamic content</p>
 											</div>
 										</div>
 									</li>
@@ -566,12 +566,12 @@
 										</div>
 										<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
 											<div class="panel-body">
-												<p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
+												<p>Dynamic content.</p>
 											</div>
 										</div>
 									</li>
 									<li class="panel panel-default">
-										<h3 class="panel-title"><a href="#">Signout</a></h3>
+										<h3 class="panel-title"><a href="/user/logout">Signout</a></h3>
 									</li>
 								</ul>
 							</div>
@@ -598,12 +598,12 @@
 									</a>
 								</strong>
 								<div class="tg-description">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut laboret dolore magna aliqua.</p>
+									<p>Dynamic content</p>
 								</div>
 								<ul class="tg-info">
 									<li>
 										<i class="fa fa-home"></i>
-										<address>123 Eccles Old Road, New Salford Road, East London, Uk, M6 7AF</address>
+										<address>1 Nwodo street GRA Enugu</address>
 									</li>
 									<li>
 										<i class="fa fa-envelope"></i>
