@@ -7,6 +7,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
         <title>Doctor Directory</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -62,6 +63,7 @@
                                             <ul> 
                                                 <li><a href="/topview/doctors">Doctors</a></li>                                                     
                                                 <li><a href="/topview/hospitals">Hospitals</a></li>
+                                                <li><a href="/topview/clinics">Clinics</a></li>
                                                 <li><a href="/topview/pharmacy">Pharmacy</a></li>
                                                 <li><a href="/topview/laboratories">Laboratory Centers</a></li>
                                                 <li><a href="/topview/radiology">Radiology Centers</a></li>
@@ -80,8 +82,21 @@
                                         <li><a href="packages.html">packages</a></li>
                                         <li><a href="contactus.html">Contact</a></li>
                                         <li>
-                                            <a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a>
+                                            <a href="#" data-toggle="modal" data-target=".tg-user-modal" title="login/signup"><i class="fa fa-user-plus"></i></a>
                                             <span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
+                                        </li>
+                                        <li>
+                                            <a href="#">
+                                                <i class="fa fa-navicon"></i>
+                                                <i>pages</i>
+                                            </a>
+                                            <ul>                                                                                            
+                                                <li><a href="/user/dashboard">dashboard</a></li>
+                                                <li><a href="/user/user-update" class="active">update profile</a></li>
+                                                <li><a href="/user/user-schedule">My schedule</a></li>
+                                                <li><a href="dashboard-myaccount.html">dashboard account</a></li>
+                                                <li><a href="/user/logout">Log out</a></li>
+                                            </ul>
                                         </li>                                        
                                     </ul>
                                 </div>
@@ -148,20 +163,25 @@
 				Main Start
 		*************************************-->
 		<main id="main" class="tg-main-section tg-haslayout">
+		<a href="/topview/doctors" style="color:black">Back</a>
 			<div class="container">			
 				<div class="row">
 					<div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">
+					
 						<div class="tg-doctor-detail tg-doctor-detail2 tg-haslayout">
 							<article class="tg-doctor-profile">
 								<div class="tg-box">
 									<span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
-									<figure class="tg-docprofile-img"><img src="<%= userInfo.profile_pic_url %>" alt="image description" style="width: 300px; height: 300px"></figure>
+									<figure class="tg-docprofile-img"><img src="<%= userInfo.profile_pic_url %>" alt="image description" style="width: 300px; height: 300px">
+									</figure>
+									<span class="on">Online</span>
+									<span class="on"></span>
 									<div class="tg-docprofile-content">
 										<div class="tg-heading-border tg-small">
 											<h2>Dr.<%= userInfo.firstname %> <%= userInfo.lastname %></h2>
 										</div>
 										<div class="tg-description">
-											<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliquat enim ad minim veniam. Eascxcepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt.</p>
+											<p><%= userInfo.introductory %> </p>
 										</div>
 										<ul class="tg-doccontactinfo">
 											<li>
@@ -170,23 +190,26 @@
 											</li>
 											<li>
 												<i class="fa fa-phone"></i>
-												<span>+44 235 856843</span>
+												<span><%= userInfo.phone %></span>
 											</li>
 											<li>
 												<i class="fa fa-envelope-o"></i>
 												<a href="jhon@company.com">obinna@fareland.com</a>
-											</li>
-											<li>
-												<i class="fa fa-fax"></i>
-												<span>+44 235 856843</span>
-											</li>
+											</li>											
 											<li>
 												<i class="fa fa-globe"></i>
 												<span><a href="<%= userInfo.profile_url %>">www.fareland.com</a></span>
 											</li>
 											<li>
 												<i class="fa fa-skype"></i>
-												<span>jhon227</span>
+												<span><%= userInfo.skype %></span>
+											</li>
+											<li>
+												<div class="communication-btn">
+												<button class="com-btn">Chat</button>
+												<button class="com-btn">Audio Call</button>
+												<button class="com-btn">Video Call</button>
+												</div>
 											</li>
 										</ul>
 									</div>
@@ -197,29 +220,33 @@
 									<h3>Specialty</h3>
 								</div>
 								<div class="tg-description">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+									<p>Dr <%= userInfo.firstname %> <%= userInfo.lastname %> is a specialist in <%= userInfo.specialty %></p>
 								</div>
 							</div>
+                            <div class="tg-doc-feature">
+								<div class="tg-heading-border tg-small">
+									<h3>Sub Specialty</h3>
+								</div>
+								<div class="tg-description">
+									<ul>
+                                    <% for(var i = 0; i < userInfo.sub_specialty.length; i++) { %>									  
+									  	<li><%= userInfo.sub_specialty[i].sub_specialty || "not supplied" %></li>									  
+                                    <% } %>
+									</ul>
+								</div>
+							</div>												
 							<div class="tg-doc-feature">
 								<div class="tg-heading-border tg-small">
-									<h3>Languages</h3>
+									<h3>About Dr. <%= userInfo.firstname %> <%= userInfo.lastname %>, Md</h3>
 								</div>
+                                <% for(var i = 0; i < userInfo.education.length; i++) { %>
+								<h3><%= userInfo.education[i].school || "not supplied" %> </h3>
 								<div class="tg-description">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+									<p> Dr, <%= userInfo.firstname %> <%= userInfo.lastname %> studied in <%= userInfo.education[i].school %> 
+                                    from <%= userInfo.education[i].start_year %> and graduated in <%= userInfo.education[i].end_year %>. 
+                                    Obtained a <%= userInfo.education[i].certificate %></p>
 								</div>
-							</div>
-							<div class="tg-doc-feature">
-								<div class="tg-heading-border tg-small">
-									<h3>About Dr. Jhon Doe, Md</h3>
-								</div>
-								<h3>University of L.a Medical Branch</h3>
-								<div class="tg-description">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-								</div>
-								<h3>Himalayan University of Texas</h3>
-								<div class="tg-description">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-								</div>
+                                <% } %>								
 							</div>
 							<div class="tg-doc-photos">
 								<div class="tg-heading-border tg-small">
@@ -623,11 +650,80 @@
                                 </div>
                                 <div class="form-group" id="specialization">
                                     <span class="select">
-                                        <label>Select your specialization</label> 
+                                        <label>Select Specialty</label> 
                                         <select  ng-model="user.specializtion">                                            
-                                            <option>Eye specialist</option>
-                                            <option>Specialty two</option>
-                                            <option>Specialty three</option>
+                                            <option>Acupunture</option>
+                                            <option>Addiction Medicine</option>
+                                            <option>Adolescent Medicine</option>
+                                            <option>Aerospace Medicine</option>
+                                            <option>Allergy</option>
+                                            <option>Allergy/Immunology</option>
+                                            <option>Anesthesiology</option>
+                                            <option>Audiologist</option>
+                                            <option>Bariatrician</option>
+                                            <option>Cardiac Electrophysiology</option>
+                                            <option>Cardiology</option>
+                                            <option>Chiropractic</option>
+                                            <option>Clinical Laboratory Immunology</option>
+                                            <option>Clinical Pathology</option>
+                                            <option>Colon/Rectal Surgery</option>
+                                            <option>Critical Care</option>
+                                            <option>Cythopathology</option>
+                                            <option>Dermatology</option>
+                                            <option>Dermatopathology</option>
+                                            <option>Diabetes</option>
+                                            <option>Diagnostic</option>
+                                            <option>Emergency Medical Tech</option>
+                                            <option>Emergency Medicine</option>
+                                            <option>Endocrinology</option>
+                                            <option>Endovascular Surgical Neuroradiology</option>
+                                            <option>Family Practice</option>
+                                            <option>Gastroenterology</option>
+                                            <option>General Practice</option>
+                                            <option>General Surgery</option>
+                                            <option>Genetics</option>
+                                            <option>Geriatrics</option>
+                                            <option>Gynecology</option>
+                                            <option>Gynecology Oncology</option>
+                                            <option>Hand Surgery</option>
+                                            <option>Hand and Neck Surgery</option>
+                                            <option>Hematology</option>
+                                            <option>Hematology/Oncology</option>
+                                            <option>Hepatology</option>
+                                            <option>Holistic Medicine</option>
+                                            <option>Hospitalist</option>
+                                            <option>Immunology</option>
+                                            <option>Infectious Disease</option>
+                                            <option>Internal Medicine</option>
+                                            <option>Interventional Cardiology</option>
+                                            <option>Legal Medicine</option>
+                                            <option>Medical Oncology</option>
+                                            <option>Medical Toxicology</option>
+                                            <option>Neonatology</option>
+                                            <option>Nephrology</option>
+                                            <option>Neurology</option>
+                                            <option>Neuroradiology</option>
+                                            <option>Nuclear Cardiology</option>
+                                            <option>Nuclear Medicine</option>
+                                            <option>Nutrition</option>
+                                            <option>Obstetrics/Gynecology</option>
+                                            <option>Occupational Medicine</option>
+                                            <option>Oncology</option>
+                                            <option>Opthalmology</option>
+                                            <option>Optometry</option>
+                                            <option>Orthopedic Foot & Ankle</option>
+                                            <option>Orthopedic Reconstructive Surgery</option>
+                                            <option>Orthopedic Spine Surgery</option>
+                                            <option>Orthopedic Surgery</option>
+                                            <option>Osteopathy</option>
+                                            <option>Otorhinolaryngology</option>
+                                            <option>Pain Management</option>
+                                            <option>Pathology</option>
+                                            <option>PPediatric Allergy</option>
+                                            <option>Pediatric Cardiology</option>
+                                            <option>Pediatric Critical Care</option>
+                                            <option>Padiatric Emergency Medicine</option>
+                                            <option>Other</option>
                                         </select>
                                     </span>
                                 </div>
@@ -650,6 +746,9 @@
                                 </div>
                                 <div class="form-group">
                                     <input type="text" class="form-control placeholder-color" placeholder="Name*" id="name" ng-model="user.name">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Place of work*" id="work" ng-model="user.work_place">
                                 </div>
                                 <div class="form-group">
                                     <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">
@@ -694,13 +793,15 @@
                 var lastname = document.getElementById("lastname");
                 var phone = document.getElementById("phone");
                 var category_of_type = document.getElementById("category-of-type");               
-                var website = document.getElementById("website");                
+                var website = document.getElementById("website");
+                var workPlace = document.getElementById("work");                
                 initForm(); 
                 function setType() {                    
                     switch(type.value) {
                         case "Doctor":
                             specialization.style.display = "block";
                             firstname.style.display = "block";
+                            workPlace.style.display = "block";
                             lastname.style.display = "block";
                             phone.style.display = "block";
                             name.style.display = "none";
@@ -774,6 +875,7 @@
                     phone.style.display = "none";
                     website.style.display = "none";
                     specialization.style.display = "none";
+                    workPlace.style.display = "none";
                 }
                 type.addEventListener('change',setType,false)
             }, false)

@@ -112,7 +112,7 @@
 				Home Slider Start
 		*************************************-->
         
-		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="searchController">
+		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="resultController">
         {{user}}
 			<div class="tg-searcharea tg-haslayout">
 				<div class="container">
@@ -236,75 +236,8 @@
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">
-						<div class="tg-doctors-list tg-haslayout">							
-                            <% for(var i = 0; i < userInfo.length; i++) { %>
-							<div class="tg-view tg-list-view">
-								<div class="row">
-									<article class="tg-doctor-profile">
-										<div class="tg-box">
-											<a href="<%= userInfo[i].profile_url %>"><span class="tg-show"><a href="<%= userInfo[i].profile_url %>"><em class="icon-add"></em></span></a>
-											<figure class="tg-docprofile-img">
-												<span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
-												<a href="<%= userInfo[i].profile_url %>"><img src="<%= userInfo[i].profile_pic_url %>" class="pp" alt="image description"></a>
-												<img src="/assets/images/icons/online-icon.png" class="presence"><span class="on">Online</span>
-												<!--<img src="/assets/images/icons/offline-red-icon.png" class="presence"><span class="on"></span>-->
-											</figure>												
-											<div class="tg-docprofile-content">
-												<div class="tg-heading-border tg-small">
-													<h3><a href="<%= userInfo[i].profile_url %>">Dr. <%= userInfo[i].firstname %> <%= userInfo[i].lastname %></a></h3>
-													<h4><%= userInfo[i].specialty %> Specialist</h4>
-												</div>
-												<div class="tg-description">													
-													<p>Dr. <%= userInfo[i].firstname %> <%= userInfo[i].lastname %>  is a specialist in <%= userInfo[i].specialty %> 
-													with clinical experience in diagnosing and treating the patients with various diseases.&nbsp; 
-													<a href="<%= userInfo[i].profile_url %>" style="color: green">Learn more..</a>
-													</p>
-												</div>
-												<ul class="tg-doccontactinfo">
-													<li>
-														<i class="fa fa-map-marker"></i>
-														<span style="font-weight: bold"><%= userInfo[i].work_place %>:</span>
-														<address><%= userInfo[i].address %></address>
-													</li>
-													<li>
-														<i class="fa fa-phone"></i>
-														<span>+234 <%= userInfo[i].phone %></span>
-													</li>
-													<li>
-														<i class="fa fa-envelope-o"></i>
-														<a href="obinna@fareland.com">jhon@company.com</a>
-													</li>
-													<li>														
-														<span style="font-weight: bold">Residence: </span>
-														<span><%= userInfo[i].city %>, <%= userInfo[i].country || "N/A" %></span>
-													</li>
-													<li>
-														<span style="font-weight: bold">Experience: </span>
-														<span><%= userInfo[i].experience || "N/A" %> years</span>
-													</li>
-													<li>
-														<span style="font-weight: bold">Degree(s): </span>
-														<% for(var j = 0; j < userInfo[i].education.length; j++) { %>
-															<span><%= userInfo[i].education[j].certificate %>,</span>
-														<% } %>														
-													</li>
-                                                    <li>
-                                                        <div class="communication-btn">                                                
-														<button class="ng-show" ng-show="valid">BOOK NOW</button>
-                                                        <button class="ng-show" ng-show="valid">ASK QUESTION</button>														                                                        
-                                                        </div>
-                                                    </li>
-												</ul>                                               
-											</div>
-										</div>
-									</article>							
-								</div>
-							</div>
-                            <% } %>
-							<div class="tg-btnarea">
-								<a class="tg-btn" href="#">load more</a>
-							</div>
-						</div>
+						<div ng-view>
+                        </div>
 					</div>
 					<div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
 						<aside id="tg-sidebar">
@@ -318,70 +251,7 @@
 									<button style="background-color: rgba(20,255,0,0.7); color: #fff; padding: 10px 15px; border-radius:5px">Filter Search</button>
 								</fieldset>
 							</form>
-							<div class="tg-widget tg-tab-widget">
-								<h3>similar doctors</h3>
-								<div class="tg-tabwidet-content">
-									<ul class="tg-nav-tabs nav-tabs" role="tablist">
-										<li role="presentation" class="active">
-											<a href="#recent" aria-controls="recent" role="tab" userInfo-toggle="tab">Recent</a>
-										</li>
-										<li role="presentation"><a href="#popular" aria-controls="popular" role="tab" userInfo-toggle="tab">Popular</a>
-										</li>
-									</ul>
-									<% if(userInfo.length > 10) { %> 									
-									<div class="tab-content">
-										<div role="tg-tabpanel tabpanel" class="tg-tab-pane tab-pane active" id="recent">
-											<ul>
-											<% for(var k = 10; k <userInfo.length; k++) { %>
-												<li>
-													<figure>
-														<a href="<% userInfo[k].profile_url %>">
-															<img src="<% userInfo[k].profile_pic_url %>" alt="image description">
-														</a>
-													</figure>
-													<div class="tg-description">
-														<h3>Dr. <% userInfo[k].firstname %> <% userInfo[k].lastname %> </h3>
-														<em><% userInfo[k].specialty %></em>
-														<span class="tg-stars">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star-half-empty"></i>
-														</span>
-													</div>
-												</li>												
-											</ul>
-											<% } %>
-										</div>
-										<div role="tg-tabpanel tabpanel" class="tg-tab-pane tab-pane" id="popular">
-											<ul>
-											<% for(var k = 10; k <userInfo.length; k++) { %>
-												<li>
-													<figure>
-														<a href="#">
-															<img src="/assets/images/blog/img-12.jpg" alt="image description">
-														</a>
-													</figure>
-													<div class="tg-description">
-														<h3>Dr. Alen Doe</h3>
-														<em>Senior Therapist</em>
-														<span class="tg-stars">
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star"></i>
-															<i class="fa fa-star-half-empty"></i>
-														</span>
-													</div>
-												</li>
-												<% } %>										
-											</ul>
-										</div>
-									</div>									
-									<% } %>
-								</div>
-							</div>
+							
 						</aside>
 					</div>
 				</div>

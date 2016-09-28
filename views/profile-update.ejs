@@ -61,6 +61,7 @@
                                             <ul> 
                                                 <li><a href="/topview/doctors">Doctors</a></li>                                                     
                                                 <li><a href="/topview/hospitals">Hospitals</a></li>
+                                                <li><a href="/topview/clinics">Clinics</a></li>
                                                 <li><a href="/topview/pharmacy">Pharmacy</a></li>
                                                 <li><a href="/topview/laboratories">Laboratory Centers</a></li>
                                                 <li><a href="/topview/radiology">Radiology Centers</a></li>
@@ -155,28 +156,26 @@
 		<!--************************************
 				Main Start
 		*************************************-->
-		<main id="main" class="tg-main-section tg-haslayout" ng-controller="updateController" style="overflow-x:hidden">
+		<main id="main" class="tg-main-section tg-haslayout" style="overflow-x:hidden">
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-9 col-md-9 col-sm-8 col-xs-12 pull-right">
 						<form class="tg-formeditprofile tg-haslayout">
 							<fieldset>
-								<div class="tg-editprofile tg-haslayout">
+								<div class="tg-editprofile tg-haslayout" ng-controller="pictureController">
 									<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 tg-findheatlhwidth">
 										<div class="row">
 											<div class="tg-editimg tg-haslayout">
 												<div class="tg-heading-border tg-small">
 													<h3>tips for uploading</h3>													
-												</div>
-												<input type="file" name="file" id="file" class="inputfile" file-model = "user.profilepic"/>
-												<label for="file">Choose a photo</label>												
-												<div class="tg-uploadtips">													
-													<ul class="tg-instructions">
-														<li>Max Upload Size: 1MB</li>
-														<li>Dimensions: 370x377</li>
-														<li>Extensions: Jpeg, Png</li>
-													</ul>
-												</div>
+												</div>																														
+												<ul class="tg-instructions">
+													<li>Max Upload Size: 1MB</li>
+													<li>Dimensions: 370x377</li>
+													<li>Extensions: Jpeg, Png</li>
+												</ul>												
+												<input type="file" name="file" id="file" file-model = "user.profilepic"/>
+												<button ng-click="update()" class="btn btn-primary">Upload</button>	
 											</div>
 										</div>
 									</div>
@@ -224,17 +223,13 @@
 										</div>
 									</div>
 								</div>
+								<div ng-controller="formController">
 								<div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
 										<div class="tg-heading-border tg-small">
 											<h3>Basic Information</h3>
 										</div>
-										<div class="row">
-											<div class="col-md-4 col-sm-6 col-xs-12">
-												<div class="form-group">
-													<input class="form-control" type="text" placeholder="<%= person.name %>" ng-model="user.name">
-												</div>
-											</div>
+										<div class="row">											
 											<div class="col-md-4 col-sm-6 col-xs-12">
 												<div class="form-group">
 													<input class="form-control" type="text" placeholder="<%= person.firstname %>" ng-model="user.firstname">
@@ -252,12 +247,12 @@
 											</div>
 											<div class="col-md-4 col-sm-6 col-xs-12">
 												<div class="form-group">
-													<input class="form-control" type="text" placeholder="<%= person.phone %>" ng-model="user.phone">
+													<input class="form-control" type="text" placeholder=" +234 <%= person.phone %>" ng-model="user.phone">
 												</div>
 											</div>
 											<div class="col-md-4 col-sm-6 col-xs-12">
 												<div class="form-group">
-													<input class="form-control" type="text" placeholder="<%= person.zip_code %>" ng-model="user.zip_code">
+													<input class="form-control" type="text" placeholder="<%= person.work_place%>" ng-model="user.work_place">
 												</div>
 											</div>
 											<div class="col-md-4 col-sm-6 col-xs-12">
@@ -285,41 +280,70 @@
 											</div>
 										</div>
 									</div>
+									{{user}}
 								</div>
 								<div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
 										<div class="tg-heading-border tg-small">
-											<h3>Speciality*</h3>
+											<h3>Introductory Note*</h3>
 										</div>
-										<div class="row">
-											<div class="col-md-4 col-sm-6 col-xs-12">
-												<div class="form-group">
-													<span class="select">
-														<select class="group" id="group1" ng-model="user.category">
-															<option>All</option>
-															<option>Doctor one</option>
-															<option>Doctor two</option>
-															<option>Doctor three</option>
-														</select>
-													</span>
-												</div>
-											</div>
+										<div class="row">											
 											<div class="col-md-8 col-sm-6 col-xs-12">
 												<div class="form-group">
-													<input class="form-control" type="text" placeholder="Speciality" ng-model="user.specialty">
+													<textArea style="width: 600px; height:300px" ng-model="user.introductory" placeholder="write..."></textArea>
+												</div>												
+											</div>											
+										</div>
+									</div>
+								</div>
+								<div class="tg-bordertop tg-haslayout">
+									<div class="tg-formsection">
+										<div class="tg-heading-border tg-small">
+											<h3>Years of experience</h3>
+										</div>
+										<div class="row">											
+											<div class="col-md-8 col-sm-6 col-xs-12">
+												<div class="form-group">
+													<input class="form-control" type="number" placeholder="Procedure" ng-model="user.experience">
 												</div>
+											</div>											
+										</div>
+									</div>
+								</div>								
+								<div class="tg-bordertop tg-haslayout">
+									<div class="tg-formsection">
+										<div class="tg-heading-border tg-small">
+											<h3>Education</h3>
+										</div>
+										<div class="row">											
+											<div class="col-md-8 col-sm-6 col-xs-12" ng-repeat="item in user.education">
+												<div class="form-group">
+													<input class="form-control" type="text" placeholder="Medical School Attended" ng-model="item.school">
+												</div>
+												<div class="form-group">
+													<label>From</label>
+													<input class="form-control" type="date" ng-model="item.start_year" style="width:200px">
+													<label>to</label>
+													<input class="form-control" type="date" ng-model="item.end_year" style="width:200px">
+												</div>
+												<div class="form-group" style="border-bottom: 2px dotted rgba(0,0,0,0.2)">
+													<input class="form-control" type="text" placeholder="Certificate obtained" ng-model="item.certificate">
+												</div>														
 											</div>
-											<div class="col-sm-12">
+											<div class="col-sm-12">												
 												<div class="tg-addfield">
-													<button type="submit">
+													<button type="submit" ng-click="removeNewField(user.education)" ng-if="edu" ng-cloak>														
+														<span>remove last field</span>
+													</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;							
+													<button type="submit" ng-click="addNewField(user.education)">
 														<i class="fa fa-plus"></i>
 														<span>add field</span>
-													</button>
+													</button>													
 												</div>
 											</div>
 										</div>
 									</div>
-								</div>
+								</div>								
                                 <div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
 										<div class="tg-heading-border tg-small">
@@ -328,8 +352,8 @@
 										<div class="row">
 											<div class="col-md-4 col-sm-6 col-xs-12">
 												<div class="form-group">
-													<span class="select">
-														<select class="group" id="group1">
+													<span class="select" ng-repeat="item in user.subSpecialty">
+														<select class="group" id="group1" ng-model="item.sub_specialty">
 															<option>All</option>
 															<option>Doctor one</option>
 															<option>Doctor two</option>
@@ -337,18 +361,16 @@
 														</select>
 													</span>
 												</div>
-											</div>
-											<div class="col-md-8 col-sm-6 col-xs-12">
-												<div class="form-group">
-													<input class="form-control" type="text" placeholder="Sub Speciality">
-												</div>
-											</div>
+											</div>											
 											<div class="col-sm-12">
 												<div class="tg-addfield">
-													<button type="submit">
+													<button type="submit" ng-click="removeNewField(user.subSpecialty)" ng-if="sp" ng-cloak>														
+														<span>remove last field</span>
+													</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;							
+													<button type="submit" ng-click="addNewField(user.subSpecialty)">
 														<i class="fa fa-plus"></i>
 														<span>add field</span>
-													</button>
+													</button>													
 												</div>
 											</div>
 										</div>
@@ -359,30 +381,21 @@
 										<div class="tg-heading-border tg-small">
 											<h3>Procedure</h3>
 										</div>
-										<div class="row">
-											<div class="col-md-4 col-sm-6 col-xs-12">
+										<div class="row">											
+											<div class="col-md-8 col-sm-6 col-xs-12" ng-repeat = "item in user.procedure">
 												<div class="form-group">
-													<span class="select">
-														<select class="group" id="group1">
-															<option>All</option>
-															<option>Doctor one</option>
-															<option>Doctor two</option>
-															<option>Doctor three</option>
-														</select>
-													</span>
-												</div>
-											</div>
-											<div class="col-md-8 col-sm-6 col-xs-12">
-												<div class="form-group">
-													<input class="form-control" type="text" placeholder="Procedure">
+													<input class="form-control" type="text" placeholder="Procedure" ng-model="item.procedure_description">
 												</div>
 											</div>
 											<div class="col-sm-12">
 												<div class="tg-addfield">
-													<button type="submit">
+													<button type="submit" ng-click="removeNewField(user.procedure)" ng-if="pro" ng-cloak>														
+														<span>remove last field</span>
+													</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;							
+													<button type="submit" ng-click="addNewField(user.procedure)">
 														<i class="fa fa-plus"></i>
 														<span>add field</span>
-													</button>
+													</button>						
 												</div>
 											</div>
 										</div>
@@ -391,15 +404,16 @@
 								<div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
 										<div class="tg-heading-border tg-small">
-											<h3>Honors & Awards*</h3>
+											<h3>Honors & Awards</h3>
 										</div>
 										<div class="row">
+										<div ng-repeat="item in user.award">
 											<div class="col-md-4 col-sm-6 col-xs-12">
 												<div class="form-group">
 													<span class="select">
-														<select class="group" id="group1">
+														<select class="group" id="group1" ng-model="item.type_of_award">
 															<option>All</option>
-															<option>Doctor one</option>
+															<option>good one</option>
 															<option>Doctor two</option>
 															<option>Doctor three</option>
 														</select>
@@ -408,101 +422,26 @@
 											</div>
 											<div class="col-md-8 col-sm-6 col-xs-12">
 												<div class="form-group">
-													<input class="form-control" type="text" placeholder="Description">
+													<input class="form-control" type="text" placeholder="Description" ng-model="item.description">
 												</div>
+											</div>
 											</div>
 											<div class="col-sm-12">
 												<div class="tg-addfield">
-													<button type="submit">
+													<button type="submit" ng-click="removeNewField(user.award)" ng-if="ha" ng-cloak>														
+														<span>remove last field</span>
+													</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;							
+													<button type="submit" ng-click="addNewField(user.award)">
 														<i class="fa fa-plus"></i>
 														<span>add field</span>
-													</button>
+													</button>						
 												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-								<div class="tg-bordertop tg-haslayout">
-									<div class="tg-formsection">
-										<div class="tg-heading-border tg-small">
-											<h3>description</h3>
-										</div>
-										<div class="row">
-											<div class="col-md-4 col-sm-6 col-xs-12">
-												<div class="form-group">
-													<input class="form-control" type="text" placeholder="Title">
-												</div>
-											</div>
-											<div class="col-md-8 col-sm-6 col-xs-12">
-												<div class="form-group">
-													<input class="form-control" type="text" placeholder="Description">
-												</div>
-											</div>
-											<div class="col-sm-12">
-												<div class="tg-addfield">
-													<button type="submit">
-														<i class="fa fa-plus"></i>
-														<span>add field</span>
-													</button>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-								<div class="tg-bordertop tg-haslayout">
-									<div class="tg-formsection">
-										<div class="tg-heading-border tg-small">
-											<h3>Honors & Awards*</h3>
-										</div>
-										<div class="row">
-											<div class="col-md-4 col-sm-6 col-xs-12">
-												<div class="form-group">
-													<span class="select">
-														<select class="group" id="group1">
-															<option>All</option>
-															<option>Doctor one</option>
-															<option>Doctor two</option>
-															<option>Doctor three</option>
-														</select>
-													</span>
-												</div>
-											</div>
-											<div class="col-md-4 col-sm-6 col-xs-12">
-												<div class="form-group">
-													<span class="select">
-														<select class="group" id="group1">
-															<option>All</option>
-															<option>Doctor one</option>
-															<option>Doctor two</option>
-															<option>Doctor three</option>
-														</select>
-													</span>
-												</div>
-											</div>
-											<div class="col-md-4 col-sm-6 col-xs-12">
-												<div class="form-group">
-													<span class="select">
-														<select class="group" id="group1">
-															<option>All</option>
-															<option>Doctor one</option>
-															<option>Doctor two</option>
-															<option>Doctor three</option>
-														</select>
-													</span>
-												</div>
-											</div>
-											<div class="col-sm-12">
-												<div class="tg-addfield">
-													<button type="submit">
-														<i class="fa fa-plus"></i>
-														<span>add field</span>
-													</button>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
+								</div>						
 								<button type="submit" class="tg-btn" ng-click="update()">update</button>
+								</div>
 							</fieldset>
 						</form>
 					</div>
@@ -512,7 +451,7 @@
 								<figure class="tg-docprofile-img">
 									<figcaption>
 										<h4>Dr. <%= person.firstname %> <%= person.lastname %> </h4>
-										<span>Senior Eye Doctor</span>
+										<span><%= person.specialty %> Specialist</span>
 									</figcaption>
 									<span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
 									<a href="#"><img alt="image description" src="<%= person.profile_pic_url %>"></a>
@@ -578,8 +517,9 @@
 						</aside>
 					</div>
 				</div>
-			</div>
+			</div>			
 		</main>
+		
 		<!--************************************
 				Main End
 		*************************************-->
@@ -625,7 +565,7 @@
 									<ul>
 										<li>
 											<figure class="tg-imgdoc">
-												<img src="images/img-02.jpg" alt="image description">
+												<img src="<%= person.profile_pic_url %>" alt="image description" style="width:80px; height:80px">
 												<div class="tg-img-hover">
 													<a href="#"><i class="icon-zoom"></i></a>
 												</div>
@@ -647,7 +587,7 @@
 										</li>
 										<li>
 											<figure class="tg-imgdoc">
-												<img src="images/img-03.jpg" alt="image description">
+												<img src="<%= person.profile_pic_url %>" alt="image description" style="width:80px; height:80px">
 												<div class="tg-img-hover">
 													<a href="#"><i class="icon-zoom"></i></a>
 												</div>

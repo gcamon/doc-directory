@@ -119,31 +119,29 @@ $(document).ready(function (e) {
 	-----------------------------------------*/
 
 	 $(function() {
-            var availableTutorials = [
-               "Enugu",
-               "Awka",
-               "Uyo",
-               "Lagos",
-			   "Aba",
-			   "onitsha",
-			   "Abuja",
-			   "Zaria",
-			   "Oshogbo",
-			   "Benin",
-			   "Calabar",
-			   "Ibadan",
-			   "Abakaliki",
-			   "Afikpo",
-			   "Ikeja",
-			   "Akure",
-			   "Port-Harcourt",
-			   "Owerri",
-			   "yenuguo"
-            ];
-            $( "#autocom" ).autocomplete({
-               source: availableTutorials,
-               autoFocus:true
-            });
+		 var location = {}
+		 $.get("/users/cities", function(data, status){
+			 if(data)
+			 console.log(data)
+			 	getData(data);
+				$("#no-of-specialists").html(data.total_doctors + " Specialists");
+				$("#no-of-hospitals").html(data.total_hospitals);
+				$("#no-of-clinics").html(data.total_clinics);
+				$("#no-of-laboratories").html(data.total_laboratory);
+				$("#no-of-radiology").html(data.total_radiology);
+				$("#no-of-phamarcies").html(data.total_pharmarcy);
+				$("#no-of-fitness").html(data.total_fitness);
+    	});
+
+		function getData(data){
+			location.cities = data.cities;
+			$( "#autocom" ).autocomplete({
+			source: location.cities,
+			autoFocus:true
+		});
+		}
+            
+		
     });
 
 		/*---------------------------------------

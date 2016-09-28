@@ -31,7 +31,7 @@ function(req,email,password,done){
                     phone: req.body.phone,
                     admin: false,
                     type: req.body.typeOfUser,
-                    location: req.body.city,
+                    city: req.body.city,
                     firstname: req.body.firstname,
                     lastname: req.body.lastname,
                     username: req.body.username,
@@ -39,10 +39,18 @@ function(req,email,password,done){
 					profile_pic: {
 						filename:""
 					},
+					specialty: req.body.specialty,
 					profile_url: "/ranking/views/" + uid,
-					profile_pic_url: "/download/profile_pic/nopic"					
-				});			
+					profile_pic_url: "/download/profile_pic/nopic",
+					work_place: req.body.work_place,
+					country: req.body.country					
+					});
+
+					User.ewallet.push({available_amount:0});
+
+				
 				User.save(function(err){
+					console.log("user saved");
 					if(err) throw err;					
 					return done(null,User);
 				})

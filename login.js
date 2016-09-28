@@ -48,8 +48,7 @@ router.post('/user/login', passport.authenticate('login', {
 }));
 
 router.get('/login',function(req,res){
-        if(req.user){
-        console.log(req.user.email + "i am general request");        
+        if(req.user){      
         res.send(true);
         } else {
         res.sendFile(path.join(__dirname + "/404.html"));

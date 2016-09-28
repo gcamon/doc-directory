@@ -222,6 +222,51 @@ form fieldset{
   color: #7dbb00;
 }
 
+/*my communication button */
+.communication-btn {
+	margin-top: 20px;
+}
+
+.communication-btn button {
+	padding: 5px 20px;	
+	min-width: 100px;
+	border-radius: 2px;
+	margin: 10px 2px;		
+}
+
+.presence {
+	margin-top: -5px;
+	color: green;
+	width: 20px;
+	height: 20px;
+}
+
+.pp {
+	border-radius: 130px!important;
+	width: 250px;
+	height: 250px;
+}
+
+.on {
+	display: inline-block;
+	padding: 10px 5px;
+	font-size: 12px;
+	margin-top: 20px;
+}
+
+.ng-hide {
+	background-color: rgba(0,205,0,0.8);
+	color: #000;
+	border: 1px solid rgba(0,0,0,0.6);
+	opacity: 0.5;
+	border: 1px solid rgba(0,0,0,0.5);
+}
+
+.ng-show {
+	background-color: rgba(0,205,0,0.8);
+	color: #fff;
+}
+
 .tj {
 	font-size: 18px!important;
 }
@@ -315,7 +360,7 @@ address { font-style: italic; }
 }
 .tg-main-section{
 	z-index: 2;
-	padding: 100px 0;
+	padding: 30px 0;
 	position: relative;
 }
 .tg-btn-sm{
