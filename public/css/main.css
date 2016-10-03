@@ -222,6 +222,18 @@ form fieldset{
   color: #7dbb00;
 }
 
+/*my input style */
+.btn-login {
+	background-color: rgba(0,255,0,0.8);
+	padding: 10px 10px;
+	min-width: 100px;
+	color: #fff;
+}
+
+.ng-cloak {
+  display: none !important;
+}
+
 /*my communication button */
 .communication-btn {
 	margin-top: 20px;
@@ -243,8 +255,16 @@ form fieldset{
 
 .pp {
 	border-radius: 130px!important;
-	width: 250px;
-	height: 250px;
+	width: 250px!important;
+	min-height: 250px;
+}
+
+.t-align {
+	text-align: center;
+}
+
+.ico-com {
+	margin: 40px 0px;
 }
 
 .on {
@@ -265,7 +285,45 @@ form fieldset{
 .ng-show {
 	background-color: rgba(0,205,0,0.8);
 	color: #fff;
+	padding: 8px 20px;
+	margin-right: 5px!important; 
+
 }
+
+/* my ng animate style */
+.view-animate-container {
+  position:relative;  
+  background:white;
+  height:800px;
+  overflow-x:hidden;
+}
+
+.view-animate {
+  padding:10px;
+}
+
+.view-animate.ng-enter, .view-animate.ng-leave {
+  transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.8s;
+  display:block;
+  width:100%;
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  padding:10px;
+}
+
+.view-animate.ng-enter {
+  left:100%;
+}
+.view-animate.ng-enter.ng-enter-active {
+  left:0;
+}
+.view-animate.ng-leave.ng-leave-active {
+  left:-100%;
+}
+
 
 .tj {
 	font-size: 18px!important;
@@ -1107,7 +1165,7 @@ form fieldset .form-group.tg-checkbox input.form-control[type='checkbox'] {
 	width: 100%;
 	height: 100%;
 	z-index: 2;
-	background: rgba(0, 0, 0, 0.9);
+	background: rgba(0, 0, 0, 0.6);
 }
 .tg-banner-content .form-searchdoctors .tg-btn{color: #fff;}
 .tg-homebanner .tg-searchform .tg-btn{color: #fff;}
@@ -1998,7 +2056,7 @@ body.tg-comming-soon #main{
 /* =============================================
 		Doc Profile List View & Map
 ============================================= */
-.tg-list-view .tg-doctor-profile {padding: 15px;}
+.tg-list-view .tg-doctor-profile {padding: 0px;}
 .tg-list-view .tg-box {padding: 30px;}
 .tg-list-view .tg-box figure{
 	float: left;
@@ -2006,12 +2064,14 @@ body.tg-comming-soon #main{
 	margin: 0 30px 0 0;
 	border: 1px solid #ddd;
 }
-.tg-list-view .tg-docprofile-content{
+.tg-list-view .tg-docprofile-content {
 	padding: 0;
 	width: auto;
 	float: none;
 	overflow: hidden;
 }
+
+
 /* =============================================
 		Doc Detail & Map
 ============================================= */
@@ -2228,6 +2288,7 @@ body.tg-comming-soon #main{
 	line-height: 16px;
 	background: #505050;
 	text-transform: uppercase;
+	margin-top: 35px;
 }
 .tg-widget > ul{
 	margin: 0;

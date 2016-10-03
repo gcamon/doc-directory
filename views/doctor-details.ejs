@@ -71,14 +71,7 @@
                                                 <!--<li><a href="doctor-detail2.html">Doctor Detail 2</a></li>-->
                                             </ul>
                                         </li>
-                                        <li>
-                                            <a href="#">Blog</a>
-                                            <ul>
-                                                <li><a href="blog-list.html">Blog List</a></li>
-                                                <li><a href="blog-grid.html">Blog Grid</a></li>
-                                                <li><a href="blog-detail.html">Blog Detail</a></li>
-                                            </ul>
-                                        </li>
+                                       <!-- blog here -->
                                         <li><a href="packages.html">packages</a></li>
                                         <li><a href="contactus.html">Contact</a></li>
                                         <li>
@@ -111,31 +104,99 @@
 		<!--************************************
 				Home Slider Start
 		*************************************-->
-		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout">
+		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="searchController">
 			<div class="tg-searcharea tg-haslayout">
 				<div class="container">
 					<div class="row">
 						<form class="tg-searchform">
 							<div class="col-md-5 col-sm-5 col-xs-12">
 								<div class="form-group">
-									<input type="text" placeholder="Address" class="form-control">
+									<input type="text" placeholder="Enter city name" class="form-control" ng-model="user.city">
 								</div>
 							</div>
 							<div class="col-md-5 col-sm-5 col-xs-8">
-								<div class="form-group">
+								<div class="form-group">								
 									<span class="select">
-										<select id="group1" class="group">
-											<option>Catagory</option>
-											<option>Doctor one</option>
-											<option>Doctor two</option>
-											<option>Doctor three</option>
+										<select id="group1" class="group" placeholder="Specialty" ng-model="user.specialty">
+											<option>Acupunture</option>
+                                            <option>Addiction Medicine</option>
+                                            <option>Adolescent Medicine</option>
+                                            <option>Aerospace Medicine</option>
+                                            <option>Allergy</option>
+                                            <option>Allergy/Immunology</option>
+                                            <option>Anesthesiology</option>
+                                            <option>Audiologist</option>
+                                            <option>Bariatrician</option>
+                                            <option>Cardiac Electrophysiology</option>
+                                            <option>Cardiology</option>
+                                            <option>Chiropractic</option>
+                                            <option>Clinical Laboratory Immunology</option>
+                                            <option>Clinical Pathology</option>
+                                            <option>Colon/Rectal Surgery</option>
+                                            <option>Critical Care</option>
+                                            <option>Cythopathology</option>
+                                            <option>Dermatology</option>
+                                            <option>Dermatopathology</option>
+                                            <option>Diabetes</option>
+                                            <option>Diagnostic</option>
+                                            <option>Emergency Medical Tech</option>
+                                            <option>Emergency Medicine</option>
+                                            <option>Endocrinology</option>
+                                            <option>Endovascular Surgical Neuroradiology</option>
+                                            <option>Family Practice</option>
+                                            <option>Gastroenterology</option>
+                                            <option>General Practice</option>
+                                            <option>General Surgery</option>
+                                            <option>Genetics</option>
+                                            <option>Geriatrics</option>
+                                            <option>Gynecology</option>
+                                            <option>Gynecology Oncology</option>
+                                            <option>Hand Surgery</option>
+                                            <option>Hand and Neck Surgery</option>
+                                            <option>Hematology</option>
+                                            <option>Hematology/Oncology</option>
+                                            <option>Hepatology</option>
+                                            <option>Holistic Medicine</option>
+                                            <option>Hospitalist</option>
+                                            <option>Immunology</option>
+                                            <option>Infectious Disease</option>
+                                            <option>Internal Medicine</option>
+                                            <option>Interventional Cardiology</option>
+                                            <option>Legal Medicine</option>
+                                            <option>Medical Oncology</option>
+                                            <option>Medical Toxicology</option>
+                                            <option>Neonatology</option>
+                                            <option>Nephrology</option>
+                                            <option>Neurology</option>
+                                            <option>Neuroradiology</option>
+                                            <option>Nuclear Cardiology</option>
+                                            <option>Nuclear Medicine</option>
+                                            <option>Nutrition</option>
+                                            <option>Obstetrics/Gynecology</option>
+                                            <option>Occupational Medicine</option>
+                                            <option>Oncology</option>
+                                            <option>Opthalmology</option>
+                                            <option>Optometry</option>
+                                            <option>Orthopedic Foot & Ankle</option>
+                                            <option>Orthopedic Reconstructive Surgery</option>
+                                            <option>Orthopedic Spine Surgery</option>
+                                            <option>Orthopedic Surgery</option>
+                                            <option>Osteopathy</option>
+                                            <option>Otorhinolaryngology</option>
+                                            <option>Pain Management</option>
+                                            <option>Pathology</option>
+                                            <option>PPediatric Allergy</option>
+                                            <option>Pediatric Cardiology</option>
+                                            <option>Pediatric Critical Care</option>
+                                            <option>Padiatric Emergency Medicine</option>
+                                            <option>Other</option>	
 										</select>
 									</span>
 								</div>
 							</div>
 							<div class="col-md-2 col-sm-2 col-xs-4">
 								<div class="form-group">
-									<a id="search_banner" class="tg-btn tg-btn-lg" href="#">Search</a>
+									<button id="search_banner" class="tg-btn tg-btn-lg" ng-click = "search()">Search</button>
 								</div>
 							</div>
 						</form>
@@ -162,93 +223,134 @@
 		<!--************************************
 				Main Start
 		*************************************-->
+
 		<main id="main" class="tg-main-section tg-haslayout">
-		<a href="/topview/doctors" style="color:black">Back</a>
+		<!--<a href="/topview/doctors" style="color:black">Back</a>-->
+
+
 			<div class="container">			
 				<div class="row">
-					<div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">
-					
+					<div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">					
 						<div class="tg-doctor-detail tg-doctor-detail2 tg-haslayout">
 							<article class="tg-doctor-profile">
-								<div class="tg-box">
-									<span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
-									<figure class="tg-docprofile-img"><img src="<%= userInfo.profile_pic_url %>" alt="image description" style="width: 300px; height: 300px">
-									</figure>
-									<span class="on">Online</span>
-									<span class="on"></span>
-									<div class="tg-docprofile-content">
-										<div class="tg-heading-border tg-small">
-											<h2>Dr.<%= userInfo.firstname %> <%= userInfo.lastname %></h2>
-										</div>
-										<div class="tg-description">
-											<p><%= userInfo.introductory %> </p>
-										</div>
-										<ul class="tg-doccontactinfo">
-											<li>
-												<i class="fa fa-map-marker"></i>
-												<address><%= userInfo.address %></address>
-											</li>
-											<li>
-												<i class="fa fa-phone"></i>
-												<span><%= userInfo.phone %></span>
-											</li>
-											<li>
-												<i class="fa fa-envelope-o"></i>
-												<a href="jhon@company.com">obinna@fareland.com</a>
-											</li>											
-											<li>
-												<i class="fa fa-globe"></i>
-												<span><a href="<%= userInfo.profile_url %>">www.fareland.com</a></span>
-											</li>
-											<li>
-												<i class="fa fa-skype"></i>
-												<span><%= userInfo.skype %></span>
-											</li>
-											<li>
-												<div class="communication-btn">
-												<button class="com-btn">Chat</button>
-												<button class="com-btn">Audio Call</button>
-												<button class="com-btn">Video Call</button>
+									<div class="tg-box">										
+											<figure class="tg-docprofile-img">
+												<span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
+												<img src="<%= userInfo.profile_pic_url %>" class="pp" alt="image description">						
+												<!--<img src="/assets/images/icons/offline-red-icon.png" class="presence"><span class="on"></span>-->
+											</figure>																						
+											<div class="tg-docprofile-content">
+												<div class="tg-heading-border tg-small">
+													<h3>Dr. <%= userInfo.firstname %> <%= userInfo.lastname %> <%= userInfo.title %></h3>
+													<h4><%= userInfo.specialty %> Specialist</h4>
+												</div>												
+												<ul class="tg-doccontactinfo">
+													<li>
+														<i class="fa fa-map-marker"></i>
+														<span style="font-weight: bold"><%= userInfo.work_place %>|</span>
+														<address><%= userInfo.address %></address>
+													</li>
+													<li>
+														<i class="fa fa-phone"></i>
+														<span>+234 <%= userInfo.phone %></span>
+													</li>
+													<li>
+														<i class="fa fa-envelope-o"></i>
+														<a href="obinna@fareland.com">jhon@company.com</a>
+													</li>
+													<li>														
+														<span style="font-weight: bold">Residence: </span>
+														<span><%= userInfo.city %>, <%= userInfo.country || "N/A" %></span>
+													</li>
+													<li>
+														<span style="font-weight: bold">Experience: </span>
+														<span><%= userInfo.experience || "N/A" %> years</span>
+													</li>
+													<li>
+														<span style="font-weight: bold">Degree(s): </span>
+														<% for(var j = 0; j < userInfo.education.length; j++) { %>
+															<span><%= userInfo.education[j].certificate %>,</span>
+														<% } %>														
+													</li>
+                                                    
+												</ul>
+												<div class="tg-doc-feature">
+												<div class="tg-heading-border tg-small">
+													<h5>Sub Specialty</h5>
 												</div>
-											</li>
-										</ul>
-									</div>
-								</div>
-							</article>
+												<div class="tg-description">
+													<ul>
+				                                    <% for(var i = 0; i < userInfo.sub_specialty.length; i++) { %>									  
+													  	<li><%= userInfo.sub_specialty.sub_specialty || "not supplied" %></li>									  
+				                                    <% } %>
+													</ul>
+												</div>
+												<div class="tg-heading-border tg-small">
+													<h5>Education(s)</h5>
+												</div>
+												<div class="tg-description">
+													<ul>
+				                                    <% for(var i = 0; i < userInfo.sub_specialty.length; i++) { %>									  
+													  	<li><%= userInfo.sub_specialty.sub_specialty || "not supplied" %></li>									  
+				                                    <% } %>
+													</ul>
+												</div>
+												<div class="tg-heading-border tg-small">
+													<h5>Certification(s)</h5>
+												</div>
+												<div class="tg-description">
+													<ul>
+				                                    <% for(var i = 0; i < userInfo.sub_specialty.length; i++) { %>									  
+													  	<li><%= userInfo.sub_specialty.sub_specialty || "not supplied" %></li>									  
+				                                    <% } %>
+													</ul>
+												</div>
+												<div class="tg-heading-border tg-small">
+													<h5>Office hours</h5>
+												</div>
+												<div class="tg-description">
+													<ul>
+				                                    <% for(var i = 0; i < userInfo.sub_specialty.length; i++) { %>									  
+													  	<li><%= userInfo.sub_specialty.sub_specialty || "not supplied" %></li>									  
+				                                    <% } %>
+													</ul>
+												</div>
+												<div class="tg-heading-border tg-small">
+													<h5>Honors and Awards</h5>
+												</div>
+												<div class="tg-description">
+													<ul>
+				                                    <% for(var i = 0; i < userInfo.sub_specialty.length; i++) { %>									  
+													  	<li><%= userInfo.sub_specialty.sub_specialty || "not supplied" %></li>									  
+				                                    <% } %>
+													</ul>
+												</div>								
+												
+												
+											</div>							                                               
+											</div>
+										</div>
+										<div class="communication-btn" ng-controller="bookController">                                                
+										<button class="ng-show" ng-click="book(<%= userInfo.user_id %>)">BOOK NOW</button>
+                                        <button class="ng-show" ng-click="ask(<%= userInfo.user_id %>)">ASK QUESTION</button>
+                                        </div>	
+									</article>							
+							
+                            					
 							<div class="tg-doc-feature">
 								<div class="tg-heading-border tg-small">
-									<h3>Specialty</h3>
+									<h5>Dr. <%= userInfo.firstname %> <%= userInfo.lastname %>, Md note</h5>
+								</div>
+								<div class="tg-description">													
+									<p>Dr. <%= userInfo.firstname %> <%= userInfo.lastname %>  is a specialist in <%= userInfo.specialty %> 
+									with clinical experience in diagnosing and treating the patients with various diseases.
+									</p>
 								</div>
 								<div class="tg-description">
-									<p>Dr <%= userInfo.firstname %> <%= userInfo.lastname %> is a specialist in <%= userInfo.specialty %></p>
-								</div>
+									<p><%= userInfo.introductory %></p>
+								</div>						 	
 							</div>
-                            <div class="tg-doc-feature">
-								<div class="tg-heading-border tg-small">
-									<h3>Sub Specialty</h3>
-								</div>
-								<div class="tg-description">
-									<ul>
-                                    <% for(var i = 0; i < userInfo.sub_specialty.length; i++) { %>									  
-									  	<li><%= userInfo.sub_specialty[i].sub_specialty || "not supplied" %></li>									  
-                                    <% } %>
-									</ul>
-								</div>
-							</div>												
-							<div class="tg-doc-feature">
-								<div class="tg-heading-border tg-small">
-									<h3>About Dr. <%= userInfo.firstname %> <%= userInfo.lastname %>, Md</h3>
-								</div>
-                                <% for(var i = 0; i < userInfo.education.length; i++) { %>
-								<h3><%= userInfo.education[i].school || "not supplied" %> </h3>
-								<div class="tg-description">
-									<p> Dr, <%= userInfo.firstname %> <%= userInfo.lastname %> studied in <%= userInfo.education[i].school %> 
-                                    from <%= userInfo.education[i].start_year %> and graduated in <%= userInfo.education[i].end_year %>. 
-                                    Obtained a <%= userInfo.education[i].certificate %></p>
-								</div>
-                                <% } %>								
-							</div>
-							<div class="tg-doc-photos">
+							<!--<div class="tg-doc-photos">
 								<div class="tg-heading-border tg-small">
 									<h2>Photos</h2>
 								</div>
@@ -256,40 +358,40 @@
 									<div id="tg-photosgallery" class="tg-photosgallery tg-haslayout">
 										<div class="item">
 											<a href="images/doctors/img-10.jpg" data-rel="prettyPhoto[docgallery]">
-												<img src="assets/images/doctors/img-10.jpg" alt="image description">
+												<img src="/assets/images/doctors/img-10.jpg" alt="image description">
 											</a>
 										</div>
 										<div class="item">
 											<a href="images/doctors/img-11.jpg" data-rel="prettyPhoto[docgallery]">
-												<img src="assets/images/doctors/img-11.jpg" alt="image description">
+												<img src="/assets/images/doctors/img-11.jpg" alt="image description">
 											</a>
 										</div>
 										<div class="item">
 											<a href="images/doctors/img-12.jpg" data-rel="prettyPhoto[docgallery]">
-												<img src="images/doctors/img-12.jpg" alt="image description">
+												<img src="/assets/images/doctors/img-12.jpg" alt="image description">
 											</a>
 										</div>
 										<div class="item">
 											<a href="images/doctors/img-10.jpg" data-rel="prettyPhoto[docgallery]">
-												<img src="images/doctors/img-10.jpg" alt="image description">
+												<img src="/assets/images/doctors/img-10.jpg" alt="image description">
 											</a>
 										</div>
 										<div class="item">
 											<a href="images/doctors/img-11.jpg" data-rel="prettyPhoto[docgallery]">
-												<img src="images/doctors/img-11.jpg" alt="image description">
+												<img src="/assets/images/doctors/img-11.jpg" alt="image description">
 											</a>
 										</div>
 										<div class="item">
 											<a href="images/doctors/img-12.jpg" data-rel="prettyPhoto[docgallery]">
-												<img src="images/doctors/img-12.jpg" alt="image description">
+												<img src="/assets/images/doctors/img-12.jpg" alt="image description">
 											</a>
 										</div>
 									</div>
 								</div>
-							</div>
+							</div>-->
 							<div class="tg-reviewbox">
 								<div class="tg-heading-border tg-small">
-									<h2>add review</h2>
+									<h5>add review</h5>
 								</div>
 								<form class="form-review tg-haslayout">
 									<fieldset class="row">
@@ -333,12 +435,13 @@
 					<div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
 						<aside id="tg-sidebar">
 							<div class="tg-widget tg-widget-map">
-								<h3>on map</h3>
-								<div id="doctor-location" class="tg-location-map tg-haslayout"></div>
-								<a class="tg-btn" href="#">get direction</a>
+								<h3 class="t-align">Patients review</h3>
+								<ul>
+									<li></li>
+								</ul>								
 							</div>
 							<div class="tg-widget tg-tab-widget">
-								<h3>similar doctors</h3>
+								<h3 class="t-align">similar doctors</h3>
 								<div class="tg-tabwidet-content">
 									<ul class="tg-nav-tabs nav-tabs" role="tablist">
 										<li role="presentation" class="active">
@@ -353,7 +456,7 @@
 												<li>
 													<figure>
 														<a href="#">
-															<img src="images/blog/img-11.jpg" alt="image description">
+															<img src="/assets/images/blog/img-11.jpg" alt="image description">
 														</a>
 													</figure>
 													<div class="tg-description">
@@ -371,7 +474,7 @@
 												<li>
 													<figure>
 														<a href="#">
-															<img src="images/blog/img-12.jpg" alt="image description">
+															<img src="/assets/images/blog/img-12.jpg" alt="image description">
 														</a>
 													</figure>
 													<div class="tg-description">
@@ -389,7 +492,7 @@
 												<li>
 													<figure>
 														<a href="#">
-															<img src="images/blog/img-13.jpg" alt="image description">
+															<img src="/assets/images/blog/img-13.jpg" alt="image description">
 														</a>
 													</figure>
 													<div class="tg-description">
@@ -411,7 +514,7 @@
 												<li>
 													<figure>
 														<a href="#">
-															<img src="images/blog/img-12.jpg" alt="image description">
+															<img src="/assets/images/blog/img-12.jpg" alt="image description">
 														</a>
 													</figure>
 													<div class="tg-description">
@@ -429,7 +532,7 @@
 												<li>
 													<figure>
 														<a href="#">
-															<img src="images/blog/img-13.jpg" alt="image description">
+															<img src="/assets/images/blog/img-13.jpg" alt="image description">
 														</a>
 													</figure>
 													<div class="tg-description">
@@ -447,7 +550,7 @@
 												<li>
 													<figure>
 														<a href="#">
-															<img src="images/blog/img-11.jpg" alt="image description">
+															<img src="/assets/images/blog/img-11.jpg" alt="image description">
 														</a>
 													</figure>
 													<div class="tg-description">
@@ -887,7 +990,7 @@
         <script src="/assets/js/vendor/bootstrap.min.js"></script>
         <script type="text/javascript" src="/assets/js/source.js"></script>
         <script type="text/javascript" src="/assets/js/angularclient.js"></script>
-        <!--<script type="text/javascript" src="/assets/js/ngroute.js"></script>-->
+        <script type="text/javascript" src="/assets/js/ngroute.js"></script>
         <script src="/assets/js/jquery-ui.js"></script>
         <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
         <script src="/assets/js/map/jquery.gomap.js"></script>
@@ -900,6 +1003,7 @@
         <script src="/assets/js/appear.js"></script>
         <script src="/assets/js/countTo.js"></script>
         <script src="/assets/js/map/map.js"></script>
+        <script src="/assets/js/angularAnimate.js"></script>
         <script src="/assets/js/main.js"></script>
     </body>
 </html>

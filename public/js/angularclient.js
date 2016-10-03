@@ -1,4 +1,4 @@
-var app = angular.module('myApp',["ngRoute"]);
+var app = angular.module('myApp',["ngRoute","ngAnimate"]);
 
 app.config(function($routeProvider){
 	$routeProvider
@@ -13,8 +13,15 @@ app.config(function($routeProvider){
 		controller: 'listController'
 	})
 
+  .when("/list/:num",{
+		templateUrl: '/assets/pages/list-doctors.html',
+		controller: 'listController'
+	})
+
 
 });
+
+
 
 app.service("multiData",["$http","$window",function($http,$window){
 	this.sendPic = function(url,data){
@@ -34,10 +41,29 @@ app.service("multiData",["$http","$window",function($http,$window){
 	}
 }]);
 
+app.factory("localManager",["$window",function($window){
+  return {
+    setValue: function(key, value) {
+        $window.localStorage.setItem(key, JSON.stringify(value));
+    },
+    getValue: function(key) {
+        try {
+            return JSON.parse($window.localStorage.getItem(key));
+        } catch (e) {
+          console.log(e);
+        }
+    },
+    removeItem: function(key) {
+      $window.localStorage.removeItem(key);
+    }
+  };
+}])
+
 app.factory("userData",function(){
   var user = {};
   return {
     set: function(data){
+      console.log(data)
       user["userInfo"] = data;
     },
     get: function(){
@@ -48,6 +74,7 @@ app.factory("userData",function(){
 
 app.controller('loginController',["$scope","$http","$location","$window",function($scope,$http,$location,$window) {
   $scope.login = {};
+  $scope.error = "";
   
 	$scope.send = function(){        
         $http({
@@ -56,19 +83,31 @@ app.controller('loginController',["$scope","$http","$location","$window",functio
           data    : $scope.login, //forms user object
           headers : {'Content-Type': 'application/json'} 
          })
-          .success(function(data) {              
-            if (data) {             
-              $window.location.href = '/user/dashboard';             
-            } else {       
-              $scope.error = "Email or Password incorrect!";            
-            }
-          });	                                 //multiData.sendData(uploadUrl,$scope.logInfo);
+        .success(function(data) {
+        console.log(data)              
+          if (data.isLoggedIn) {
+            if(data.type === "Patient") {
+              $window.location.href = '/patient/dashboard';  
+            } else if(data.type === "Doctor") {
+              $window.location.href = '/doctor/dashboard';  
+            } else if(data.type === "Hospital" || data.type === "Clinic" || data.type === "Phamarcy" || 
+              data.type === "Radiology Center" || data.type === "Laboratory Center" || data.type === "Fitness Center" ) {
+              $window.location.href = "/medical-center/view";  
+            }  
+                       
+          } else {       
+            $scope.error = "Email or Password incorrect!";            
+          }
+        });	                                 //multiData.sendData(uploadUrl,$scope.logInfo);
 	}
+  
 }])
 
 app.controller('signupController',["$scope","$http","$location","$window",function($scope,$http,$location,$window) {
-  $scope.user = {};
-	$scope.submit = function(){        
+  $scope.user = {};  
+	$scope.submit = function(){
+        var capitalize = $scope.user.city.charAt(0).toUpperCase() + $scope.user.city.slice(1);
+        $scope.user.city = capitalize;        
         $http({
           method  : 'POST',
           url     : '/user/signup',
@@ -106,8 +145,7 @@ app.controller('pictureController',["$scope","$http","$location","multiData",fun
    $scope.user = {};
    $scope.user.type = "picture";
    $scope.update = function(){
-    var uploadUrl = "/user/update"; 
-    console.log($scope.user)       
+    var uploadUrl = "/user/update";     
      multiData.sendPic(uploadUrl,$scope.user);    
 	  } 
 }]);
@@ -186,35 +224,129 @@ app.controller('formController',["$scope","$http","$location","multiData","$wind
 
 }]);
 
-app.controller('searchController',["$scope","$http","$location","$window","multiData","userData",function($scope,$http,$location,$window,multiData,userData) {
-   $scope.result;
+app.controller('searchController',["$scope","$http","$location","$window","multiData","localManager",function($scope,$http,$location,$window,multiData,localManager) {
    $scope.user = {};
-    $scope.search = function(){        
+   console.log($scope.user)
+    $scope.search = function(){
+      if($scope.user.city !== undefined) {
+        var capitalize = $scope.user.city.charAt(0).toUpperCase() + $scope.user.city.slice(1);
+        $scope.user.city = capitalize;
+      }
+
+       var filterInput = {};
+      for(var i in $scope.user){
+        if($scope.user.hasOwnProperty(i) && $scope.user[i] !== "" && $scope.user[i].length > 1) {
+          filterInput[i] = $scope.user[i];
+        }
+      }
+      localManager.removeItem("userInfo");        
       $http({
-        method  : 'GET',
+        method  : 'POST',
         url     : "/user/find-group",
-        data    : $scope.user, //forms user object
+        data    : filterInput, //forms user object
         headers : {'Content-Type': 'application/json'} 
         })
       .success(function(data) {              
-        console.log(data);
         if(data){
-          userData.set(data);
+          localManager.setValue("userInfo",data);
           $window.location.href = "/user/find-specialist";
         }
       });		                                 
     }    
 }]);
 
-app.controller('resultController',["$scope","$http","$location","multiData","userData",function($scope,$http,$location,multiData,userData) {
-   $scope.userInfo =  userData.get();
-   console.log($scope.userInfo);
-   $location.path("/list");                              
+app.controller('resultController',["$scope","$http","$location","localManager",function($scope,$http,$location,localManager) {
+  $scope.user = {};
+  $scope.refineUser = {};
+  $scope.searchMore = function () {
+   search($scope.user,"/user/find-group");
+  }
+  $scope.refineSearch = function () {
+   search($scope.refineUser,"/user/refine-find-group");
+  }
+  var search = function(data,url){
+    if(Object.keys(data).length > 0){
+    localManager.removeItem("userInfo");
+      if(data.city !== undefined) {
+          var capitalize = data.city.charAt(0).toUpperCase() + data.city.slice(1);
+          data.city = capitalize;
+      }
+      var filterInput = {};
+      for(var i in data){
+        if(data.hasOwnProperty(i) && data[i] !== "" && data[i].length > 1) {
+          filterInput[i] = data[i];
+        }
+      }
+      console.log(filterInput)    
+      $http({
+        method  : 'POST',
+        url     : url,
+        data    : filterInput, //forms user object
+        headers : {'Content-Type': 'application/json'} 
+        })
+      .success(function(data) {              
+        if(data){
+          console.log(data)
+          localManager.setValue("userInfo",data);
+          var id = Math.floor(Math.random() * 2635374836);
+          $location.path("/list/" + id);
+        } else {
+          console.log("no data");
+        }
+      });
+   }		                                 
+  }
+  $location.path("/list");                              
 }]);
 
-app.controller('listController',["$scope","$http","$location","multiData","userData",function($scope,$http,$location,multiData,userData) {
-   $scope.userInfo =  userData.get();
-   console.log($scope.userInfo);
-                          
+
+
+app.controller('listController',["$scope","$http","$location","$window","localManager",function($scope,$http,$location,$window,localManager) {
+   $scope.searchResult = localManager.getValue("userInfo");
+   $scope.valid = true;
+   if($scope.searchResult) {
+      if($scope.searchResult.length >= 10) {
+         $scope.data = true;   
+      }
+      if($scope.searchResult.length === 0){
+        $scope.isNotFound = true;
+      }
+    }
+                      
 }]);
+
+app.controller('bookController',["$scope","$http","$location","$window","localManager",function($scope,$http,$location,$window,localManager) {
+
+  $scope.book = function(person){
+    getAHelp("book",person);
+  }
+
+  $scope.ask = function(person){
+    getAHelp("ask",person)
+  }
+
+  function getAHelp(type,thePerson) {
+     var theDoctor = {user_id: thePerson}
+     console.log(theDoctor);
+     $http({
+        method  : 'PUT',
+        url     : "/user/book",
+        data : theDoctor,
+        headers : {'Content-Type': 'application/json'} 
+        })
+      .success(function(data) {              
+        if(data.isNotLoggedIn){
+          alert("You're not logged in!");
+          console.log(data);
+        } else {
+          console.log(data);
+          localManager.removeItem("userInfo");
+          localManager.setValue("userInfo",data);
+          $window.location.href = "/patient/dashboard";
+        }
+      });
+  }
+                      
+}]);
+
 

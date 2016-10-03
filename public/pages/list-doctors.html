@@ -1,0 +1,71 @@
+
+    <div ng-controller = "listController"  class="tg-view tg-list-view">
+        <div class="row">
+            <article class="tg-doctor-profile" ng-repeat="i in searchResult">
+                <div class="tg-box">
+                    <a href="{{i.profile_url}}"><span class="tg-show"><a href="{{i.profile_url}}"><em class="icon-add"></em></span></a>
+                    <figure class="tg-docprofile-img">
+                        <span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
+                        <a href="{{i.profile_url}}"><img ng-src="{{i.profile_pic_url}}" class="pp" alt="image description"></a>
+                        <img src="/assets/images/icons/online-icon.png" class="presence"><span class="on">Online</span>
+                        <!--<img src="/assets/images/icons/offline-red-icon.png" class="presence"><span class="on"></span>-->
+                    </figure>												
+                    <div class="tg-docprofile-content">
+                        <div class="tg-heading-border tg-small">
+                            <h3><a href="{{i.profile_url}}">Dr {{i.firstname}} {{i.lastname}}</a></h3>
+                            <h4>{{i.specialty}} Specialist</h4>
+                        </div>
+                        <div class="tg-description">													
+                            <p>Dr. {{i.firstname}} {{i.lastname }}  is a specialist in {{i.specialty}}
+                            with clinical experience in diagnosing and treating the patients with various diseases.&nbsp; 
+                            <a href="{{i.profile_url}}" style="color: green">Learn more..</a>
+                            </p>
+                        </div>
+                        <ul class="tg-doccontactinfo">
+                            <li>
+                                <i class="fa fa-map-marker"></i>
+                                <span style="font-weight: bold">{{i.work_place}}:</span>
+                                <address>{{i.address}}</address>
+                            </li>
+                            <li>
+                                <i class="fa fa-phone"></i>
+                                <span>+234{{i.phone}}</span>
+                            </li>
+                            <li>
+                                <i class="fa fa-envelope-o"></i>
+                                <a href="obinna@fareland.com">jhon@company.com</a>
+                            </li>
+                            <li>														
+                                <span style="font-weight: bold">Residence: </span>
+                                <span>{{i.city}}, {{i.country || "N/A"}}</span>
+                            </li>
+                            <li>
+                                <span style="font-weight: bold">Experience: </span>
+                                <span>{{i.experience || "N/A" }} years</span>
+                            </li>
+                            <li>
+                                <span style="font-weight: bold">Degree(s): </span>                                
+                                <span ng-repeat = "j in i.education">{{j.certificate}},</span>
+                                														
+                            </li>
+                            <li ng-controller="bookController">
+                                <div class="communication-btn">                                                
+                                <button class="ng-show" ng-click="book(i.user_id)">BOOK NOW</button>
+                                <button class="ng-show" ng-click="ask(i.user_id)">ASK QUESTION</button>														                                                        
+                                </div>
+                            </li>
+                        </ul>                                               
+                    </div>
+                </div>
+            </article>							
+        </div>
+    
+    
+        <div class="tg-btnarea">
+            <a class="tg-btn" href="#" ng-if="data">load more</a>
+            <div class="info-div" ng-show="isNotFound" style="width: 400px;height: 100px; margin:0 auto; border: 1px solid rgba(0,255,0,0.8);padding: 20px 20px;">
+                <p style="text-align: center; color: green">Oops! No match found based on your search criteria.<br>
+                Try again..</p>           
+            </div>
+        </div>
+    </div>

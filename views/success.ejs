@@ -24,7 +24,7 @@
 	<link rel="stylesheet" href="/assets/css/responsive.css">
 	<script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
 </head>
-<body>
+<body ng-app = "myApp" class="ng-cloak">
 	<!--[if lt IE 8]>
 		<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
 	<![endif]-->
@@ -104,31 +104,99 @@
 		<!--************************************
 				Home Slider Start
 		*************************************-->
-		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout">
+		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="searchController">
 			<div class="tg-searcharea tg-haslayout">
 				<div class="container">
 					<div class="row">
 						<form class="tg-searchform">
 							<div class="col-md-5 col-sm-5 col-xs-12">
 								<div class="form-group">
-									<input type="text" placeholder="Address" class="form-control">
+									<input type="text" placeholder="City" class="form-control" ng-model="user.city">
 								</div>
 							</div>
 							<div class="col-md-5 col-sm-5 col-xs-8">
-								<div class="form-group">
+								<div class="form-group">								
 									<span class="select">
-										<select id="group1" class="group">
-											<option>Catagory</option>
-											<option>Doctor one</option>
-											<option>Doctor two</option>
-											<option>Doctor three</option>
+										<select id="group1" class="group" placeholder="Specialty" ng-model="user.specialty">
+											<option>Acupunture</option>
+                                            <option>Addiction Medicine</option>
+                                            <option>Adolescent Medicine</option>
+                                            <option>Aerospace Medicine</option>
+                                            <option>Allergy</option>
+                                            <option>Allergy/Immunology</option>
+                                            <option>Anesthesiology</option>
+                                            <option>Audiologist</option>
+                                            <option>Bariatrician</option>
+                                            <option>Cardiac Electrophysiology</option>
+                                            <option>Cardiology</option>
+                                            <option>Chiropractic</option>
+                                            <option>Clinical Laboratory Immunology</option>
+                                            <option>Clinical Pathology</option>
+                                            <option>Colon/Rectal Surgery</option>
+                                            <option>Critical Care</option>
+                                            <option>Cythopathology</option>
+                                            <option>Dermatology</option>
+                                            <option>Dermatopathology</option>
+                                            <option>Diabetes</option>
+                                            <option>Diagnostic</option>
+                                            <option>Emergency Medical Tech</option>
+                                            <option>Emergency Medicine</option>
+                                            <option>Endocrinology</option>
+                                            <option>Endovascular Surgical Neuroradiology</option>
+                                            <option>Family Practice</option>
+                                            <option>Gastroenterology</option>
+                                            <option>General Practice</option>
+                                            <option>General Surgery</option>
+                                            <option>Genetics</option>
+                                            <option>Geriatrics</option>
+                                            <option>Gynecology</option>
+                                            <option>Gynecology Oncology</option>
+                                            <option>Hand Surgery</option>
+                                            <option>Hand and Neck Surgery</option>
+                                            <option>Hematology</option>
+                                            <option>Hematology/Oncology</option>
+                                            <option>Hepatology</option>
+                                            <option>Holistic Medicine</option>
+                                            <option>Hospitalist</option>
+                                            <option>Immunology</option>
+                                            <option>Infectious Disease</option>
+                                            <option>Internal Medicine</option>
+                                            <option>Interventional Cardiology</option>
+                                            <option>Legal Medicine</option>
+                                            <option>Medical Oncology</option>
+                                            <option>Medical Toxicology</option>
+                                            <option>Neonatology</option>
+                                            <option>Nephrology</option>
+                                            <option>Neurology</option>
+                                            <option>Neuroradiology</option>
+                                            <option>Nuclear Cardiology</option>
+                                            <option>Nuclear Medicine</option>
+                                            <option>Nutrition</option>
+                                            <option>Obstetrics/Gynecology</option>
+                                            <option>Occupational Medicine</option>
+                                            <option>Oncology</option>
+                                            <option>Opthalmology</option>
+                                            <option>Optometry</option>
+                                            <option>Orthopedic Foot & Ankle</option>
+                                            <option>Orthopedic Reconstructive Surgery</option>
+                                            <option>Orthopedic Spine Surgery</option>
+                                            <option>Orthopedic Surgery</option>
+                                            <option>Osteopathy</option>
+                                            <option>Otorhinolaryngology</option>
+                                            <option>Pain Management</option>
+                                            <option>Pathology</option>
+                                            <option>PPediatric Allergy</option>
+                                            <option>Pediatric Cardiology</option>
+                                            <option>Pediatric Critical Care</option>
+                                            <option>Padiatric Emergency Medicine</option>
+                                            <option>Other</option>	
 										</select>
 									</span>
 								</div>
 							</div>
 							<div class="col-md-2 col-sm-2 col-xs-4">
 								<div class="form-group">
-									<a id="search_banner" class="tg-btn tg-btn-lg" href="#">Search</a>
+									<button id="search_banner" class="tg-btn tg-btn-lg" ng-click = "search()">Search</button>
 								</div>
 							</div>
 						</form>
@@ -139,10 +207,10 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-xs-12">
-							<h1>Accounted created</h1>
+							<h1>Success!</h1>
 							<ol class="tg-breadcrumb">
 								<li><a href="#">Home</a></li>
-								<li class="active">Acount</li>
+								<li class="active">Account Created</li>
 							</ol>
 						</div>
 					</div>
@@ -155,53 +223,25 @@
 		<!--************************************
 				Main Start
 		*************************************-->
-		<main id="main" class="tg-main-section tg-haslayout">
+		<main id="main" class="tg-main-section tg-haslayout" ng-controller = "loginController">
 			<div class="container">
 				<div class="row">
 					<div class="tg-404 tg-haslayout">
-						<div class="col-md-8 col-sm-12">
-							<h2>Account created Successfully!!</h2>
-                            <p style="color:red"> A link has been sent to your email.
-                            Go to the email you used for registration to confirm and connect to your account.</p>
+						<div class="col-md-12 col-sm-12">
 							
-							<h3><a href="/user/user-update">Edit Your profile</a></h3>
-							<h3><a href="/user/dashboard">View Your profile</a></h3>
-						</div>
-						<div class="col-md-4 col-sm-12">
-							<div class="tg-contentbox">
-								<div class="tg-heading-border">
-									<h2><%= message.firstname %> nice step!</h2>
-									<h3><%= message.firstname %> <%= message.lastname %> There are a lot o benefit<span> you can 
-                                    enjoy in this platform</h3>
-									<h4>Your login details</h4>
-									<ul>
-										<li>username: <%= message.email %></li>
-										<li>password: <%= message.user_id %></li>
-									</ul>
-								</div>
-								<div class="tg-description">
-										<p><%= message.typeOfUser %> go ahead to enjoy reaching out to thousands of patients i just one click away!</p>
-								</div>
-								<div class="tg-refinesearcharea">
-									<div class="tg-heading-border tg-small">
-										<h2>Perhaps searching can help.</h2>
-									</div>
-									<form class="form-refinesearch">
-										<fieldset>
-											<div class="col-sm-12">
-												<div class="row">
-													<div class="form-group">
-														<input type="text" class="form-control" placeholder="Search Here">
-													</div>
-												</div>
-											</div>
-											<button class="tg-btn" type="submit">search</button>
-										</fieldset>
-									</form>
-								</div>
+							<h3 style="text-align: center; margin:10px 0px 60px">Account created Successfully!!</h4>
+                            <h5 style="text-align: center;color:rgba(0,0,0,0.6)">Login</h5>
+                            <div style="width: 400px; height: 400px; margin:0 auto">
+                            <span  style="color: red;display:block;text-align: center; font-size:16px;padding:10px 10px" ng-cloak>{{error}}</span>							
+							<form>
+								<input type="text" placeholder="Email" ng-model = "login.email" style="border: 1px solid rgba(0,255,0,0.8)">
+								<input type="text" placeholder="Password" ng-model = "login.password" style="border: 1px solid rgba(0,255,0,0.8);margin: 10px 0px">
+								<p style="text-align: center">
+								<button class="btn btn-login" ng-click="send()">Send</button>
+								</p>
+							</form>
 							</div>
-						</div>
-					</div>
+						</div>						
 				</div>
 			</div>
 		</main>
@@ -413,19 +453,24 @@
 	<!--************************************
 		Sign In Sign Up Light Box End
 	*************************************-->
-	<script src="/assets/js/vendor/jquery-library.js"></script>
-	<script src="/assets/js/vendor/bootstrap.min.js"></script>
-	<script src="/assets/js/jquery-ui.js"></script>
-	<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
-	<script src="/assets/js/map/jquery.gomap.js"></script>
-	<script src="/assets/js/map/markerclusterer.min.js"></script>
-	<script src="/assets/js/countdown.js"></script>
-	<script src="/assets/js/jquery.nicescroll.js"></script>
-	<script src="/assets/js/parallax.js"></script>
-	<script src="/assets/js/owl.carousel.js"></script>
-	<script src="/assets/js/prettyPhoto.js"></script>
-	<script src="/assets/js/appear.js"></script>
-	<script src="/assets/js/countTo.js"></script>
-	<script src="/assets/js/main.js"></script>
+	 	<script src="/assets/js/vendor/jquery-library.js"></script>
+        <script src="/assets/js/vendor/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/assets/js/source.js"></script>
+        <script type="text/javascript" src="/assets/js/angularclient.js"></script>
+        <script type="text/javascript" src="/assets/js/ngroute.js"></script>
+        <script src="/assets/js/jquery-ui.js"></script>
+        <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <script src="/assets/js/map/jquery.gomap.js"></script>
+        <script src="/assets/js/map/markerclusterer.min.js"></script>
+        <script src="/assets/js/countdown.js"></script>
+        <script src="/assets/js/jquery.nicescroll.js"></script>
+        <script src="/assets/js/parallax.js"></script>
+        <script src="/assets/js/owl.carousel.js"></script>
+        <script src="/assets/js/prettyPhoto.js"></script>
+        <script src="/assets/js/appear.js"></script>
+        <script src="/assets/js/countTo.js"></script>
+        <script src="/assets/js/map/map.js"></script>
+        <script src="/assets/js/angularAnimate.js"></script>
+        <script src="/assets/js/main.js"></script>
 </body>
 </html>

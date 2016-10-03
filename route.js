@@ -9,14 +9,28 @@ var basicRoute = function (model) {
   router.get("/",function (req,res) {
     res.render('index',{"message":""});
   });
-  router.get("/user/dashboard",function(req,res){
+  router.get("/doctor/dashboard",function(req,res){
     if(req.user){     
       res.render("profile",{"person":req.user});
     } else {
       res.redirect("/");
     }
   });
-  router.get("/user/user-update",function(req,res){
+  router.get("/patient/dashboard",function(req,res){
+        if(req.user){
+          res.render("patient",{"userInfo": req.user});
+        } else {
+          res.redirect('/');
+        }
+  });
+  router.get("/medical-center/view",function(req,res){
+        if(req.user){
+          res.render("medical",{"userInfo": req.user});
+        } else {
+          res.redirect('/');
+        }
+  })
+  router.get("/doctor/update",function(req,res){
     if(req.user){            
       res.render("profile-update",{"person":req.user});
     } else {
@@ -181,7 +195,7 @@ var basicRoute = function (model) {
       res.redirect("/");
     }
   });
-    router.get("/user/user-schedule",function(req,res){
+    router.get("/doctor/schedule",function(req,res){
         if(req.user){
         res.render("profile",{"person":req.user});
         } else {
@@ -216,7 +230,8 @@ var basicRoute = function (model) {
                         phone:1,
                         experience:1,
                         country: 1,
-                        city:1
+                        city:1,
+                        user_id:1
                     },function(err,data){
                     if(err) throw err;
                     console.log(data);
@@ -334,41 +349,108 @@ var basicRoute = function (model) {
             }).limit(1000);                
     });
 
-    router.get("/ranking/views/:id",function(req,res){
+  router.get("/ranking/views/:id",function(req,res){
         model.user.findOne({user_id: req.params.id},function(err,user){            
             if(err) throw err;
             res.render("doctor-details",{"userInfo":user});
         });
     });
 
-    router.get("/user/find-group",function(req,res){
-        model.user.find(
-            req.body,{
-                firstname:1,
-                lastname:1,
-                address:1,
-                profile_url:1,
-                profile_pic_url: 1,
-                introductory:1,
-                education:1,
-                sub_specialty:1,
-                specialty:1,
-                procedure:1,
-                work_place:1,
-                phone:1,
-                experience:1,
-                country: 1,
-                city:1                
-            },function(err,data){
-            if(err) throw err;
-            console.log(data);
-             res.send(data)               
-            }).limit(1000);                 
-    });
+  
 
     router.get("/user/find-specialist",function(req,res){
         res.render("list-doctors",{"userInfo":req.user})
+    });
+
+    router.post("/user/find-group",function(req,res){
+     if(Object.keys(req.body).length > 0) {
+      console.log(req.body);
+        model.user.find(
+        req.body,{
+            firstname:1,
+            lastname:1,
+            address:1,
+            profile_url:1,
+            profile_pic_url: 1,
+            introductory:1,
+            education:1,
+            sub_specialty:1,
+            specialty:1,
+            procedure:1,
+            work_place:1,
+            phone:1,
+            experience:1,
+            country: 1,
+            city:1,
+            user_id:1                
+        },function(err,data){
+        if(err) throw err;
+            res.send(data)               
+        }).limit(1000);
+     } else {
+         res.end();
+     }                
+    });
+
+    router.post("/user/refine-find-group",function(req,res){
+     if(Object.keys(req.body).length > 0) {
+      console.log(req.body);
+      var projection = {
+            firstname:1,
+            lastname:1,
+            address:1,
+            profile_url:1,
+            profile_pic_url: 1,
+            introductory:1,
+            education:1,
+            sub_specialty:1,
+            specialty:1,
+            procedure:1,
+            work_place:1,
+            phone:1,
+            experience:1,
+            country: 1,
+            city:1                
+        }
+        if(req.body.procedure){
+            model.user.find(
+            {
+                city: req.body.city,
+                specialty: req.body.specialty,
+                sub_specialty: {"sub_specialty.sub_specialty": req.body.sub_specialty},
+                procedure: {"procedure.procedure_description": req.body.procedure}
+            },projection,function(err,data){
+            if(err) throw err;
+                res.send(data)               
+            }).limit(1000);
+        } else {
+             model.user.find(
+            {
+                city: req.body.city,
+                specialty: req.body.specialty,
+                sub_specialty: {"sub_specialty.sub_specialty": req.body.sub_specialty},
+            },projection,function(err,data){
+            if(err) throw err;
+                res.send(data)               
+            }).limit(1000);
+            }
+     } else {
+         res.end();
+     }                
+    });
+
+    router.put("/user/book",function(req,res){
+        if(req.user){
+            model.user.findOne(req.body,{firstname:1,lastname:1,profile_url:1,profile_pic_url:1,specialty:1},function(err,data){
+                console.log(data);
+                res.send(data);
+            })
+        } else {
+            res.json({isNotLoggedIn: true, error: "We notice you are NOT logged in!", beNice: "Please Login or Register to make use of these services"})
+        }
     })
+
+    
 
     router.get("/user/webrtc",function(req,res){
         res.send(true);
