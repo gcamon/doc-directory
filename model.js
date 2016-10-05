@@ -44,6 +44,19 @@ var myModel = function () {
 			lastname: String
 	});
 
+	var noteSchema = Schema({
+		note_id: Number,
+		date: Date,
+		message: String,
+		sender: String
+	})
+
+	var periodSchema = Schema({
+		day: String,
+		from: String,
+		to: String
+	})
+
 	var subspecialtySchema = Schema({
 		id: Number,
 		sub_specialty: String
@@ -94,7 +107,9 @@ var myModel = function () {
 		work_place: String,
 		phone: Number,
 		experience: Number,
-		country: String
+		country: String,
+		notification:[noteSchema],
+		office_hour:[periodSchema]
 	},{
 		collections: "userinfos"
 	})

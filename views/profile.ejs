@@ -215,8 +215,14 @@
 						<div class="col-xs-12">
 							<h1>dashboard</h1>
 							<ol class="tg-breadcrumb">
-								<li><a href="#">Home</a></li>
+								<li><a href="/">Home</a></li>
 								<li class="active">dashboard</li>
+								<li style="position:relative">
+									<img src="/assets/images/icons/ring.png">
+									<ul style="position:absolute;top:0;left:0">
+										<li></li>
+									</ul>
+								</li>
 							</ol>
 						</div>
 					</div>
@@ -235,7 +241,7 @@
 					<div class="col-lg-9 col-md-9 col-sm-8 col-xs-12 pull-right">
 						<div class="tg-dashboard tg-haslayout">
 							<div class="tg-docprofilechart tg-haslayout">
-								<div class="col-lg-8 col-md-7 col-sm-12 col-xs-12 tg-findheatlhwidth">
+								<div class="col-lg-9 col-md-8 col-sm-12 col-xs-12 tg-findheatlhwidth">
 									<div class="row">
 										<div class="tg-docinfo tg-haslayout">
 											<div class="tg-box">
@@ -264,7 +270,7 @@
 										</div>
 									</div>
 								</div>
-								<div class="col-lg-4 col-md-5 col-sm-12 col-xs-12 tg-expectwidth">
+								<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 tg-expectwidth">
 								<div class="row">
 									<div class="tg-support">
 										<div class="tg-heading-border tg-small">
@@ -282,15 +288,7 @@
 											<li>
 												<i class="fa fa-envelope-o"></i>
 												<a href="#">info@Fareland.com</a>
-											</li>
-											<li>
-												<i class="fa fa-envelope-o"></i>
-												<a href="#">suggestions@company.com</a>
-											</li>
-											<li>
-												<i class="fa fa-fax"></i>
-												<span>+44 235 856843</span>
-											</li>
+											</li>									
 										</ul>
 									</div>
 								</div>
@@ -308,7 +306,7 @@
 								<div class="col-lg-4 col-md-6 col-sm-12 col-xs-12">
 									<div class="row">
 										<div class="tg-heading-border tg-small">
-											<h3>Overall Rank</h3>
+											<h3 style="text-align: center">Overall Rank</h3>
 										</div>
 										<div class="tg-ratingbox">
 											<div class="tg-stars">
@@ -321,13 +319,13 @@
 											<strong>very good</strong>
 										</div>
 										<div class="tg-description">
-											<p>Consectetur adipisicing elit seidodia tempor incididunt ut labore etolore magna aliqua. Ut enim ad minimaia quis nostrud exercitation. Aullamco at laboris nisi ut aliquip exea. </p>
+											<p></p>
 										</div>
 										<a href="#">Read More</a>
 									</div>
 								</div>
 								<div class="col-lg-8 col-md-6 col-sm-12 col-xs-12">
-									<div class="tg-costumerreview">
+									<!--<div class="tg-costumerreview">
 										<div class="tg-heading-border tg-small">
 											<h3>Customer Reviews</h3>
 										</div>
@@ -439,7 +437,7 @@
 												</li>
 											</ul>
 										</div>
-									</div>
+									</div>-->
 								</div>
 							</div>
 						</div>
@@ -450,14 +448,14 @@
 								<figure class="tg-docprofile-img">
 									<figcaption>
 										<h4>Dr.<%= person.firstname %> <%= person.lastname %></h4>
-										<span>Senior Eye Doctor</span>
+										<span><%= person.specialty %></span>
 									</figcaption>
 									<span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
 									<a href="#"><img alt="image description" src="<%= person.profile_pic_url %>"></a>									
 								</figure>
 							</div>
 							<div class="tg-widget tg-widget-accordions">
-								<h3>Dashboard</h3>
+								<h3> Doctor Dashboard</h3>
 								<ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
 									<li class="panel panel-default active">
 										<div class="tg-panel-heading" role="tab" id="headingOne">
@@ -467,19 +465,27 @@
 										</div>
 										<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
 											<div class="panel-body">
-												<p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
+												<p><%= person.introductory %></p>
 											</div>
 										</div>
 									</li>
 									<li class="panel panel-default">
 										<div class="tg-panel-heading" role="tab" id="headingTwo">
 											<h3 class="panel-title">
-												<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Profile</a>
+												<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Patients</a>
 											</h3>
+
 										</div>
 										<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
 											<div class="panel-body">
-												<p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
+												<ol>
+													<li>
+														<h6 style="margin:0 auto">Ede Obinna</h6>														
+														<button>delete</button>&nbsp;&nbsp;&nbsp;&nbsp;
+														<button>view</button>
+														
+													</li>													
+												</ol>
 											</div>
 										</div>
 									</li>
@@ -508,7 +514,7 @@
 										</div>
 									</li>
 									<li class="panel panel-default">
-										<h3 class="panel-title"><a href="#">Signout</a></h3>
+										<h3 class="panel-title"><a href="/user/logout">Signout</a></h3>
 									</li>
 								</ul>
 							</div>
@@ -531,16 +537,16 @@
 							<div class="tg-footercol">
 								<strong class="logo">
 									<a href="#">
-										<img src="images/logo2.png" alt="image description">
+										<img src="/assets/images/logo2.png" alt="image description">
 									</a>
 								</strong>
 								<div class="tg-description">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut laboret dolore magna aliqua.</p>
+									<p>We specialize in offering help to find your best medical solution.</p>
 								</div>
 								<ul class="tg-info">
 									<li>
 										<i class="fa fa-home"></i>
-										<address>123 Eccles Old Road, New Salford Road, East London, Uk, M6 7AF</address>
+										<address>1 Nwodo street GRA Enugu, Enugu State</address>
 									</li>
 									<li>
 										<i class="fa fa-envelope"></i>
@@ -548,7 +554,7 @@
 									</li>
 									<li>
 										<i class="fa fa-phone"></i>
-										<em><a href="#">+44 123 456 788 - 9</a></em>
+										<em><a href="#">+234 8064245256</a></em>
 									</li>
 								</ul>
 							</div>
@@ -562,7 +568,7 @@
 									<ul>
 										<li>
 											<figure class="tg-imgdoc">
-												<img src="images/img-02.jpg" alt="image description">
+												<img src="/assets/images/img-02.jpg" alt="image description">
 												<div class="tg-img-hover">
 													<a href="#"><i class="icon-zoom"></i></a>
 												</div>
@@ -584,7 +590,7 @@
 										</li>
 										<li>
 											<figure class="tg-imgdoc">
-												<img src="images/img-03.jpg" alt="image description">
+												<img src="/assets/images/img-03.jpg" alt="image description">
 												<div class="tg-img-hover">
 													<a href="#"><i class="icon-zoom"></i></a>
 												</div>

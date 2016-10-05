@@ -79,7 +79,7 @@
                                         </li>
                                         <li><a href="packages.html">packages</a></li>
                                         <li><a href="contactus.html">Contact</a></li>                                        
-                                        <li>
+                                        <!--<li>
                                             <a href="#">
                                                 <i class="fa fa-navicon"></i>
                                                 <i>pages</i>
@@ -91,7 +91,7 @@
                                                 <li><a href="dashboard-myaccount.html">dashboard account</a></li>
                                                 <li><a href="/user/logout">Log out</a></li>
                                             </ul>
-                                        </li>
+                                        </li>-->
                                     </ul>
                                 </div>
                             </nav>
@@ -109,7 +109,7 @@
             <div class="tg-searcharea tg-haslayout">
                 <div class="container">
                     <div class="row">
-                        <form class="tg-searchform">
+                        <!--<form class="tg-searchform">
                             <div class="col-md-2 col-sm-2 col-xs-12">
                                 <div class="form-group">
                                     
@@ -205,7 +205,7 @@
                                     <button id="search_banner" class="tg-btn tg-btn-lg" ng-click = "search()">Search</button>
                                 </div>
                             </div>
-                        </form>
+                        </form>-->
                     </div>
                 </div>
             </div>
@@ -213,10 +213,10 @@
                 <div class="container">
                     <div class="row">
                         <div class="col-xs-12">
-                            <h1>dashboard</h1>
+                            <h1>Patient dashboard</h1>
                             <ol class="tg-breadcrumb">
                                 <li><a href="#">Home</a></li>
-                                <li class="active">dashboard</li>
+                                <li class="active">Patient dashboard</li>
                             </ol>
                         </div>
                     </div>
@@ -229,15 +229,17 @@
         <!--************************************
                 Main Start
         *************************************-->
-        <main id="main" class="tg-main-section tg-haslayout">
+        <main id="main" class="tg-main-section tg-haslayout" ng-controller="inPatientDashboardController">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12 pull-right">
                         <div class="row">
-                            <div class="col-sm-9 col-md-9 col-lg-9">
+                            <div class="col-sm-12 col-md-12 col-lg-12">
+                                <div class="row" ng-view>
+                                </div>
                             </div>
-                            <div class="col-sm-3 col-md-3 col-lg-3">
-                            </div>
+                            <!--<div class="col-sm-3 col-md-3 col-lg-3">
+                            </div>-->
                         </div>
                     </div>
                     <!--<div class="col-lg-9 col-md-9 col-sm-8 col-xs-12 pull-right">
@@ -457,8 +459,7 @@
                             <div class="tg-widget tg-widget-doctor">
                                 <figure class="tg-docprofile-img">
                                     <figcaption>
-                                        <h4>Dr.<%= userInfo.firstname %> <%= userInfo.lastname %></h4>
-                                        <span>Senior Eye Doctor</span>
+                                        <h4><%= userInfo.firstname %> <%= userInfo.lastname %></h4>                                        
                                     </figcaption>
                                     <span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
                                     <a href="#"><img alt="image description" src="<%= userInfo.profile_pic_url %>"></a>                                   
@@ -470,53 +471,66 @@
                                     <li class="panel panel-default active">
                                         <div class="tg-panel-heading" role="tab" id="headingOne">
                                             <h3 class="panel-title">
-                                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">Insights</a>
+                                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseOne" aria-expanded="true" aria-controls="collapseOne">Medical Records</a>
                                             </h3>
                                         </div>
                                         <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
                                             <div class="panel-body">
-                                                <p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
+                                                <ol style="color:rgba(0,110,0,0.8)">
+                                                    <li ng-cloak>
+                                                        Treatment by Dr Udeichi Chimaroke<br/>
+                                                        <button ng-click="del()"> Delete </button>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <button ng-click="view()"> View </button>
+                                                    </li>
+                                                     <li ng-cloak>
+                                                        Treatment by Dr Ede obinna<br/>
+                                                        <button ng-click="del()"> Delete </button>&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <button ng-click="view()"> View </button>
+                                                    </li>
+                                                </ol>
                                             </div>
                                         </div>
-                                    </li>
+                                    </li>                                    
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingTwo">
                                             <h3 class="panel-title">
-                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Profile</a>
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Profile</a>
                                             </h3>
                                         </div>
                                         <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                                             <div class="panel-body">
-                                                <p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
+                                                <p><a href="#">Edit your profile</a></p>
+                                                <p><a href="#">View as doctors see </a></p>
                                             </div>
                                         </div>
                                     </li>
+                                    
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingThree">
                                             <h3 class="panel-title">
-                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">Schedule</a>
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseThree" aria-expanded="false" aria-controls="collapseThree">Prescriptions</a>
                                             </h3>
                                         </div>
                                         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                                             <div class="panel-body">
-                                                <p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
+                                                <p>No prescription yet</p>
                                             </div>
                                         </div>
                                     </li>
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingFour">
                                             <h3 class="panel-title">
-                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseThree">My Account</a>
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseFour" aria-expanded="false" aria-controls="collapseThree">My wallet</a>
                                             </h3>
                                         </div>
                                         <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
                                             <div class="panel-body">
-                                                <p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
+                                                <p>Your wallet is empty</p>
                                             </div>
                                         </div>
                                     </li>
                                     <li class="panel panel-default">
-                                        <h3 class="panel-title"><a href="#">Signout</a></h3>
+                                        <h3 class="panel-title"><a href="/user/logout">Signout</a></h3>
                                     </li>
                                 </ul>
                             </div>
@@ -545,16 +559,16 @@
                             <div class="tg-footercol">
                                 <strong class="logo">
                                     <a href="#">
-                                        <img src="images/logo2.png" alt="image description">
+                                        <img src="/assets/images/logo2.png" alt="image description">
                                     </a>
                                 </strong>
                                 <div class="tg-description">
-                                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut laboret dolore magna aliqua.</p>
+                                    <p>We specialize in offering help to find your best medical solution.</p>
                                 </div>
                                 <ul class="tg-info">
                                     <li>
                                         <i class="fa fa-home"></i>
-                                        <address>123 Eccles Old Road, New Salford Road, East London, Uk, M6 7AF</address>
+                                        <address>1 Nwodo street GRA Enugu, Enugu State</address>
                                     </li>
                                     <li>
                                         <i class="fa fa-envelope"></i>
@@ -562,7 +576,7 @@
                                     </li>
                                     <li>
                                         <i class="fa fa-phone"></i>
-                                        <em><a href="#">+44 123 456 788 - 9</a></em>
+                                        <em><a href="#">+234 8064245256</a></em>
                                     </li>
                                 </ul>
                             </div>
@@ -576,7 +590,7 @@
                                     <ul>
                                         <li>
                                             <figure class="tg-imgdoc">
-                                                <img src="images/img-02.jpg" alt="image description">
+                                                <img src="/assets/images/img-02.jpg" alt="image description">
                                                 <div class="tg-img-hover">
                                                     <a href="#"><i class="icon-zoom"></i></a>
                                                 </div>
@@ -598,7 +612,7 @@
                                         </li>
                                         <li>
                                             <figure class="tg-imgdoc">
-                                                <img src="images/img-03.jpg" alt="image description">
+                                                <img src="/assets/images/img-03.jpg" alt="image description">
                                                 <div class="tg-img-hover">
                                                     <a href="#"><i class="icon-zoom"></i></a>
                                                 </div>
@@ -757,6 +771,7 @@
         <script src="/assets/js/countTo.js"></script>
         <script src="/assets/js/map/map.js"></script>
         <script src="/assets/js/angularAnimate.js"></script>
+        <script src="/assets/js/modalService.js"></script>
         <script src="/assets/js/main.js"></script>
 </body>
 </html>

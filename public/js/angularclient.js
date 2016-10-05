@@ -1,4 +1,4 @@
-var app = angular.module('myApp',["ngRoute","ngAnimate"]);
+var app = angular.module('myApp',["ngRoute","ngAnimate","angularModalService"]);
 
 app.config(function($routeProvider){
 	$routeProvider
@@ -18,10 +18,20 @@ app.config(function($routeProvider){
 		controller: 'listController'
 	})
 
+  .when("/appointment",{
+    templateUrl: '/assets/pages/in-patient-dashboard.html',
+    controller: 'appointmentController'
+  })
 
+  .when("/welcome",{
+    templateUrl: '/assets/pages/in-patient-dashboard-welcome.html',
+    controller: 'welcomeController'
+  })
 });
 
-
+app.service('templateService',[function(){
+  this.isThroughLogin = false;
+}])
 
 app.service("multiData",["$http","$window",function($http,$window){
 	this.sendPic = function(url,data){
@@ -35,7 +45,7 @@ app.service("multiData",["$http","$window",function($http,$window){
 		})
     .success(function(response){
       if(response === "success") {
-        $window.location.href = '/user/user-update';
+        $window.location.href = '/doctor/update';
       }
     });
 	}
@@ -72,9 +82,10 @@ app.factory("userData",function(){
   }
 })
 
-app.controller('loginController',["$scope","$http","$location","$window",function($scope,$http,$location,$window) {
+app.controller('loginController',["$scope","$http","$location","$window","ModalService","templateService",function($scope,$http,$location,$window,ModalService,templateService) {
   $scope.login = {};
   $scope.error = "";
+  
   
 	$scope.send = function(){        
         $http({
@@ -100,12 +111,29 @@ app.controller('loginController',["$scope","$http","$location","$window",functio
           }
         });	                                 //multiData.sendData(uploadUrl,$scope.logInfo);
 	}
+
+  $scope.close = function(result) {
+    close(result,500);
+  }
+
+  $scope.register = function(){
+     ModalService.showModal({
+          templateUrl: 'signup.html',
+          controller: "signupController"
+      }).then(function(modal) {
+          modal.element.modal();
+          modal.close.then(function(result) {
+              $scope.message = "You said " + result;
+          });
+      });
+  }
   
 }])
 
 app.controller('signupController',["$scope","$http","$location","$window",function($scope,$http,$location,$window) {
   $scope.user = {};  
-	$scope.submit = function(){
+	$scope.submit = function(type){
+        $scope.user.typeOfUser = type;
         var capitalize = $scope.user.city.charAt(0).toUpperCase() + $scope.user.city.slice(1);
         $scope.user.city = capitalize;        
         $http({
@@ -115,7 +143,7 @@ app.controller('signupController',["$scope","$http","$location","$window",functi
           headers : {'Content-Type': 'application/json'} 
          })
           .success(function(data) {              
-            if (data) {
+            if (data) {              
               $window.location.href = '/account-created';                           
             } else {       
               $scope.error = "Oops! signup failed! It seems like user with this email already exist. ";
@@ -123,6 +151,10 @@ app.controller('signupController',["$scope","$http","$location","$window",functi
             }
           });		                                 
 	}
+
+  $scope.close = function(result) {
+    close(result,500);
+  }
 }]);
 
 app.directive("fileModel",["$parse",function($parse){
@@ -157,6 +189,7 @@ app.controller('formController',["$scope","$http","$location","multiData","$wind
   $scope.user.subSpecialty = [{"id":1,"type":"ss"}];
   $scope.user.procedure = [{"id":1,"type":"pro"}];
   $scope.user.award = [{"id":1,"type":"ha"}];
+  $scope.user.office = [{"id":1,"type":"of"}];
 
   $scope.addNewField = function(arr) {
      var random = Math.floor(Math.random() * 99965);
@@ -196,6 +229,13 @@ app.controller('formController',["$scope","$http","$location","multiData","$wind
             $scope.ha = false;
           }
           break;
+        case "of":
+          if(arr.length > 1) {
+            $scope.of = true;
+          } else {
+            $scope.of = false;
+          }
+          break;
         default:
           break;
      }
@@ -217,7 +257,7 @@ app.controller('formController',["$scope","$http","$location","multiData","$wind
         })
       .success(function(data) {              
         if (data) {
-          $window.location.href = '/user/user-update';                           
+          $window.location.href = '/doctor/update';                           
         } 
       });		                                 
 	}
@@ -315,7 +355,8 @@ app.controller('listController',["$scope","$http","$location","$window","localMa
                       
 }]);
 
-app.controller('bookController',["$scope","$http","$location","$window","localManager",function($scope,$http,$location,$window,localManager) {
+app.controller('bookController',["$scope","$http","$location","$window","localManager","ModalService","templateService",
+  function($scope,$http,$location,$window,localManager,ModalService,templateService) {
 
   $scope.book = function(person){
     getAHelp("book",person);
@@ -324,6 +365,8 @@ app.controller('bookController',["$scope","$http","$location","$window","localMa
   $scope.ask = function(person){
     getAHelp("ask",person)
   }
+
+
 
   function getAHelp(type,thePerson) {
      var theDoctor = {user_id: thePerson}
@@ -336,17 +379,52 @@ app.controller('bookController',["$scope","$http","$location","$window","localMa
         })
       .success(function(data) {              
         if(data.isNotLoggedIn){
-          alert("You're not logged in!");
-          console.log(data);
+          
+          modalCall();
         } else {
           console.log(data);
           localManager.removeItem("userInfo");
-          localManager.setValue("userInfo",data);
+          localManager.setValue("userInfo",data);          
           $window.location.href = "/patient/dashboard";
         }
       });
   }
+
+  function modalCall(){
+
+      ModalService.showModal({
+          templateUrl: 'login.html',
+          controller: "loginController"
+      }).then(function(modal) {
+          modal.element.modal();
+          modal.close.then(function(result) {
+              $scope.message = "You said " + result;
+          });
+      });
+  
+  }
                       
 }]);
+
+app.controller("inPatientDashboardController",["$scope","$location","localManager","templateService",function($scope,$location,localManager,templateService){
+  console.log(templateService.isThroughLogin)
+  if(templateService.isThroughLogin){
+    $location.path("/welcome");
+  } else {
+    $location.path("/appointment");
+  }
+   
+}])
+
+app.controller("appointmentController",["$scope","$location","localManager",function($scope,$location,localManager){
+   var doctorData = localManager.getValue("userInfo");
+   $scope.docInfo = doctorData;
+   console.log($scope.docInfo)
+}])
+app.controller("welcomeController",["$scope","$location","localManager",function($scope,$location,localManager){
+   
+}])
+
+
 
 

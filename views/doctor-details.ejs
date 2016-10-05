@@ -290,28 +290,20 @@
 												</div>
 												<div class="tg-description">
 													<ul>
-				                                    <% for(var i = 0; i < userInfo.sub_specialty.length; i++) { %>									  
-													  	<li><%= userInfo.sub_specialty.sub_specialty || "not supplied" %></li>									  
+				                                    <% for(var i = 0; i < userInfo.education.length; i++) { %>									  
+													  	<li><%= userInfo.education[i].school %></li>
+                                                        <span>Certification: <%= userInfo.education[i].certificate %></span>                                                     								  
 				                                    <% } %>
 													</ul>
-												</div>
-												<div class="tg-heading-border tg-small">
-													<h5>Certification(s)</h5>
-												</div>
-												<div class="tg-description">
-													<ul>
-				                                    <% for(var i = 0; i < userInfo.sub_specialty.length; i++) { %>									  
-													  	<li><%= userInfo.sub_specialty.sub_specialty || "not supplied" %></li>									  
-				                                    <% } %>
-													</ul>
-												</div>
+												</div>										
+												
 												<div class="tg-heading-border tg-small">
 													<h5>Office hours</h5>
 												</div>
 												<div class="tg-description">
 													<ul>
-				                                    <% for(var i = 0; i < userInfo.sub_specialty.length; i++) { %>									  
-													  	<li><%= userInfo.sub_specialty.sub_specialty || "not supplied" %></li>									  
+				                                    <% for(var i = 0; i < userInfo.office_hour.length; i++) { %>									  
+													  	<li><%= userInfo.office_hour[i].day %> <%= userInfo.office_hour[i].from %> to <%= userInfo.office_hour[i].to %></li>									  
 				                                    <% } %>
 													</ul>
 												</div>
@@ -582,115 +574,115 @@
 				Footer Start
 		*************************************-->
 		<footer id="footer" class="tg-haslayout">
-			<div class="tg-threecolumn">
-				<div class="container">
-					<div class="row">
-						<div class="col-sm-4">
-							<div class="tg-footercol">
-								<strong class="logo">
-									<a href="#">
-										<img src="images/logo2.png" alt="image description">
-									</a>
-								</strong>
-								<div class="tg-description">
-									<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut laboret dolore magna aliqua.</p>
-								</div>
-								<ul class="tg-info">
-									<li>
-										<i class="fa fa-home"></i>
-										<address>123 Eccles Old Road, New Salford Road, East London, Uk, M6 7AF</address>
-									</li>
-									<li>
-										<i class="fa fa-envelope"></i>
-										<em><a href="#">info@domain.com</a></em>
-									</li>
-									<li>
-										<i class="fa fa-phone"></i>
-										<em><a href="#">+44 123 456 788 - 9</a></em>
-									</li>
-								</ul>
-							</div>
-						</div>
-						<div class="col-sm-4">
-							<div class="tg-footercol">
-								<div class="tg-heading-border tg-small">
-									<h4>featured doctors</h4>
-								</div>
-								<div class="tg-widget tg-featured-doctore">
-									<ul>
-										<li>
-											<figure class="tg-imgdoc">
-												<img src="images/img-02.jpg" alt="image description">
-												<div class="tg-img-hover">
-													<a href="#"><i class="icon-zoom"></i></a>
-												</div>
-											</figure>
-											<div class="tg-docinfo">
-												<span class="tg-docname"><a href="#">Dr. Jennifer Bada-Ellzey, MD, MPH</a></span>
-												<span class="tg-stars">
-													<em>Ranking:</em>
-													<i class="fa fa-star"></i>
-													<i class="fa fa-star"></i>
-													<i class="fa fa-star"></i>
-													<i class="fa fa-star"></i>
-													<i class="fa fa-star"></i>
-												</span>
-												<div class="tg-designation">
-													<p><a href="#">Family &amp; Community Medicine</a></p>
-												</div>
-											</div>
-										</li>
-										<li>
-											<figure class="tg-imgdoc">
-												<img src="images/img-03.jpg" alt="image description">
-												<div class="tg-img-hover">
-													<a href="#"><i class="icon-zoom"></i></a>
-												</div>
-											</figure>
-											<div class="tg-docinfo">
-												<span class="tg-docname"><a href="#">Dr. Curtis O. Ballard, MD</a></span>
-												<span class="tg-stars">
-													<em>Ranking:</em>
-													<i class="fa fa-star"></i>
-													<i class="fa fa-star"></i>
-													<i class="fa fa-star"></i>
-													<i class="fa fa-star-o"></i>
-													<i class="fa fa-star-o"></i>
-												</span>
-												<div class="tg-designation">
-													<p><a href="#">Orthopaedic Surgery &amp; Sports Medicine</a></p>
-												</div>
-											</div>
-										</li>
-									</ul>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-4">
-							<div class="tg-footercol">
-								<div class="tg-heading-border tg-small">
-									<h4>Useful links</h4>
-								</div>
-								<div class="tg-widget tg-usefullinks">
-									<ul>
-										<li><a href="#">About Us</a></li>
-										<li><a href="#">Latest Blog</a></li>
-										<li><a href="#">Terms and Conditions</a></li>
-										<li><a href="#">Privacy Policy</a></li>
-										<li><a href="#">Contact Us</a></li>
-									</ul>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="tg-footerbar tg-haslayout">
-				<div class="tg-copyrights">
-					<p>2015 All Rights Reserved © DocDirect</p>
-				</div>
-			</div>
-		</footer>
+            <div class="tg-threecolumn">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <div class="tg-footercol">
+                                <strong class="logo">
+                                    <a href="#">
+                                        <img src="/assets/images/logo2.png" alt="image description">
+                                    </a>
+                                </strong>
+                                <div class="tg-description">
+                                    <p>We specialize in offering help to find your best medical solution.</p>
+                                </div>
+                                <ul class="tg-info">
+                                    <li>
+                                        <i class="fa fa-home"></i>
+                                        <address>1 Nwodo street GRA Enugu, Enugu State</address>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-envelope"></i>
+                                        <em><a href="#">info@domain.com</a></em>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-phone"></i>
+                                        <em><a href="#">+234 8064245256</a></em>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="tg-footercol">
+                                <div class="tg-heading-border tg-small">
+                                    <h4>featured doctors</h4>
+                                </div>
+                                <div class="tg-widget tg-featured-doctore">
+                                    <ul>
+                                        <li>
+                                            <figure class="tg-imgdoc">
+                                                <img src="/assets/images/img-02.jpg" alt="image description">
+                                                <div class="tg-img-hover">
+                                                    <a href="#"><i class="icon-zoom"></i></a>
+                                                </div>
+                                            </figure>
+                                            <div class="tg-docinfo">
+                                                <span class="tg-docname"><a href="#">Dr. Jennifer Bada-Ellzey, MD, MPH</a></span>
+                                                <span class="tg-stars">
+                                                    <em>Ranking:</em>
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fa fa-star"></i>
+                                                </span>
+                                                <div class="tg-designation">
+                                                    <p><a href="#">Family &amp; Community Medicine</a></p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <figure class="tg-imgdoc">
+                                                <img src="/assets/images/img-03.jpg" alt="image description">
+                                                <div class="tg-img-hover">
+                                                    <a href="#"><i class="icon-zoom"></i></a>
+                                                </div>
+                                            </figure>
+                                            <div class="tg-docinfo">
+                                                <span class="tg-docname"><a href="#">Dr. Curtis O. Ballard, MD</a></span>
+                                                <span class="tg-stars">
+                                                    <em>Ranking:</em>
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fa fa-star"></i>
+                                                    <i class="fa fa-star-o"></i>
+                                                    <i class="fa fa-star-o"></i>
+                                                </span>
+                                                <div class="tg-designation">
+                                                    <p><a href="#">Orthopaedic Surgery &amp; Sports Medicine</a></p>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="tg-footercol">
+                                <div class="tg-heading-border tg-small">
+                                    <h4>Useful links</h4>
+                                </div>
+                                <div class="tg-widget tg-usefullinks">
+                                    <ul>
+                                        <li><a href="#">About Us</a></li>
+                                        <li><a href="#">Latest Blog</a></li>
+                                        <li><a href="#">Terms and Conditions</a></li>
+                                        <li><a href="#">Privacy Policy</a></li>
+                                        <li><a href="#">Contact Us</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tg-footerbar tg-haslayout">
+                <div class="tg-copyrights">
+                    <p>2015 All Rights Reserved © DocDirect</p>
+                </div>
+            </div>
+        </footer>
 		<!--************************************
 				Footer End
 		*************************************-->
@@ -983,6 +975,110 @@
                 type.addEventListener('change',setType,false)
             }, false)
         </script>
+        <script type="text/ng-template" id="login.html">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+               <h6 class="modal-title">We noticed you have not logged in! 
+                <span style="display:block; color:black">Please do login now to reach your doctor</span></h6>
+              </div>
+              <div class="modal-body">
+                <p>not yet a member? <button ng-click= "register()">Register</button>                
+                    <form class="tg-form-modal tg-form-signin">
+                        <span style="color:red" ng-cloak>{{error}}</span>
+                            <fieldset>
+                                <div class="form-group">
+                                    <input type="email" class="form-control" placeholder="Email Address" name="email" ng-model="login.email">
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" placeholder="Password" name="password" ng-model="login.password">
+                                </div>                                
+                                <div class="form-group tg-checkbox">
+                                    <label>
+                                        <input type="checkbox" class="form-control">
+                                        Remember Me
+                                    </label>
+                                    <a class="tg-forgot-password" href="#">
+                                        <i>Forgot Password</i>
+                                        <i class="fa fa-question-circle"></i>
+                                    </a>
+                                </div>
+                                <button class="tg-btn tg-btn-lg" ng-click="send()">LOGIN now</button>
+                            </fieldset>
+                        </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="close('No')" class="btn btn-default" data-dismiss="modal">No</button>
+                <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+     </script>
+     <script type="text/ng-template" id="signup.html">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+                
+              </div>
+              <div class="modal-body">
+                <form class="tg-form-modal tg-form-signup">
+                            <span style="color:red" ng-cloak>{{error}}</span>
+                            <fieldset>
+                            <h5>Patient signup</h5>                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname">
+                                </div>                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="lastname" ng-model="user.lastname">
+                                </div>
+                                 <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" name="gender" placeholder="Gender" ng-model="user.gender">
+                                </div>
+                               
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Age*" id="work" ng-model="user.age">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="City/Town*" id="firstname" ng-model="user.city" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="email" class="form-control placeholder-color" placeholder="Email*" id="firstname" ng-model="user.email" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" placeholder="Password" ng-model="user.password">
+                                </div>                                                   
+                               
+                                <div class="form-group tg-checkbox">
+                                    <label>
+                                        <input type="checkbox" class="form-control" ng-model="user.check">
+                                        I agree with the terms and conditions
+                                    </label>
+                                </div>                                
+                                <button class="tg-btn tg-btn-lg" ng-click="submit('Patient')">Create an Account</button>
+                            </fieldset>
+                        </form>               
+                    
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="close('No')" class="btn btn-default" data-dismiss="modal">No</button>
+                <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        </script>
         <!--************************************
                 Sign In Sign Up Light Box End
         *************************************-->
@@ -1004,6 +1100,7 @@
         <script src="/assets/js/countTo.js"></script>
         <script src="/assets/js/map/map.js"></script>
         <script src="/assets/js/angularAnimate.js"></script>
+         <script src="/assets/js/modalService.js"></script>
         <script src="/assets/js/main.js"></script>
     </body>
 </html>

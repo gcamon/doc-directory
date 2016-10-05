@@ -254,7 +254,7 @@ form fieldset{
 }
 
 .pp {
-	border-radius: 130px!important;
+	/*border-radius: 130px!important;*/
 	width: 250px!important;
 	min-height: 250px;
 }

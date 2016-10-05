@@ -108,6 +108,9 @@ var basicRoute = function (model) {
                                case "award":
                                 pushAll(req.body.award);                               
                                break;
+                               case "office":
+                                pushAll(req.body.office);                               
+                               break;
                                default:                               
                                break;
                            }
@@ -129,6 +132,9 @@ var basicRoute = function (model) {
                                 break;
                                 case "ha":
                                 result.awards.push(arr[i]);
+                                break;
+                                case "of":
+                                result.office_hour.push(arr[i]);
                                 break;
                                 default:
                                 break;

@@ -105,37 +105,7 @@
 		<!--************************************
 				Home Slider Start
 		*************************************-->
-		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout">
-			<div class="tg-searcharea tg-haslayout">
-				<div class="container">
-					<div class="row">
-						<form class="tg-searchform">
-							<div class="col-md-5 col-sm-5 col-xs-12">
-								<div class="form-group">
-									<input type="text" placeholder="Address" class="form-control">
-								</div>
-							</div>
-							<div class="col-md-5 col-sm-5 col-xs-8">
-								<div class="form-group">
-									<span class="select">
-										<select id="group1" class="group">
-											<option>Catagory</option>
-											<option>Doctor one</option>
-											<option>Doctor two</option>
-											<option>Doctor three</option>
-										</select>
-									</span>
-								</div>
-							</div>
-							<div class="col-md-2 col-sm-2 col-xs-4">
-								<div class="form-group">
-									<a id="search_banner" class="tg-btn tg-btn-lg" href="#">Search</a>
-								</div>
-							</div>
-						</form>
-					</div>
-				</div>
-			</div>
+		
 			<div class="tg-pagebar tg-haslayout">
 				<div class="container">
 					<div class="row">
@@ -162,26 +132,25 @@
 					<div class="col-lg-9 col-md-9 col-sm-8 col-xs-12 pull-right">
 						<form class="tg-formeditprofile tg-haslayout">
 							<fieldset>
-								<div class="tg-editprofile tg-haslayout" ng-controller="pictureController">
+								<div class="tg-editprofile tg-haslayout">
 									<div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 tg-findheatlhwidth">
 										<div class="row">
 											<div class="tg-editimg tg-haslayout">
 												<div class="tg-heading-border tg-small">
-													<h3>tips for uploading</h3>													
+													<h4>tips for uploading</h4>													
 												</div>																														
 												<ul class="tg-instructions">
 													<li>Max Upload Size: 1MB</li>
 													<li>Dimensions: 370x377</li>
 													<li>Extensions: Jpeg, Png</li>
 												</ul>												
-												<input type="file" name="file" id="file" file-model = "user.profilepic"/>
-												<button ng-click="update()" class="btn btn-primary">Upload</button>	
+												
 											</div>
 										</div>
 									</div>
 									<div class="col-lg-4 col-md-4 col-sm-12 col-xs-12 tg-expectwidth">
 										<div class="row">
-											<div class="tg-otherphotos">
+											<!--<div class="tg-otherphotos">
 												<div class="tg-heading-border tg-small">
 													<h3><a href="#">Other Photos</a></h3>
 												</div>
@@ -219,15 +188,16 @@
 														</ul>
 													</div>
 												</div>
-											</div>
+											</div>-->
 										</div>
 									</div>
 								</div>
 								<div ng-controller="formController">
 								<div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
+										{{user}}
 										<div class="tg-heading-border tg-small">
-											<h3>Basic Information</h3>
+											<h4>Basic Information</h4>
 										</div>
 										<div class="row">											
 											<div class="col-md-4 col-sm-6 col-xs-12">
@@ -271,21 +241,20 @@
 												</div>
 											</div>
 											<div class="col-sm-12">
-												<div class="tg-addfield">
+												<!--<div class="tg-addfield">
 													<button type="submit">
 														<i class="fa fa-plus"></i>
 														<span>add field</span>
 													</button>
-												</div>
+												</div>-->
 											</div>
 										</div>
-									</div>
-									{{user}}
+									</div>									
 								</div>
 								<div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
 										<div class="tg-heading-border tg-small">
-											<h3>Introductory Note*</h3>
+											<h4>Introductory Note*</h4>
 										</div>
 										<div class="row">											
 											<div class="col-md-8 col-sm-6 col-xs-12">
@@ -299,7 +268,7 @@
 								<div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
 										<div class="tg-heading-border tg-small">
-											<h3>Years of experience</h3>
+											<h4>Years of experience</h4>
 										</div>
 										<div class="row">											
 											<div class="col-md-8 col-sm-6 col-xs-12">
@@ -313,7 +282,7 @@
 								<div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
 										<div class="tg-heading-border tg-small">
-											<h3>Education</h3>
+											<h4>Education</h4>
 										</div>
 										<div class="row">											
 											<div class="col-md-8 col-sm-6 col-xs-12" ng-repeat="item in user.education">
@@ -333,7 +302,7 @@
 											<div class="col-sm-12">												
 												<div class="tg-addfield">
 													<button type="submit" ng-click="removeNewField(user.education)" ng-if="edu" ng-cloak>														
-														<span>remove last field</span>
+														<span style="color:rgba(200,0,0,0.9);font-size:12px">remove last field</span>
 													</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;							
 													<button type="submit" ng-click="addNewField(user.education)">
 														<i class="fa fa-plus"></i>
@@ -347,7 +316,7 @@
                                 <div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
 										<div class="tg-heading-border tg-small">
-											<h3>Sub Speciality</h3>
+											<h4>Sub Speciality</h4>
 										</div>
 										<div class="row">
 											<div class="col-md-4 col-sm-6 col-xs-12">
@@ -365,7 +334,7 @@
 											<div class="col-sm-12">
 												<div class="tg-addfield">
 													<button type="submit" ng-click="removeNewField(user.subSpecialty)" ng-if="sp" ng-cloak>														
-														<span>remove last field</span>
+														<span style="color:rgba(200,0,0,0.9);font-size:12px">remove last field</span>
 													</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;							
 													<button type="submit" ng-click="addNewField(user.subSpecialty)">
 														<i class="fa fa-plus"></i>
@@ -379,18 +348,20 @@
                                 <div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
 										<div class="tg-heading-border tg-small">
-											<h3>Procedure</h3>
+											<h4>Procedure</h4>
 										</div>
 										<div class="row">											
 											<div class="col-md-8 col-sm-6 col-xs-12" ng-repeat = "item in user.procedure">
 												<div class="form-group">
-													<input class="form-control" type="text" placeholder="Procedure" ng-model="item.procedure_description">
+													<input class="form-control" type="text" placeholder="Procedure" ng-model="item.procedure_description" style="margin-bottom: 10px">													
+													<input type="file">
+													<button ng-click="upload()" style="background-color:rgba(0,200,0,0.8); padding:10px 105px; color:#fff;border-radius:5px;margin:10px auto">add Photo/Video</button>
 												</div>
 											</div>
 											<div class="col-sm-12">
 												<div class="tg-addfield">
 													<button type="submit" ng-click="removeNewField(user.procedure)" ng-if="pro" ng-cloak>														
-														<span>remove last field</span>
+														<span style="color:rgba(200,0,0,0.9);font-size:12px">remove last field</span>
 													</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;							
 													<button type="submit" ng-click="addNewField(user.procedure)">
 														<i class="fa fa-plus"></i>
@@ -404,20 +375,21 @@
 								<div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
 										<div class="tg-heading-border tg-small">
-											<h3>Honors & Awards</h3>
+											<h4>Honors & Awards</h4>
 										</div>
 										<div class="row">
 										<div ng-repeat="item in user.award">
 											<div class="col-md-4 col-sm-6 col-xs-12">
 												<div class="form-group">
-													<span class="select">
+													<input class="form-control" type="text" placeholder="Name of award" ng-model="item.type_of_award">
+													<!--<span class="select">
 														<select class="group" id="group1" ng-model="item.type_of_award">
 															<option>All</option>
 															<option>good one</option>
 															<option>Doctor two</option>
 															<option>Doctor three</option>
 														</select>
-													</span>
+													</span>-->
 												</div>
 											</div>
 											<div class="col-md-8 col-sm-6 col-xs-12">
@@ -429,7 +401,7 @@
 											<div class="col-sm-12">
 												<div class="tg-addfield">
 													<button type="submit" ng-click="removeNewField(user.award)" ng-if="ha" ng-cloak>														
-														<span>remove last field</span>
+														<span style="color:rgba(200,0,0,0.9);font-size:12px">remove last field</span>
 													</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;							
 													<button type="submit" ng-click="addNewField(user.award)">
 														<i class="fa fa-plus"></i>
@@ -439,14 +411,59 @@
 											</div>
 										</div>
 									</div>
-								</div>						
+								</div>
+								<div class="tg-bordertop tg-haslayout">
+									<div class="tg-formsection">
+										<div class="tg-heading-border tg-small">
+											<h4>OFFice HOURS</h4>
+										</div>
+										<div class="row">
+										<div ng-repeat="item in user.office">
+											<div class="col-md-4 col-sm-6 col-xs-12">
+												<div class="form-group">
+													<span class="select">
+														<select class="group" id="group1" ng-model="item.day">
+															<option>Monday</option>
+															<option>Tuesday</option>
+															<option>Wednesday</option>
+															<option>Thursday</option>
+															<option>Friday</option>
+															<option>Saturday</option>
+															<option>Sunday</option>
+														</select>
+													</span>
+												</div>
+											</div>
+											<div class="col-md-8 col-sm-6 col-xs-12">
+												<div class="form-group">
+													<label for = "from">From</label>
+													<input class="form-control" type="text" name= "from" placeholder="what time?" ng-model="item.from">
+													<label for = "to">to</label>
+													<input class="form-control" type="text" name="to" placeholder="what time?" ng-model="item.to">
+												</div>
+											</div>
+											</div>
+											<div class="col-sm-12">
+												<div class="tg-addfield">
+													<button type="submit" ng-click="removeNewField(user.office)" ng-if="of" ng-cloak>														
+													<span style="color:rgba(200,0,0,0.9);font-size:12px">remove last field</span>
+													</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;							
+													<button type="submit" ng-click="addNewField(user.office)">
+														<i class="fa fa-plus"></i>
+														<span>add field</span>
+													</button>						
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>								
 								<button type="submit" class="tg-btn" ng-click="update()">update</button>
 								</div>
 							</fieldset>
 						</form>
 					</div>
 					<div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
-						<aside id="tg-sidebar">
+						<aside id="tg-sidebar"  ng-controller="pictureController">
 							<div class="tg-widget tg-widget-doctor">
 								<figure class="tg-docprofile-img">
 									<figcaption>
@@ -457,7 +474,45 @@
 									<a href="#"><img alt="image description" src="<%= person.profile_pic_url %>"></a>
 								</figure>
 							</div>
-							<div class="tg-widget tg-widget-accordions">
+							<input type="file" name="file" id="file" file-model = "user.profilepic"/>
+							<button ng-click="update()" style="background-color:rgba(0,200,0,0.8); padding:10px 105px; color:#fff;border-radius:5px;margin:10px auto">Upload</button>	
+							<div class="tg-otherphotos">
+												<div class="tg-heading-border tg-small">
+													<h5><a href="#">Procedural Photos</a></h5>
+												</div>												
+												<div id="tg-photoscroll" class="tg-photoscroll">
+													<div class="form-group">
+														<ul class="tg-otherimg">
+															<li>
+																<figure>
+																	<a href="#"><img src="/assets/images/dashboard/img-04.jpg" alt="image description"></a>
+																	<div class="tg-img-hover">
+																		<i class="fa fa-plus"></i>
+																	</div>
+																</figure>
+															</li>
+															<li>
+																<figure>
+																	<a href="#"><img src="/assets/images/dashboard/img-05.jpg" alt="image description"></a>
+																	<div class="tg-img-hover">
+																		<i class="fa fa-plus"></i>
+																	</div>
+																</figure>
+															</li>
+															<li>
+																<figure>
+																	<a href="#"><img src="/assets/images/dashboard/img-06.jpg" alt="image description"></a>
+																	<div class="tg-img-hover">
+																		<i class="fa fa-plus"></i>
+																	</div>
+																</figure>
+															</li>												
+															
+														</ul>
+													</div>
+												</div>
+							</div>
+							<!--<div class="tg-widget tg-widget-accordions">
 								<input type="file" name="file" id="file" class="inputfile" ng-model = "user.profilepic"/>
 								<label for="file">Dashboard</label>
 								<ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -513,7 +568,7 @@
 										<h3 class="panel-title"><a href="/user/logout">Signout</a></h3>
 									</li>
 								</ul>
-							</div>
+							</div>-->
 						</aside>
 					</div>
 				</div>
@@ -538,12 +593,12 @@
 									</a>
 								</strong>
 								<div class="tg-description">
-									<p>Dynamic content</p>
+									<p>We specialize in offering help to find your best medical solution.</p>
 								</div>
 								<ul class="tg-info">
 									<li>
 										<i class="fa fa-home"></i>
-										<address>1 Nwodo street GRA Enugu</address>
+										<address>1 Nwodo street GRA Enugu, Enugu State</address>
 									</li>
 									<li>
 										<i class="fa fa-envelope"></i>
@@ -551,7 +606,7 @@
 									</li>
 									<li>
 										<i class="fa fa-phone"></i>
-										<em><a href="#">+44 123 456 788 - 9</a></em>
+										<em><a href="#">+234 8064245256</a></em>
 									</li>
 								</ul>
 							</div>
@@ -565,7 +620,7 @@
 									<ul>
 										<li>
 											<figure class="tg-imgdoc">
-												<img src="<%= person.profile_pic_url %>" alt="image description" style="width:80px; height:80px">
+												<img src="/assets/images/img-02.jpg" alt="image description">
 												<div class="tg-img-hover">
 													<a href="#"><i class="icon-zoom"></i></a>
 												</div>
@@ -587,7 +642,7 @@
 										</li>
 										<li>
 											<figure class="tg-imgdoc">
-												<img src="<%= person.profile_pic_url %>" alt="image description" style="width:80px; height:80px">
+												<img src="/assets/images/img-03.jpg" alt="image description">
 												<div class="tg-img-hover">
 													<a href="#"><i class="icon-zoom"></i></a>
 												</div>
@@ -746,6 +801,7 @@
         <script src="/assets/js/countTo.js"></script>
         <script src="/assets/js/map/map.js"></script>
 		<script src="/assets/js/angularAnimate.js"></script>
+		 <script src="/assets/js/modalService.js"></script>
         <script src="/assets/js/main.js"></script>
 </body>
 </html>
