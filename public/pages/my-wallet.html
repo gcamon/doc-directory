@@ -1,0 +1,14 @@
+<div ng-controller = "walletController" style="text-align: center">
+	<h2 style="padding: 10px 1px; margin: 10px 0px">My wallet</h2>
+	<div>
+		<button ng-click="invoice()">Generate invoice</button>
+		<button ng-click="transactions()">View transactions</button>		
+	</div>	
+	<div ng-if="viewInvoice">
+		<div style="margin-top: 20px; border-top: 1px dashed rgba(0,0,0,0.3)"></div>
+		<h3>Payment options</h3>
+	</div>
+	<div ng-if="viewTransactions">
+		<div style="margin-top: 20px; border-top: 1px dashed rgba(0,0,0,0.3)"></div>
+	</div>
+</div>
