@@ -658,6 +658,111 @@
                 type.addEventListener('change',setType,false)
             }, false)
         </script>
+       <script type="text/ng-template" id="login.html">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+               <h6 class="modal-title">We noticed you have not logged in! 
+                <span style="display:block; color:black">Please do login now to reach your doctor</span></h6>
+              </div>
+              <div class="modal-body">
+              	<p>not yet a member? <button ng-click= "register()">Register</button>                
+ 					<form class="tg-form-modal tg-form-signin">
+                        <span style="color:red" ng-cloak>{{error}}</span>
+                            <fieldset>
+                                <div class="form-group">
+                                    <input type="email" class="form-control" placeholder="Email Address" name="email" ng-model="login.email">
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" placeholder="Password" name="password" ng-model="login.password">
+                                </div>                                
+                                <div class="form-group tg-checkbox">
+                                    <label>
+                                        <input type="checkbox" class="form-control">
+                                        Remember Me
+                                    </label>
+                                    <a class="tg-forgot-password" href="#">
+                                        <i>Forgot Password</i>
+                                        <i class="fa fa-question-circle"></i>
+                                    </a>
+                                </div>
+                                <button class="tg-btn tg-btn-lg" ng-click="send()">LOGIN now</button>
+                            </fieldset>
+                        </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="close('No')" class="btn btn-default" data-dismiss="modal">No</button>
+                <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+     </script>
+     <script type="text/ng-template" id="signup.html">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+                
+              </div>
+              <div class="modal-body">
+              	<form class="tg-form-modal tg-form-signup">
+                            <span style="color:red" ng-cloak>{{error}}</span>
+                            <fieldset>
+                            <h5>Patient signup</h5>                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname">
+                                </div>                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="lastname" ng-model="user.lastname">
+                                </div>
+                                 <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" name="gender" placeholder="Gender" ng-model="user.gender">
+                                </div>
+                               
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Age*" id="work" ng-model="user.age">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="City/Town*" id="firstname" ng-model="user.city" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="email" class="form-control placeholder-color" placeholder="Email*" id="firstname" ng-model="user.email" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" placeholder="Password" ng-model="user.password">
+                                </div>                                                   
+                               
+                                <div class="form-group tg-checkbox">
+                                    <label>
+                                        <input type="checkbox" class="form-control" ng-model="user.check">
+                                        I agree with the terms and conditions
+                                    </label>
+                                </div>                                
+                                <button class="tg-btn tg-btn-lg" ng-click="submit('Patient')">Create an Account</button>
+                            </fieldset>
+                        </form>               
+ 					
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="close('No')" class="btn btn-default" data-dismiss="modal">No</button>
+                <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        </script>
+        
         <!--************************************
                 Sign In Sign Up Light Box End
         *************************************-->
@@ -678,9 +783,8 @@
         <script src="/assets/js/appear.js"></script>
         <script src="/assets/js/countTo.js"></script>
         <script src="/assets/js/map/map.js"></script>
-        <script src="/assets/js/main.js"></script>
         <script src="/assets/js/angularAnimate.js"></script>
-         <script src="/assets/js/modalService.js"></script>
-        <!--<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0/angular-animate.js"></script>-->
+        <script src="/assets/js/main.js"></script>
+        <script src="/assets/js/modalService.js"></script>
     </body>
 </html>

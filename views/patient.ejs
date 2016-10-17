@@ -22,7 +22,10 @@
     <link rel="stylesheet" href="/assets/css/transitions.css">
     <link rel="stylesheet" href="/assets/css/color.css">
     <link rel="stylesheet" href="/assets/css/responsive.css">
-    <script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
+    <link rel="stylesheet" href="/assets/css/angular-carousel.css">   
+
+
+    <!--<script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>-->
 </head>
 <body ng-app = "myApp">
         <!--[if lt IE 8]>
@@ -109,18 +112,18 @@
             <div class="tg-searcharea tg-haslayout">
                 <div class="container">
                     <div class="row">
-                        <!--<form class="tg-searchform">
-                            <div class="col-md-2 col-sm-2 col-xs-12">
+                        <form class="tg-searchform">
+                            <!--<div class="col-md-2 col-sm-2 col-xs-12">
                                 <div class="form-group">
                                     
                                 </div>
-                            </div>
-                            <div class="col-md-4 col-sm-4 col-xs-12">
+                            </div>-->
+                            <div class="col-md-5 col-sm-5 col-xs-12">
                                 <div class="form-group">
                                     <input type="text" placeholder="Enter city name" class="form-control" ng-model="user.city">
                                 </div>
                             </div>
-                            <div class="col-md-4 col-sm-4 col-xs-8">
+                            <div class="col-md-5 col-sm-5 col-xs-12">
                                 <div class="form-group">                                
                                     <span class="select">
                                         <select id="group1" class="group" placeholder="Specialty" ng-model="user.specialty">
@@ -205,25 +208,69 @@
                                     <button id="search_banner" class="tg-btn tg-btn-lg" ng-click = "search()">Search</button>
                                 </div>
                             </div>
-                        </form>-->
+                        </form>
                     </div>
                 </div>
             </div>
-            <div class="tg-pagebar tg-haslayout">
+            <div class="tg-pagebar tg-haslayout" ng-controller = "patientNotificationController">
                 <div class="container">
                     <div class="row">
-                        <div class="col-xs-12">
+                        <div class="col-xs-4 col-md-8">
                             <h1>Patient dashboard</h1>
-                            <ol class="tg-breadcrumb">
+                            <!--<ol class="tg-breadcrumb">
                                 <li><a href="#">Home</a></li>
-                                <li class="active">Patient dashboard</li>
-                            </ol>
+                                <li class="active">Patient dashboard</li>                                
+                            </ol>-->
+                        </div>
+                        <div class="col-xs-8 col-md-4">                            
+                            <ul class="notify">
+                                <li class="noti note">
+                                    <i class="fa fa-bell-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
+                                    <ul class="all-notify">
+                                        <li> <h6 style="text-align: center">Notification(s)</h6> </li>
+                                        <% for(var i = userInfo.patient_notification.length -1; i >= 0; i--) { %>
+                                            <li class="note-field" ng-click="viewNote('<%= userInfo.patient_notification[i].doctor_id %>')">                                                
+                                                <img src="<%= userInfo.patient_notification[i].doctor_profile_pic_url %>" style="width: 50px; height: 50px">
+                                                <div>{{getData("<%= userInfo.patient_notification[i].doctor_firstname%>","<%= userInfo.patient_notification[i].doctor_lastname %>","<%= userInfo.patient_notification[i].date %>","<%= userInfo.patient_notification[i].doctor_profile_pic_url %>","<%= userInfo.patient_notification[i].consultation_fee %>","<%= userInfo.firstname %>","<%= userInfo.ewallet.available_amount %>","<%= userInfo.patient_notification[i].doctor_id %>","<%= userInfo.patient_notification[i].service_access %>","<%= userInfo.patient_notification[i].doctor_specialty %>")}}</div>
+                                                <span>{{convertDate('<%= userInfo.patient_notification[i].date %>')}}</span>    
+
+                                                <span> From Dr. <%= userInfo.patient_notification[i].doctor_firstname %> <%= userInfo.patient_notification[i].doctor_lastname %></span>
+                                                <span style="display:block">{{realDate | date: "medium"}}</span>
+                                            </li>
+                                        <% } %>
+
+                                    </ul>
+                                </li>
+                                <li class="noti chat">
+                                    <i class="fa fa-commenting-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
+                                    <ul class="all-notify">
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                    </ul>
+                                </li>
+                                <li class="noti video">
+                                    <i class="fa fa-phone" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
+                                    <ul class="all-notify">
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                    </ul>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!--************************************
+        <!--************************************              
+                            <div ng-view class="view-animate">
+                            </div>
+                        </div>          
                 Home Slider End
         *************************************-->
         <!--************************************
@@ -234,10 +281,82 @@
                 <div class="row">
                     <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12 pull-right">
                         <div class="row">
-                            <div class="col-sm-12 col-md-12 col-lg-12">
-                                <div class="row" ng-view>
+                            <div class="col-sm-12 col-md-9 col-lg-9">
+                                <div class="view-animate-container row" >  
+                                    <div class="view-animate" ng-view >
+                                    </div>
                                 </div>
                             </div>
+                            <div class="col-sm-12 col-md-3 col-lg-3" style="padding: 0px 3px">
+                                <aside id="tg-sidebar">
+                            <!--<div class="tg-heading-border tg-small">
+                                <h2>refine search</h2>
+                            </div>-->
+                            <!--<form class="form-refinesearch tg-haslayout"  ng-controller="refineSearchController">
+                                <fieldset style="background-color:#ccc; padding: 10px 10px;margin-bottom: 20px">
+                                    <input type="text" placeholder="Sub Specialty" style="padding: 5px 5px;margin-top: 10px" ng-model="user.sub_specialty">
+                                    <input type="text" placeholder="Procedure" style="padding: 5px 5px;margin: 10px 0px" ng-model="user.procedure">
+                                    <button style="background-color: rgba(20,255,0,0.7); color: #fff; padding: 10px 15px; border-radius:5px">Filter Search</button>
+                                </fieldset>
+                            </form>-->
+                            <div class="tg-widget tg-tab-widget">
+                                <h3>My doctor(s)</h3>
+                                <div>
+                                    <ul style="height: 600px; overflow-x: auto">
+                                        <% if(userInfo.accepted_doctors.length > 0) { %> 
+                                            <% for(var k = 0; k < userInfo.accepted_doctors.length; k++) { %>
+                                            <li style="list-style-type: none; padding: 10px;border-bottom: 1px dashed rgba(0,0,0,0.2);border-radius: 20px;cursor: pointer" class="clearfix" ng-click="checkoutDoctor()">
+                                                <div style="cursor: pointer;" ng-click="userDoctor(<%= userInfo.accepted_doctors[k].doctor_id %>)">                                                
+                                                    <img src="<%= userInfo.accepted_doctors[k].doctor_profile_pic_url %>" style="width:32px;height:32px" alt="image description">
+                                                    <span style="font-size: 12px">Dr. <%= userInfo.accepted_doctors[k].doctor_firstname %> <%= userInfo.accepted_doctors[k].doctor_lastname %> </span>                                                    
+                                                </div>
+                                                <div>
+                                                </div>
+                                            </li>
+                                            <% } %>
+                                        <% } %>
+                                    </ul>
+                                </div>
+                                <!--<div class="tg-tabwidet-content">
+                                    <ul class="tg-nav-tabs nav-tabs" role="tablist">
+                                        <li role="presentation" class="active">
+                                            <a href="#recent" aria-controls="recent" role="tab" userInfo-toggle="tab">Recent</a>
+                                        </li>                                        
+                                    </ul>
+                                    <% if(userInfo.accepted_doctors.length > 0) { %>                                     
+                                    <div class="tab-content">
+                                        <div role="tg-tabpanel tabpanel" class="tg-tab-pane tab-pane active" id="recent">
+                                            <ul>
+                                            <% for(var k = 0; k < userInfo.accepted_doctors.length; k++) { %>
+                                                <li>
+                                                    <figure>
+                                                        <a href="<% userInfo.accepted_doctors[k].profile_url %>">
+                                                            <img src="<% userInfo.accepted_doctors[k].doctor_profile_pic_url %>" style="width:32px;height:32px" alt="image description">
+                                                        </a>
+                                                    </figure>
+                                                    <div class="tg-description">
+                                                        <h3>Dr. <% userInfo.accepted_doctors[k].doctor_firstname %> <% userInfo.accepted_doctors[k].doctor_lastname %> </h3>
+                                                        <em><% userInfo.accepted_doctors[k].doctor_specialty %></em>
+                                                        <span class="tg-stars">
+                                                            <i class="fa fa-star"></i>
+                                                            <i class="fa fa-star"></i>
+                                                            <i class="fa fa-star"></i>
+                                                            <i class="fa fa-star"></i>
+                                                            <i class="fa fa-star-half-empty"></i>
+                                                        </span>
+                                                    </div>
+                                                </li>                                               
+                                            </ul>
+                                            <% } %>
+                                        </div>
+                                        
+                                    </div>                                  
+                                    <% } %>
+                                </div>-->
+                            </div>
+                        </aside>
+                            </div>
+                           
                             <!--<div class="col-sm-3 col-md-3 col-lg-3">
                             </div>-->
                         </div>
@@ -454,7 +573,7 @@
                             </div>
                         </div>
                     </div>-->
-                    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
+                    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12" ng-controller="pictureController">
                         <aside id="tg-sidebar">
                             <div class="tg-widget tg-widget-doctor">
                                 <figure class="tg-docprofile-img">
@@ -465,6 +584,9 @@
                                     <a href="#"><img alt="image description" src="<%= userInfo.profile_pic_url %>"></a>                                   
                                 </figure>
                             </div>
+                            <input type="file" name="file" id="file" file-model = "user.profilepic"/>
+                            <button ng-click="update('patient')" style="background-color:rgba(0,200,0,0.8); padding:10px 105px; color:#fff;border-radius:5px;margin:10px auto">Upload</button>   
+                            <div class="tg-otherphotos">
                             <div class="tg-widget tg-widget-accordions">
                                 <h3>Dashboard</h3>
                                 <ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -538,9 +660,60 @@
                     </div>
                 </div>
             </div><!-- main content -->
-            <div class="container-fluid">
+            <div class="container-fluid" ng-controller="appointmentController">
                 <div class="row">
                     <div class="col-sm-12 col-lg-12 col-md-12">
+                        <ul rn-carousel rn-carousel-index class="image">
+                         <li><img src="/assets/images/doctors/img-03.jpg"></li>
+                        </ul>
+                        
+                       
+                    </div>                       
+                    <div class="col-sm-12 col-lg-12 col-md-12">
+                         <div class="row">
+                            <div class="col-md-4 col-lg-4">
+                            <div style="width:89%;margin: -20px auto 0;">
+                            <p style="font-size: 22px; font-weight: 100; margin-top: 50px">Fund your wallet now!</p>                
+                            <ul>
+                                <li>Make payments to gain access to our all services</li>
+                                <li>Call your doctor at your free time.</li>
+                                <li>Request for in-person consultation</li>
+                                <li>Book a video chat appointment with you doctor</li>
+                                <li>Enter live chat with your doctor</li>
+                                <li>View your medical records at all times</li>
+                                <li>Download your prescriptions</li>
+                                <li>Share files with your doctor</li>                                
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-4">
+                            <div style="width:89%;margin: -20px auto 0;">
+                            <p style="font-size: 22px; font-weight: 100; margin-top: 50px">Find a phamarcy close to you!</p>                
+                            <ul>
+                                <li>Just few click you can locate a Phamarcy nearby to buy drug</li>
+                                <li>All are verified and certified by us</li>
+                                <li>You are sure to buy quality drugs</li>
+                                <li>You can purchase drugs and pay online with our easy services</li>
+                                <li>We can deliver at your door step if so desired</li>
+                            </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-4">
+                            <div style="width:89%;margin: -20px auto 0;">
+                            <p style="font-size: 22px; font-weight: 100; margin-top: 50px">Find a diagnostic center close to you!</p>                
+                            <ul>
+                                <li>Make payments to gain access to our all services</li>
+                                <li>Call your doctor at your free time.</li>
+                                <li>Request for in-person consultation</li>
+                                <li>Book a video chat appointment with you doctor</li>
+                                <li>Enter live chat with you doctor</li>
+                                <li>Reach out to all our diagnostic centers in one click</li>
+                                </ul>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
                     </div>
                 </div>
             </div><!-- slider -->
@@ -750,6 +923,99 @@
             </div>
         </div>
     </div>
+    <script type="text/ng-template" id="question.html" ng-controller="connectController">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              <div class="row">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+                     <h6 style="color: #000; font-size: 12px;text-align: center">{{message}}</h6> 
+                    <div class="col-md-9 col-lg-9">
+                    <h6 style="margin-top: 50px;text-align:center">What symptom are you experiencing?</h6>
+                    </div>
+                    <div class="col-md-3 col-lg-3">
+                    
+                    <img ng-src="{{docInfo.profile_pic_url}}" style="width:100px; height:100px"/>
+                    </div>
+                </div>
+                </h6>               
+              </div>
+              <div class="modal-body">                                                   
+                    <form class="tg-form-modal tg-form-signin">                        
+                            <fieldset>
+                                <caption>Describe in summary your illness</caption>
+                                <div>
+                                    <textarea style="height: 300px; color: black" placeholder="write.." ng-model="patient.message"></textarea>
+                                </div>
+                        <button class="tg-btn tg-btn-lg" ng-click="getAnswer('<%= userInfo.firstname %>','<%= userInfo.lastname %>','<%= userInfo.profile_pic_url %>',<%=userInfo.user_id %>)">Get answer</button>
+                            </fieldset>
+                        </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="close('No')" class="btn btn-default" data-dismiss="modal">No</button>
+                <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+     </script>
+     <script type="text/ng-template" id="request.html" ng-controller="connectController">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              <div class="row">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+                 <h6 style="text-align: center; color: #000; font-size: 12px">{{message}}</h6>
+              </div>
+              <div class="modal-body">
+              <h6 style="text-align: center">You want to send Consultation request 
+                <span style="display:block;margin-top: 20px">To</span> 
+                </h6> 
+                                                                              
+                    <form class="tg-form-modal tg-form-signin" style="text-align: center">                        
+                            <fieldset>
+                            <img ng-src="{{docInfo.profile_pic_url}}" style="width:150px; height:150px;margin-bottom: 20px;margin-top:-10px"/>
+                            <h6>Dr. {{docInfo.firstname}} {{docInfo.lastname}}</h6>
+                            <span style="display:block;margin-top: -10px; margin-bottom:20px">{{docInfo.specialty}}</span>
+                            <p>Note: consultation fees will apply if your request is granted. </p>                                 
+                        <button class="tg-btn tg-btn-lg" ng-click="sendRequest('<%= userInfo.firstname %>','<%= userInfo.lastname %>','<%= userInfo.profile_pic_url %>',<%=userInfo.user_id %>)">Continue</button>
+                            </fieldset>
+                        </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="close('No')" class="btn btn-default" data-dismiss="modal">No</button>
+              </div>
+            </div>
+          </div>
+        </div>
+     </script>
+     <script type="text/ng-template" id="insuficient-fund.html" ng-controller="insuficientFundController">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              <div class="row">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>                
+              </div>
+              <div class="modal-body">
+                <h4>Sorry! we could not continue with your booking</h4>
+                <h5 style="font-size: 18px; font-weight: 100">Reason:</5>
+                <p style="font-size: 12px; color:#000">You do not have enough fund in your wallet to pay for the doctors consultation fee</p>
+                <h5 style="font-size: 18px; font-weight: 100">Details:</5>
+                <p style="font-size: 12px;color:#000">Your wallet available amount: <em style="font-size:18px">{{walletAmount | currency }}</em></p>
+                <p style="font-size: 12px;color:#000">Consultation fee billed to pay: <em style="font-size:18px">{{consultationFee | currency}}</em></p>
+
+                <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Go ahead to fund wallet now</button>
+              </div>
+              <div class="modal-footer">               
+                <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+     </script>
     <!--************************************
         Sign In Sign Up Light Box End
     *************************************-->
@@ -773,5 +1039,11 @@
         <script src="/assets/js/angularAnimate.js"></script>
         <script src="/assets/js/modalService.js"></script>
         <script src="/assets/js/main.js"></script>
+        <script src="/assets/js/angular-touch.min.js"></script>
+        <script src="/assets/js/angular-carousel.js"></script>
+
+   <!--<script src="http://angular-ui.github.com/bootstrap/ui-bootstrap-tpls-0.2.0.js"></script>-->
+
+       <!--<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">-->
 </body>
 </html>

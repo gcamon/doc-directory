@@ -195,7 +195,6 @@
 								<div ng-controller="formController">
 								<div class="tg-bordertop tg-haslayout">
 									<div class="tg-formsection">
-										{{user}}
 										<div class="tg-heading-border tg-small">
 											<h4>Basic Information</h4>
 										</div>
@@ -475,7 +474,7 @@
 								</figure>
 							</div>
 							<input type="file" name="file" id="file" file-model = "user.profilepic"/>
-							<button ng-click="update()" style="background-color:rgba(0,200,0,0.8); padding:10px 105px; color:#fff;border-radius:5px;margin:10px auto">Upload</button>	
+							<button ng-click="update('doctor')" style="background-color:rgba(0,200,0,0.8); padding:10px 105px; color:#fff;border-radius:5px;margin:10px auto">Upload</button>	
 							<div class="tg-otherphotos">
 												<div class="tg-heading-border tg-small">
 													<h5><a href="#">Procedural Photos</a></h5>

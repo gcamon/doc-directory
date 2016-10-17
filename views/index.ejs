@@ -23,6 +23,7 @@
         <link rel="stylesheet" href="/assets/css/color.css">
         <link rel="stylesheet" href="/assets/css/responsive.css">
         <link href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
+        <link rel="stylesheet" href="/assets/css/angular-carousel.css">  
         <script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
     </head>
     <body ng-app= "myApp">
@@ -531,7 +532,7 @@
                 <section class="tg-main-section tg-haslayout parallax-window tg-custom-padding" data-appear-top-offset="600" data-parallax="scroll" data-image-src="images/bgparallax/bgparallax-01.jpg">
                     <div class="container">
                         <div class="row">
-                            <div class="tg-areuadoctor tg-haslayout">
+                            <div class="tg-areuadoctor tg-haslayout" ng-controller='homeDoctorSignupController'>
                                 <div class="col-lg-6 col-md-5 col-sm-12 col-xs-12 pull-right">
                                     <div class="tg-contentbox tg-haslayout">
                                         <div class="tg-heading-border">
@@ -541,7 +542,7 @@
                                         <div class="tg-description">
                                             <p>We know how much it takes to become a qualified doctor so we have taken away all your hassle to look out for your patients once you have qualified. DocDirect will give you an easy reach to all the patients, all you need is to sign up!</p>
                                         </div>
-                                        <a class="tg-btn" href="#tg-signup-formarea" data-toggle="modal" data-target=".tg-user-modal">signup now</a>
+                                        <button class="tg-btn" ng-click = "docSignup()">signup now</button>
                                     </div>
                                 </div>
                                 <div class="col-lg-6 col-md-7 col-sm-12 col-xs-12 pull-left">
@@ -559,7 +560,7 @@
                 <!--************************************
                                 HealthCare on the go Start
                 *************************************-->
-                <section class="tg-padding-top tg-haslayout">
+                <section class="tg-padding-top tg-haslayout" ng-controller="homePatientSignupController">
                     <div class="container">
                         <div class="row">
                             <div class="tg-healthcareonthego tg-haslayout">
@@ -584,7 +585,7 @@
                                             <li>Find the nearest phamarcy and purchase a drug online.</li>
                                         </ul>
                                         <div class="tg-btns">                                            
-                                            <a class="tg-btn" href="#tg-signup-formarea" data-toggle="modal" data-target=".tg-user-modal">Register Now</a>
+                                            <button class="tg-btn" ng-click="patientSignup()">Register Now</button>
                                         </div>
                                     </div>
                                 </div>
@@ -1215,6 +1216,207 @@
                 type.addEventListener('change',setType,false)
             }, false)
         </script>
+        <script type="text/ng-template" id="doc-signup.html">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+                
+              </div>
+              <div class="modal-body">
+                <form class="tg-form-modal tg-form-signup">
+                            <span style="color:red" ng-cloak>{{error}}</span>
+                            <fieldset>
+                            <h5>Doctor signup</h5>
+                            <div class="form-group" id="specialization">
+                                    <span class="select">
+                                        <label>Select Specialty</label> 
+                                        <select  ng-model="user.specialty">                                            
+                                            <option>Acupunture</option>
+                                            <option>Addiction Medicine</option>
+                                            <option>Adolescent Medicine</option>
+                                            <option>Aerospace Medicine</option>
+                                            <option>Allergy</option>
+                                            <option>Allergy/Immunology</option>
+                                            <option>Anesthesiology</option>
+                                            <option>Audiologist</option>
+                                            <option>Bariatrician</option>
+                                            <option>Cardiac Electrophysiology</option>
+                                            <option>Cardiology</option>
+                                            <option>Chiropractic</option>
+                                            <option>Clinical Laboratory Immunology</option>
+                                            <option>Clinical Pathology</option>
+                                            <option>Colon/Rectal Surgery</option>
+                                            <option>Critical Care</option>
+                                            <option>Cythopathology</option>
+                                            <option>Dermatology</option>
+                                            <option>Dermatopathology</option>
+                                            <option>Diabetes</option>
+                                            <option>Diagnostic</option>
+                                            <option>Emergency Medical Tech</option>
+                                            <option>Emergency Medicine</option>
+                                            <option>Endocrinology</option>
+                                            <option>Endovascular Surgical Neuroradiology</option>
+                                            <option>Family Practice</option>
+                                            <option>Gastroenterology</option>
+                                            <option>General Practice</option>
+                                            <option>General Surgery</option>
+                                            <option>Genetics</option>
+                                            <option>Geriatrics</option>
+                                            <option>Gynecology</option>
+                                            <option>Gynecology Oncology</option>
+                                            <option>Hand Surgery</option>
+                                            <option>Hand and Neck Surgery</option>
+                                            <option>Hematology</option>
+                                            <option>Hematology/Oncology</option>
+                                            <option>Hepatology</option>
+                                            <option>Holistic Medicine</option>
+                                            <option>Hospitalist</option>
+                                            <option>Immunology</option>
+                                            <option>Infectious Disease</option>
+                                            <option>Internal Medicine</option>
+                                            <option>Interventional Cardiology</option>
+                                            <option>Legal Medicine</option>
+                                            <option>Medical Oncology</option>
+                                            <option>Medical Toxicology</option>
+                                            <option>Neonatology</option>
+                                            <option>Nephrology</option>
+                                            <option>Neurology</option>
+                                            <option>Neuroradiology</option>
+                                            <option>Nuclear Cardiology</option>
+                                            <option>Nuclear Medicine</option>
+                                            <option>Nutrition</option>
+                                            <option>Obstetrics/Gynecology</option>
+                                            <option>Occupational Medicine</option>
+                                            <option>Oncology</option>
+                                            <option>Opthalmology</option>
+                                            <option>Optometry</option>
+                                            <option>Orthopedic Foot & Ankle</option>
+                                            <option>Orthopedic Reconstructive Surgery</option>
+                                            <option>Orthopedic Spine Surgery</option>
+                                            <option>Orthopedic Surgery</option>
+                                            <option>Osteopathy</option>
+                                            <option>Otorhinolaryngology</option>
+                                            <option>Pain Management</option>
+                                            <option>Pathology</option>
+                                            <option>Pediatric Allergy</option>
+                                            <option>Pediatric Cardiology</option>
+                                            <option>Pediatric Critical Care</option>
+                                            <option>Padiatric Emergency Medicine</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </span>
+                                </div>                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname">
+                                </div>                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="lastname" ng-model="user.lastname">
+                                </div>
+
+                               <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Place of work*" id="work" ng-model="user.work_place">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="City/Town*" id="firstname" ng-model="user.city" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="email" class="form-control placeholder-color" placeholder="Email*" id="firstname" ng-model="user.email" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" placeholder="Password" ng-model="user.password">
+                                </div>                                                   
+                               
+                                <div class="form-group tg-checkbox">
+                                    <label>
+                                        <input type="checkbox" class="form-control" ng-model="user.check">
+                                        I agree with the terms and conditions
+                                    </label>
+                                </div>                                
+                                <button class="tg-btn tg-btn-lg" ng-click="submit('Doctor')">Create an Account</button>
+                            </fieldset>
+                        </form>               
+                    
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="close('No')" class="btn btn-default" data-dismiss="modal">No</button>
+                <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        </script><!-- doc-signup end -->
+        <script type="text/ng-template" id="patient-signup.html">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+                
+              </div>
+              <div class="modal-body">
+                <form class="tg-form-modal tg-form-signup">
+                            <span style="color:red" ng-cloak>{{error}}</span>
+                            <fieldset>
+                            <h5>Patient signup</h5>                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname">
+                                </div>                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="lastname" ng-model="user.lastname">
+                                </div>
+                                 <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" name="gender" placeholder="Gender" ng-model="user.gender">
+                                </div>
+                               
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Age*" id="work" ng-model="user.age">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="City/Town*" id="firstname" ng-model="user.city" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="email" class="form-control placeholder-color" placeholder="Email*" id="firstname" ng-model="user.email" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" placeholder="Password" ng-model="user.password">
+                                </div>                                                   
+                               
+                                <div class="form-group tg-checkbox">
+                                    <label>
+                                        <input type="checkbox" class="form-control" ng-model="user.check">
+                                        I agree with the terms and conditions
+                                    </label>
+                                </div>                                
+                                <button class="tg-btn tg-btn-lg" ng-click="submit('Patient')">Create an Account</button>
+                            </fieldset>
+                        </form>               
+                    
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="close('No')" class="btn btn-default" data-dismiss="modal">No</button>
+                <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        </script>
         <!--************************************
                 Sign In Sign Up Light Box End
         *************************************-->
@@ -1235,10 +1437,13 @@
         <script src="/assets/js/appear.js"></script>
         <script src="/assets/js/countTo.js"></script>
         <script src="/assets/js/map/map.js"></script>
-        <script src="/assets/js/angucomplete-alt.min.js"></script>
         <script src="/assets/js/angularAnimate.js"></script>
-        <script src="/assets/js/main.js"></script>
         <script src="/assets/js/modalService.js"></script>
-        <script src="http://angular-ui.github.com/bootstrap/ui-bootstrap-tpls-0.2.0.js"></script>
+        <script src="/assets/js/main.js"></script>
+        <script src="/assets/js/angular-touch.min.js"></script>
+        <script src="/assets/js/angular-carousel.js"></script>
+
+    
+
     </body>
 </html>

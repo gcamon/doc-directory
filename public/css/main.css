@@ -289,7 +289,84 @@ form fieldset{
 	margin-right: 5px!important; 
 
 }
+/* in patient html style */
 
+.in-patient-com {	
+	margin-top: 10px;
+}
+
+.in-patient-com  button, .in-patient-com a{
+	padding:  20px 15px;
+	background-color: rgba(0,170,0,0.6);
+	color: #fff;
+	margin-right: 10px;
+	margin-top: 20px;
+	font-size: 16px;
+	min-width: 173px;
+
+}
+
+.in-patient-com h6 > span{
+	color: #000!important;
+}
+
+/*in doctor html */
+.tg-haslayout button {
+	color: #fff;
+	background-color: rgba(0,120,0,0.6);
+	padding: 5px 15px;
+	margin-right: 20px;
+}
+
+/*i patient dashbord notification icon style */
+.notify {
+	position: relative;
+	display: inline-block;
+}
+
+.notify li.noti {
+	float: left;
+	margin-right: 10px;
+}
+
+.notify li ul {
+	position: absolute;
+	top: 28px;
+	left: 0px;
+	width: 360px;
+	background-color: #eee;
+	border: 5px solid rgba(0,120,0,0.7);
+	box-shadow: 2px 1px 20px rgba(0,0,0,0.6);
+	padding: 10px;
+	z-index: 3;
+	visibility: hidden;
+}
+
+.all-notify li{
+	display: block;
+	color: #000;
+	padding: 20px;
+	font-size: 14px;
+}
+
+.notify li.note:hover ul {	
+	visibility: visible;
+}
+
+.notify li.chat:hover ul {
+	left: 50px;	
+	visibility: visible;
+}
+
+li.note-field:hover {
+	cursor: pointer;
+	background-color: rgba(0,150,0,0.6);
+}
+
+li.note-field img, li.note-field div {
+	float: left;
+	margin-right: 10px
+}
 /* my ng animate style */
 .view-animate-container {
   position:relative;  

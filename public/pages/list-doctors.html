@@ -1,8 +1,8 @@
 
-    <div ng-controller = "listController"  class="tg-view tg-list-view">
+    <div ng-controller = "listController"  class="tg-view tg-list-view" >
         <div class="row">
             <article class="tg-doctor-profile" ng-repeat="i in searchResult">
-                <div class="tg-box">
+                <div class="tg-box" style="padding: 50px; box-shadow: 5px 5px 10px rgba(0,0,0,0.8)">
                     <a href="{{i.profile_url}}"><span class="tg-show"><a href="{{i.profile_url}}"><em class="icon-add"></em></span></a>
                     <figure class="tg-docprofile-img">
                         <span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>

@@ -46,7 +46,11 @@ function(req,email,password,done){
 					country: req.body.country					
 					});
 
-					User.ewallet.push({available_amount:0});
+					User.ewallet = {
+						available_amount: 0,
+						firstname: req.body.firstname,
+                    	lastname: req.body.lastname,
+					}
 
 				
 				User.save(function(err){

@@ -46,7 +46,10 @@ var configuration = function (app,model) {
 	});
 	});
 
-	
+	app.use(function(err, req, res, next) {
+	  res.status(err.status || 500);
+	  res.sendFile(path.join(__dirname + "/404.html"));
+	});
 
 
 }

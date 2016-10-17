@@ -52,16 +52,19 @@ $(document).ready(function (e) {
 	/*--------------------------------------
 			PRETTY PHOTO GALLERY
 	--------------------------------------*/
-	$("a[data-rel]").each(function () {
-		$(this).attr("rel", $(this).data("rel"));
-	});
-	$("a[data-rel^='prettyPhoto']").prettyPhoto({
-		animation_speed: 'normal',
-		theme: 'dark_square',
-		slideshow: 3000,
-		autoplay_slideshow: false,
-		social_tools: false
-	});
+	$(document).ready(function(){
+	   	 $("a[data-rel]").each(function () {
+			$(this).attr("rel", $(this).data("rel"));
+		});
+		$("a[data-rel^='prettyPhoto']").prettyPhoto({
+			animation_speed: 'normal',
+			theme: 'dark_square',
+			slideshow: 3000,
+			autoplay_slideshow: false,
+			social_tools: false
+		});
+ 	 });
+	
 	/* -------------------------------------
 			THEME ACCORDION
 	 -------------------------------------- */

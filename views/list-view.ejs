@@ -97,17 +97,13 @@
 				<div class="container">
 					<div class="row">
 						<form class="tg-searchform">
-							<div class="col-md-2 col-sm-2 col-xs-12">
-								<div class="form-group">
-									
-								</div>
-							</div>
-							<div class="col-md-4 col-sm-4 col-xs-12">
+							
+							<div class="col-md-5 col-sm-5 col-xs-12">
 								<div class="form-group">
 									<input type="text" placeholder="Enter city name" class="form-control" ng-model="user.city">
 								</div>
 							</div>
-							<div class="col-md-4 col-sm-4 col-xs-8">
+							<div class="col-md-5 col-sm-5 col-xs-8">
 								<div class="form-group">								
 									<span class="select">
 										<select id="group1" class="group" placeholder="Specialty" ng-model="user.specialty">
@@ -312,11 +308,11 @@
 										<li role="presentation"><a href="#popular" aria-controls="popular" role="tab" userInfo-toggle="tab">Popular</a>
 										</li>
 									</ul>
-									<% if(userInfo.length > 10) { %> 									
+									<% if(userInfo.length > 8) { %> 									
 									<div class="tab-content">
 										<div role="tg-tabpanel tabpanel" class="tg-tab-pane tab-pane active" id="recent">
 											<ul>
-											<% for(var k = 10; k <userInfo.length; k++) { %>
+											<% for(var k = 8; k <userInfo.length; k++) { %>
 												<li>
 													<figure>
 														<a href="<% userInfo[k].profile_url %>">
@@ -785,11 +781,11 @@
             <div class="modal-content">
               <div class="modal-header">
                 <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
-               <h6 class="modal-title">We noticed you have not logged in! 
-                <span style="display:block; color:black">Please do login now to reach your doctor</span></h6>
+               <h6 class="modal-title" style="text-align: center">We noticed you have not logged in! </h6> 
+                <span style="display:block; color:black; text-align: center">Please do login now to reach your doctor</span></h6>
               </div>
               <div class="modal-body">
-              	<p>not yet a member? <button ng-click= "register()">Register</button>                
+              	<p>not yet a member? <button ng-click= "register()">Register</button> </p>               
  					<form class="tg-form-modal tg-form-signin">
                         <span style="color:red" ng-cloak>{{error}}</span>
                             <fieldset>

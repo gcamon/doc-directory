@@ -3,6 +3,7 @@ var path = require('path');
 var route = require('./config');
 var router = route.router;
 var fs = require("fs");
+var dateTime = require("node-datetime");
 
 var basicRoute = function (model) {
 
@@ -49,6 +50,8 @@ var basicRoute = function (model) {
         res.download(file); // Set disposition and send it.
     }
   });
+
+  //doctors profile update route
   router.put("/user/update",function(req,res){
     if(req.user){
         switch(req.body.type){
@@ -368,6 +371,7 @@ var basicRoute = function (model) {
         res.render("list-doctors",{"userInfo":req.user})
     });
 
+    //common search for doctors route
     router.post("/user/find-group",function(req,res){
      if(Object.keys(req.body).length > 0) {
       console.log(req.body);
@@ -398,6 +402,7 @@ var basicRoute = function (model) {
      }                
     });
 
+    //refine search route for search for doctors
     router.post("/user/refine-find-group",function(req,res){
      if(Object.keys(req.body).length > 0) {
       console.log(req.body);
@@ -423,8 +428,8 @@ var basicRoute = function (model) {
             {
                 city: req.body.city,
                 specialty: req.body.specialty,
-                sub_specialty: {"sub_specialty.sub_specialty": req.body.sub_specialty},
-                procedure: {"procedure.procedure_description": req.body.procedure}
+                "sub_specialty.sub_specialty": req.body.sub_specialty,
+                "procedure.procedure_description": req.body.procedure
             },projection,function(err,data){
             if(err) throw err;
                 res.send(data)               
@@ -434,8 +439,9 @@ var basicRoute = function (model) {
             {
                 city: req.body.city,
                 specialty: req.body.specialty,
-                sub_specialty: {"sub_specialty.sub_specialty": req.body.sub_specialty},
+                "sub_specialty.sub_specialty": req.body.sub_specialty,
             },projection,function(err,data){
+                console.log()
             if(err) throw err;
                 res.send(data)               
             }).limit(1000);
@@ -444,19 +450,179 @@ var basicRoute = function (model) {
          res.end();
      }                
     });
-
+    
+    //route for displaying the selected doctor on the patient dashbord page
     router.put("/user/book",function(req,res){
         if(req.user){
-            model.user.findOne(req.body,{firstname:1,lastname:1,profile_url:1,profile_pic_url:1,specialty:1},function(err,data){
+            model.user.findOne(req.body,{firstname:1,lastname:1,profile_url:1,profile_pic_url:1,specialty:1,office_hour:1,address:1,work_place:1,experience:1,education:1},function(err,data){
                 console.log(data);
                 res.send(data);
             })
         } else {
             res.json({isNotLoggedIn: true, error: "We notice you are NOT logged in!", beNice: "Please Login or Register to make use of these services"})
         }
-    })
+    });
 
+    //route for qusetions and requsts from patients to a doctor through the modal
+    router.put("/patient/doctor/connection",function(req,res){
+        if(req.user){
+        var requestData = {};
+        for(var item in req.body){
+            if(req.body.hasOwnProperty(item) && item !== "receiverId") {
+                requestData[item] = req.body[item];
+            }
+        }
+        
+        model.user.update(
+        { _id: req.body.receiverId},
+        { "$push": { notification: requestData} },
+        function(err,info) {
+           console.log(info);
+           res.send("notified");// something with the result in here
+        }
+        );
+        } else {
+            res.send("not allowed");
+        }
+        
+    });
+
+    //this route gets all the notifications for the doctor that just logged in
+    router.get("/doctor/notifications",function(req,res){
+         if(req.user){
+         model.user.findOne({email:req.user.email},{notification:1},function(err,data){
+                console.log(data);
+                res.send(data);
+         })
+        } else {
+            res.send("not allowed");
+        }
+    });
+
+    router.put("/doctor/acceptance",function(req,res){
+         if(req.user){
+            console.log(req.body)
+             model.user.findOne(
+                {
+                    user_id: req.body.patientId
+                },
+                {
+                    ewallet:1,
+                    patient_notification: 1,
+                    service_access: 1
+                }
+            )
+            .exec(
+                function(err, result){
+                    console.log(result)
+                    if(result.ewallet.available_amount > 0 && result.ewallet.available_amount >= req.body.consultation_fee) {
+                        req.body.service_access = true;
+                        result.ewallet.available_amount -= req.body.consultation_fee;
+                    }
+                    result.patient_notification.push({
+                        doctor_id: req.body.doctor_id,
+                        doctor_firstname: req.body.doctor_firstname,
+                        doctor_lastname: req.body.doctor_lastname,
+                        date: req.body.date,
+                        consultation_fee: req.body.consultation_fee,
+                        service_access: req.body.service_access,
+                        doctor_profile_pic_url: req.body.doctor_profile_pic_url,
+                        doctor_specialty: req.body.doctor_specialty
+                    });
+
+                    result.save(function(err){
+                        if(err) throw err;
+                        console.log("updated");                        
+                        res.send("success");
+                    });
+                }
+            )
+
+            
+        } else {
+           res.send("not allowed");
+        }
+    });
+
+    router.put("/patient/acceptance",function(req,res){
+         if(req.user){         
+            console.log(req.body)
+             model.user.findOne(
+                {
+                    email: req.user.email
+                },
+                {
+                    accepted_doctors : 1,
+                    patient_notification: 1
+                    
+                }
+            )
+            .exec(
+                function(err, result){
+                    console.log(result)
+                    for(var i = 0; i < result.patient_notification.length; i++){
+                        if(result.patient_notification[i].doctor_id === req.body.doctor_id) {
+                            result.accepted_doctors.push(req.body);
+                            deleteFromPatientNotification(i);
+                            updateDoctorPatientList();
+                        }
+                    }
+
+                    function deleteFromPatientNotification(index) {
+                        result.patient_notification.splice(index,1)
+                        console.log(result.patient_notification)
+                    }
+
+                    function updateDoctorPatientList() {
+                      model.user.findOne(
+                        {
+                          user_id: req.body.doctor_id
+                        },
+                        {
+                          doctor_patients_list:1
+                        }
+                      )
+                      .exec(function(err,data){
+                        data.doctor_patients_list.push({
+                          patient_firstname: req.user.firstname,
+                          patient_lastname: req.user.lastname,
+                          patient_id: req.user.user_id,
+                          patient_profile_pic_url: req.user.profile_pic_url
+                        })
+
+                        data.save(function(err){
+                        if(err) throw err;
+                        console.log("patient save in doctor's list")
+                        })
+                      })
+
+
+                    }
+                    
+                    result.save(function(err){
+                        if(err) throw err;
+                        console.log("note deleted");                        
+                        res.send("notification deleted");
+                    });
+                    
+                }
+            )
+
+            
+        } else {
+           res.end();
+        }
+    });
     
+    //route for funding wallet
+    router.patch("/user/fundwallet",function(req,res){
+        model.user.updateOne({ email: req.user.email},function(err,result){
+          if(err) throw err;
+          console.log("wallet funded");
+          console.log(result);
+          res.end();
+        })
+    });
 
     router.get("/user/webrtc",function(req,res){
         res.send(true);

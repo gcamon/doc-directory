@@ -39,23 +39,30 @@ var myModel = function () {
 
 	var transactionSchema = Schema({
 			date: Date,
-			available_amount: Number,
+			total_balance: Number,
 			firstname: String,
-			lastname: String
+			lastname: String,
+			activity: String,
+			amount_withdrawn: Number,
+			amount_deposited: Number
 	});
 
 	var noteSchema = Schema({
-		note_id: Number,
-		date: Date,
+		sender_id: String,
+		message_id: Number,
+		type: String,
+		date: String,
 		message: String,
-		sender: String
-	})
+		sender_firstname: String,
+		sender_lastname: String,
+		sender_profile_pic_url: String
+	});
 
 	var periodSchema = Schema({
 		day: String,
 		from: String,
 		to: String
-	})
+	});
 
 	var subspecialtySchema = Schema({
 		id: Number,
@@ -66,6 +73,39 @@ var myModel = function () {
 		id: Number,
 		procedure_description: String
 	});
+
+	var accessSchema = Schema({
+		patient_id: String,
+		access_to_record: Boolean
+	});
+
+	var patient_noteSchema = Schema({
+		doctor_id: String,
+		doctor_firstname: String,
+		doctor_lastname: String,
+		date: Date,
+		consultation_fee: Number,
+		service_access: Boolean,
+		doctor_profile_pic_url: String,
+		doctor_specialty: String,
+	});
+
+	var doc_briefSchema = Schema({
+		doctor_id: String,
+		date_of_acceptance: Number,
+		doctor_firstname: String,
+		doctor_lastname: String,
+		doctor_profile_pic_url: String,
+		service_access: String,
+		doctor_specialty: String
+	});
+
+	var patient_briefSchema = Schema({
+		patient_firstname: String,
+		patient_lastname: String,
+		patient_id: String,
+		patient_profile_pic_url: String,
+	})
 
 	var userSchema = Schema({	  
 		firstname: String,
@@ -82,7 +122,12 @@ var myModel = function () {
 		medications: [prescribtionSchema],
 		date: Date,
 		profile_url: String,
-		ewallet:[transactionSchema],
+		ewallet:{			
+			available_amount: Number,
+			firstname: String,
+			lastname: String,
+			transaction:[transactionSchema]
+		},
 		admin: Boolean,
 		type: String,
 		profile_pic: {
@@ -109,7 +154,11 @@ var myModel = function () {
 		experience: Number,
 		country: String,
 		notification:[noteSchema],
-		office_hour:[periodSchema]
+		patient_notification: [patient_noteSchema],
+		office_hour:[periodSchema],
+		record_access:[accessSchema],
+		accepted_doctors: [doc_briefSchema],
+		doctor_patients_list : [patient_briefSchema]		
 	},{
 		collections: "userinfos"
 	})
@@ -117,12 +166,12 @@ var myModel = function () {
 	var models = {};
 	models.user = mongoose.model('userinfos', userSchema);
 	models.files = mongoose.model('fileinfo', fileSchema);
-	models.award = mongoose.model('awardinfo', AwardSchema);
+	/*models.award = mongoose.model('awardinfo', AwardSchema);
 	models.education = mongoose.model('educationinfo', EducationSchema);
 	models.prescribtion = mongoose.model("prescribtioninfo", prescribtionSchema);
 	models.transaction = mongoose.model("transactioninfo",transactionSchema);
 	models.procedure = mongoose.model("procedureinfo",procedureSchema);
-	models.subSpecialty = mongoose.model("subspecialtyinfo",subspecialtySchema);
+	models.subSpecialty = mongoose.model("subspecialtyinfo",subspecialtySchema);*/
 	return models		
 }
 
