@@ -222,6 +222,23 @@ form fieldset{
   color: #7dbb00;
 }
 
+/*patient update style */
+.patient-update-input div input {
+	display: inline-block!important;
+	padding: 5px;
+	margin-bottom: 20px;
+	width: 47%;
+
+}
+
+.patient-update-input div input:focus {
+	border: 1px solid #000;
+}
+
+.patient-update-input div button {
+	min-width: 100px;
+	text-align: center;
+}
 /*my input style */
 .btn-login {
 	background-color: rgba(0,255,0,0.8);
@@ -306,8 +323,93 @@ form fieldset{
 
 }
 
+.underlineDiv {
+	width: 50px;
+	border:  1px solid rgba(0,0,0,0.5)
+}
+
+ul.dosage {
+	display: inline-block;
+	border: 1px solid red;
+	width: 100%;
+	
+}
+
+.prescription li {
+	float: left;
+	list-style-type: none;
+	border: 1px solid red;
+	width: 30%;
+}
+
+.prescription ul {
+	display: inline-block;
+}
+
+.patientInfo {
+	display: inline-block;
+}
+
+.patientInfo li {
+	list-style-type: none;
+	float: left;
+	padding: 10px;
+	font-size: 20px;	
+	margin-right: 10px;
+}
+
+.patientInfo li span {
+	color:#000;
+	font-size: 14px;
+	text-transform: none;
+
+}
+
+.look-up-phamarcy:hover {
+	border-bottom: 1px solid rgba(0,0,0,0.5);
+	border-top: 1px solid rgba(0,0,0,0.2);
+	box-shadow: 0px 5px 10px rgba(0,0,0,0.3);
+}
+
+
 .in-patient-com h6 > span{
 	color: #000!important;
+}
+
+.pharmacy_notification {
+	cursor: pointer;	
+}
+
+.pharmacy_notification aside{
+	width: 80%;
+	padding-left: 10px;
+}
+
+.pharmacy_notification img, .pharmacy_notification aside {
+	float: left;
+}
+
+.pharmacy_notification aside p {
+	font-size: 12px;
+	padding: none;
+}
+
+.pharmacy_notification aside p span {
+	display: block;
+}
+
+.ref-details {
+	display: inline-block;;
+}
+
+.ref-details li {
+	list-style-type: none;
+	float:left;
+	padding: 10px; 
+}
+
+.strike {
+    text-decoration: line-through;
 }
 
 /*in doctor html */
@@ -329,9 +431,13 @@ form fieldset{
 	margin-right: 10px;
 }
 
+.notify-icon {
+	padding-top: 15px;
+}
+
 .notify li ul {
 	position: absolute;
-	top: 28px;
+	top: 40px;
 	left: 0px;
 	width: 360px;
 	background-color: #eee;
@@ -340,6 +446,8 @@ form fieldset{
 	padding: 10px;
 	z-index: 3;
 	visibility: hidden;
+	height: 300px;
+	overflow-x: hidden; 
 }
 
 .all-notify li{
@@ -401,6 +509,19 @@ li.note-field img, li.note-field div {
   left:-100%;
 }
 
+.icon-style {
+	font-size: 32px;
+	color: rgba(0,100,0,0.7);
+	margin-right: 10px
+}
+
+.learn a{
+	color: green;
+}
+
+.learn a:hover {
+	color: red;
+}
 
 .tj {
 	font-size: 18px!important;

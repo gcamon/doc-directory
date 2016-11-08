@@ -27,24 +27,51 @@ var myModel = function () {
 		certificate: String
 	});
 
-	var prescribtionSchema = Schema({
-		dose: String,
-		id: Number,
-		date: Date,
-		name_of_doctor: String,
+	//prescriptionbodyschema goes inside prescription schema
+
+	var prescriptionBodySchema = Schema({
+		sn: Number,
+		dosage: String,
 		frequency: String,
-		drug: String,
+		drug_name: String,
 		duration: String
 	});
 
+	var prescriptionSchema = Schema({
+		prescriptionId: Number,
+		allergy: String,
+		date: Date,
+		doctor_experience: Number,	
+		doctor_firstname: String,
+		doctor_lastname: String,
+		doctor_address: String,		
+		doctor_id: String,
+		doctor_work_place: String,
+		doctor_city: String,
+		doctor_country: String,
+		doctor_phone: String,
+		lab_analysis: String,
+		scan_analysis: String,
+		Doctor_profile_pic_url: String,
+		patient_profile_pic_url: String,
+		patient_firstname: String,
+		patient_lastname: String,
+		patient_address: String,
+		patient_gender: String,
+		patient_age: Number,
+		patient_city: String,
+		patient_country: String,
+		prescription_body: [prescriptionBodySchema]
+	});
+
 	var transactionSchema = Schema({
-			date: Date,
-			total_balance: Number,
-			firstname: String,
-			lastname: String,
-			activity: String,
-			amount_withdrawn: Number,
-			amount_deposited: Number
+		date: Date,
+		total_balance: Number,
+		firstname: String,
+		lastname: String,
+		activity: String,
+		amount_withdrawn: Number,
+		amount_deposited: Number
 	});
 
 	var noteSchema = Schema({
@@ -88,16 +115,19 @@ var myModel = function () {
 		service_access: Boolean,
 		doctor_profile_pic_url: String,
 		doctor_specialty: String,
+		message: String
 	});
 
 	var doc_briefSchema = Schema({
 		doctor_id: String,
-		date_of_acceptance: Number,
+		date_of_acceptance: Date,
 		doctor_firstname: String,
 		doctor_lastname: String,
 		doctor_profile_pic_url: String,
 		service_access: String,
-		doctor_specialty: String
+		doctor_specialty: String,
+		work_place: String,
+		office_hour:[periodSchema]		
 	});
 
 	var patient_briefSchema = Schema({
@@ -105,7 +135,74 @@ var myModel = function () {
 		patient_lastname: String,
 		patient_id: String,
 		patient_profile_pic_url: String,
-	})
+		patient_address: String,
+		patient_city: String,
+		Patient_country: String,
+		patient_gender: String,
+		patient_age: Number,
+		patient_body_weight: String
+	});
+
+	var diagnosisSchema = Schema({
+		doctor_note: String,
+		doctor_firstname: String,
+		doctor_lastname: String,
+		date: Date,
+		illness: String
+	});
+
+	var medical_recordSchema = Schema({		
+		files: [fileSchema],		
+		diagnosis: [diagnosisSchema],		
+		prescription: [prescriptionSchema]
+	});
+
+	var laboratory_refSchema = Schema({
+		test_to_run: String
+	});
+
+	var radiology_refSchema = Schema({
+		test_to_run: String
+	});
+
+	var drug_refSchema = Schema({
+		dosage: String,
+	    drugName: String,
+	    frequency: String,
+	    duration: String,
+	    drugId: Number
+	});
+
+	var refSchema = Schema({
+		ref_id: Number,
+		referral_firstname: String,
+		referral_lastname: String,
+		referral_title: String,
+		referral_id: String,		
+		date: Date,		
+		laboratory: laboratory_refSchema,
+		radiology: radiology_refSchema,
+		phamarcy: prescriptionSchema
+	});
+
+	var appointment_schema = Schema({
+		date: Date,
+		time: String,
+		firstname: String,
+		lastname: String,
+		ref_id: String
+	});
+
+	var ref_notificationSchema = Schema({
+		sender_firstname: String,
+		sender_lastname: String,
+		sender_title : String,
+		sent_date: Date,
+		ref_id: Number,
+		note_id: Number,
+		sender_profile_pic_url: String,
+		message: String
+	});
 
 	var userSchema = Schema({	  
 		firstname: String,
@@ -119,7 +216,7 @@ var myModel = function () {
 		state: String,
 		city: String,
 		marital_status: String,
-		medications: [prescribtionSchema],
+		medications: [prescriptionSchema],
 		date: Date,
 		profile_url: String,
 		ewallet:{			
@@ -153,12 +250,18 @@ var myModel = function () {
 		phone: Number,
 		experience: Number,
 		country: String,
-		notification:[noteSchema],
+		doctor_notification:[noteSchema],
+		referral: [refSchema],
 		patient_notification: [patient_noteSchema],
 		office_hour:[periodSchema],
 		record_access:[accessSchema],
 		accepted_doctors: [doc_briefSchema],
-		doctor_patients_list : [patient_briefSchema]		
+		doctor_patients_list : [patient_briefSchema],
+		medical_records: [medical_recordSchema],
+		name: String,
+		diagnostic_center_notification:[ref_notificationSchema],
+		accepted_patients: [patient_briefSchema],
+		appointment:[appointment_schema]		
 	},{
 		collections: "userinfos"
 	})

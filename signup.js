@@ -43,7 +43,8 @@ function(req,email,password,done){
 					profile_url: "/ranking/views/" + uid,
 					profile_pic_url: "/download/profile_pic/nopic",
 					work_place: req.body.work_place,
-					country: req.body.country					
+					country: req.body.country,
+					name: req.body.name					
 					});
 
 					User.ewallet = {

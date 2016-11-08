@@ -1,0 +1,90 @@
+<div class="col-sm-12 col-md-12 col-lg-12">
+	<div class="row">
+		<div class="col-sm-12 col-md-3 col-lg-3 pull-right">
+			<div class="tg-widget tg-widget-doctor">
+			<figure class="tg-docprofile-img" style="width: 120px;height:120px">
+	            <figcaption>
+	            <span>online</span>                                                    
+	            </figcaption>
+	            <span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
+	            <img alt="image description" ng-src="{{patientInfo.profile_pic_url}}" style="width: 120px;height:120px">                                  
+	        </figure>
+	        </div>		
+		</div>
+		<div class="col-sm-12 col-md-8 col-lg-8">
+			<div>
+				<h5 style="text-align: center;border-bottom: 1px solid rgba(0,0,0,0.4)">{{patientInfo.firstname}} {{patientInfo.lastname}} <span style="display:block;color:#000;font-size: 12px">{{patientInfo.type}}</span></h5>
+				<ul class="patientInfo">
+					<li><h6>Gender: <span>{{patientInfo.gender || "N/A"}}<span></h6></li>
+					<li><h6>Age: <span>{{patientInfo.age || "N/A"}} years</span></h6></li>
+					<li><h6>Body weight: <span>{{patientInfo.body_weight || "N/A"}}</span></h6></li>			
+					<li><h6>Address: <span>{{patientInfo.address || "N/A"}}</span></h6></li>
+					<li><h6>City: <span>{{patientInfo.city || "N/A"}}</span></h6></li>
+					<li><h6>Country: <span>{{patientInfo.country || "N/A"}}</span></h6></li>
+				</ul>
+				<div>
+					<span style="font-size: 24px; font-weight: 100">Contact Through: </span>
+					<i class="fa fa-phone" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px" title="Make an audio call to this patient"></i>				
+					<i class="fa fa-desktop" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px" title="Video chat with this patient"></i>	
+					<i class="fa fa-comments" style="font-size:32px;color:green;padding: 20px; cursor:pointer" title="Chat with this patient"></i>			
+				</div>			
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12 col-md-2 col-lg-2 pull-right" style="border-left: 1px solid rgba(0,0,0,0.2)">
+			<div>
+				<span ng-click="writePrescription()" style="cursor:pointer"><i class="icon-Pills icon-style" title="Write prescription for this patient"></i></span>
+			</div>
+			<div style="margin-top: 10px">
+				<span ng-click="viewMedicalHistory()" style="cursor:pointer"><i class="icon-FirstAidKit icon-style" title="View patient's medical record"></i></span>				
+			</div>
+			<div style="margin-top: 10px">
+				<span ng-click="viewMedicalHistory()" style="cursor:pointer"><i class="fa fa-flask" title="View patient's medical record"
+					style="font-size:32px;color:rgba(0,150,0,0.9); cursor:pointer"></i></span>	
+
+			</div>
+			
+		</div>
+		<div class="col-sm-12 col-md-10 col-lg-10">
+			<div class="prescriptionArea" ng-if="isToPrescribe" style="border-top: 1px solid rgba(0,0,0,0.4)">
+				<h6 style="cursor:pointer" ng-click="writeNew()">Write new prescription</h6>
+				<div ng-if="isNewPrescription">
+					
+					<table>
+						<tr>
+							<thead>
+								<th><strong>S/N</strong></th>
+								<th><strong>Drug name</strong></th>
+								<th><strong>Dosage</strong></th>
+								<th><strong>Frequency</strong></th>
+								<th><strong>Duration</strong></th>
+							</thead>
+						</tr>
+						<tr>
+							<tbody ng-repeat="prescription in drugList">								
+								<td>{{prescription.sn}}</td>
+								<td><textarea ng-model="prescription.drug_name" style="max-width: 200px;max-height: 80px"></textarea></td>
+								<td><input type="text" ng-model="prescription.dosage"></td>
+								<td><input type="text" ng-model="prescription.frequency"></td>
+								<td><input type="text" ng-model="prescription.duration"></td>
+							</tbody>
+						</tr>						
+					</table>
+					<div style="text-align: right">
+							<i class="fa fa-plus" style="font-size:16px;color:green;padding: 10px; cursor:pointer; margin-right: 5px" title="Add field" ng-click="addDrug()"></i>
+								<i class="fa fa-minus" style="font-size:16px;color:green;padding: 10px; cursor:pointer; margin-right: 5px" title="Remove last field" ng-click="removeDrug()"></i>
+						</div>
+					<div> 
+						<button ng-click="toPatient()">Forward prescription to patient</button>
+						<button ng-click="toPhamarcy()">Forward prescription to a Phamarcy</button>
+					</div>							
+				</div>
+				<h6 style="cursor:pointer">View prescription history</h6>
+			</div>
+			<div class="medical-record-Area" ng-if="isToSeeRecord" style="border-top: 1px solid rgba(0,0,0,0.4)">
+				<h3>Hey iam record</h3>
+			</div>
+		</div>
+	</div>
+</div>

@@ -2,7 +2,7 @@
 	<div class="col-md-2 col-lg-2 pull-right">
 		<img ng-src="{{reqInfo.getpic}}" style="width: 80px; height: 80px">
 	</div>
-	<div class="col-md-10 col-lg-10" style="padding: 10px">
+	<div class="col-md-10 col-lg-10" style="padding: 10px" ng-if="isRequest">
 		<h5 style="text-align: center; border-bottom: 1px solid rgba(0,0,0,0.4)">Dr. {{reqInfo.getfirstname}} {{reqInfo.getLastname}} <span style="display:block; text-align: center;font-size: 12px; color: #000"></span></h5>
 		<p style="line-height: 25px">Dear {{reqInfo.patientName}},<br/>
 		   Your request to consult Dr. {{reqInfo.getfirstname}} {{reqInfo.getLastname}} was granted by the doctor on {{reqInfo.getRealDate | date: "mediumDate"}}.		   
@@ -28,5 +28,8 @@
 		</div>
 		<div  class="tg-bottominfo tg-haslayout" style="margin-top: 30px;padding-left: 15px" ng-if="fundWallet">
 			<a href="#/wallet" style="color:#fff" class="btn btn-primary">Fund your wallet now!</a>
+		</div>
+		<div ng-if="isPrescription">
+			<p>{{reqInfo.message}}</p>
 		</div>
 </div>

@@ -4,12 +4,33 @@ var route = require('./config');
 var router = route.router;
 var fs = require("fs");
 var dateTime = require("node-datetime");
+var token = require("./twilio");
+var randomUserName = require("./randos");
 
 var basicRoute = function (model) {
 
   router.get("/",function (req,res) {
-    res.render('index',{"message":""});
+    if(req.user){
+     switch(req.user.type){
+        case "Doctor":
+         res.render("profile",{"person":req.user});
+         break;
+        case "Patient":
+          res.render("patient",{"userInfo": req.user});
+          break;        
+        default:
+         res.render("medical",{"person":req.user});
+         break;
+     }
+    } else {
+     res.render('index',{"message":""});
+    }
   });
+
+  router.get("/home",function (req,res) {    
+     res.render('index',{"message":""});
+  });
+
   router.get("/doctor/dashboard",function(req,res){
     if(req.user){     
       res.render("profile",{"person":req.user});
@@ -17,20 +38,45 @@ var basicRoute = function (model) {
       res.redirect("/");
     }
   });
+
   router.get("/patient/dashboard",function(req,res){
         if(req.user){
+          console.log(req.user)
           res.render("patient",{"userInfo": req.user});
         } else {
           res.redirect('/');
         }
   });
+
   router.get("/medical-center/view",function(req,res){
-        if(req.user){
-          res.render("medical",{"userInfo": req.user});
-        } else {
-          res.redirect('/');
-        }
+      if(req.user){
+         res.render("medical",{"userInfo": req.user});        
+      } else {
+        res.redirect('/');
+      }
   })
+
+  /*router.get("/medical-center/view",function(req,res){
+      if(req.user){
+         res.render("phamarcy",{"userInfo": req.user});
+        switch(req.user.type){
+          case "Phamarcy":
+           res.render("phamarcy",{"userInfo": req.user});
+           break;
+          case "Laboratory":
+            res.render("laboratory",{"userInfo": req.user});
+            break;
+          case "Radiology":
+            res.render("radiology",{"userInfo": req.user});
+            break;
+          default:
+          res.redirect("/home");
+          break;
+       }
+      } else {
+        res.redirect('/');
+      }
+  })*/
   router.get("/doctor/update",function(req,res){
     if(req.user){            
       res.render("profile-update",{"person":req.user});
@@ -50,7 +96,7 @@ var basicRoute = function (model) {
         res.download(file); // Set disposition and send it.
     }
   });
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //doctors profile update route
   router.put("/user/update",function(req,res){
     if(req.user){
@@ -69,8 +115,9 @@ var basicRoute = function (model) {
                 profile_pic_url: "/download/profile_pic/" + req.files[0].filename
                 }},function(err,info){        
                 if(err) throw err;
-                console.log(info)         
-                res.send("success");                  
+                console.log(info) 
+                var pic = "/download/profile_pic/"  + req.files[0].filename;      
+                res.send(pic);   //repalce with "success" as fallback               
                 });
             } else {
                 res.end();
@@ -216,6 +263,36 @@ var basicRoute = function (model) {
         res.send('js');
         res.send('images');
     });
+    // fetch data for patient profile update inner page
+    router.get("/profile/getDetails",function(req,res){
+        if(req.user) {
+            res.send({
+                profile_pic_url: req.user.profile_pic_url,
+                firstname: req.user.firstname,
+                lastname: req.user.lastname,
+                age: req.user.age,
+                gender: req.user.gender,
+                address: req.user.address,
+                state: req.user.state,
+                city: req.user.city,
+                marital_status: req.user.marital_status,
+            })
+        } else {
+            res.end("error: Not authorized")
+        }
+    });
+    // put updated data to the database.
+    router.put("/patient-profile/update", function(req,res){
+        if(req.user){
+            model.user.update({email: req.user.email},req.body,function(err,info){
+                console.log(info)
+                res.send("updated");
+            });
+        } else {
+            res.end("error: Not authorized")
+        }
+    })
+
     router.get('/account-created',function(req,res){
         res.render("success",{"message":""})
     });
@@ -475,10 +552,9 @@ var basicRoute = function (model) {
         
         model.user.update(
         { _id: req.body.receiverId},
-        { "$push": { notification: requestData} },
-        function(err,info) {
-           console.log(info);
-           res.send("notified");// something with the result in here
+        { "$push": { doctor_notification: requestData} },
+        function(err,info) {          
+           res.send("notified");
         }
         );
         } else {
@@ -490,8 +566,7 @@ var basicRoute = function (model) {
     //this route gets all the notifications for the doctor that just logged in
     router.get("/doctor/notifications",function(req,res){
          if(req.user){
-         model.user.findOne({email:req.user.email},{notification:1},function(err,data){
-                console.log(data);
+         model.user.findOne({email:req.user.email},{doctor_notification:1},function(err,data){                
                 res.send(data);
          })
         } else {
@@ -500,8 +575,7 @@ var basicRoute = function (model) {
     });
 
     router.put("/doctor/acceptance",function(req,res){
-         if(req.user){
-            console.log(req.body)
+         if(req.user){           
              model.user.findOne(
                 {
                     user_id: req.body.patientId
@@ -513,8 +587,7 @@ var basicRoute = function (model) {
                 }
             )
             .exec(
-                function(err, result){
-                    console.log(result)
+                function(err, result){                    
                     if(result.ewallet.available_amount > 0 && result.ewallet.available_amount >= req.body.consultation_fee) {
                         req.body.service_access = true;
                         result.ewallet.available_amount -= req.body.consultation_fee;
@@ -543,10 +616,53 @@ var basicRoute = function (model) {
            res.send("not allowed");
         }
     });
+    
+
+    //this router gets all the patient medical records and prescriptions and send it to the front end as soon as the patient logs in. 
+    //the data is sent as json and the controller that receives it on the front end is "patientPanelController" .
+    router.get("/patient-panel/get-medical-record",function(req,res){
+      res.json({medical_records: req.user.medical_records,prescriptions:req.user.medications})
+    });
+
+    //this route send all notification to the front end as soon as the patient logs in.
+    router.get("/patient/get-notification",function(req,res){
+      res.send(req.user.patient_notification);
+    });
+
+    router.get("/pharmacy/get-referral",function(req,res){
+      res.send(req.user.referral);
+    });
+
+    //11/4/2016
+    router.put("/doctor/specific-patient",function(req,res){
+      if(req.user){
+        var projection = {
+            firstname: 1,
+            lastname: 1,
+            profile_pic_url: 1,       
+            address: 1,
+            city: 1,
+            country: 1,
+            age: 1,
+            gender: 1,
+            body_weight: 1,
+            medical_records: 1,
+            user_id: 1,
+            type: 1
+
+        }
+        model.user.findOne({ user_id: req.body.id},projection,function(err,data){
+            if(err) throw err;
+            res.send(data);
+        });
+
+      } else {
+        res.end("Not allowed");
+      }
+    });
 
     router.put("/patient/acceptance",function(req,res){
          if(req.user){         
-            console.log(req.body)
              model.user.findOne(
                 {
                     email: req.user.email
@@ -558,10 +674,9 @@ var basicRoute = function (model) {
                 }
             )
             .exec(
-                function(err, result){
-                    console.log(result)
-                    for(var i = 0; i < result.patient_notification.length; i++){
-                        if(result.patient_notification[i].doctor_id === req.body.doctor_id) {
+                function(err, result){                    
+                    for (var i = 0; i < result.patient_notification.length; i++) {
+                        if (result.patient_notification[i].doctor_id === req.body.doctor_id) {
                             result.accepted_doctors.push(req.body);
                             deleteFromPatientNotification(i);
                             updateDoctorPatientList();
@@ -569,8 +684,7 @@ var basicRoute = function (model) {
                     }
 
                     function deleteFromPatientNotification(index) {
-                        result.patient_notification.splice(index,1)
-                        console.log(result.patient_notification)
+                        result.patient_notification.splice(index,1);                                  
                     }
 
                     function updateDoctorPatientList() {
@@ -613,6 +727,325 @@ var basicRoute = function (model) {
            res.end();
         }
     });
+
+    router.put("/patient/acceptance/prescription",function(req,res){
+      if(req.user){                  
+        model.user.findOne(
+                {
+                    email: req.user.email
+                },
+                {                    
+                    patient_notification: 1
+                    
+                }
+            )
+            .exec(function(err,result){
+              for (var i = 0; i < result.patient_notification.length; i++) {
+                  if (result.patient_notification[i].doctor_id === req.body.doctor_id) {                      
+                      deleteFromPatientNotification(i);                      
+                  }
+              }
+
+              function deleteFromPatientNotification (index) {
+                result.patient_notification.splice(index,1);               
+              }
+
+              result.save(function(err){
+                  if(err) throw err;                                                      
+                  res.send("deleted");
+              });
+            });
+      } else {
+        res.end("Unauthorized Access");
+      }
+
+    });
+
+    router.put("/patient/specific-doctor",function(req,res){
+        //finds specific doctor and sends to the client.
+        if(req.user){
+          var projection = {
+              firstname: 1,
+              lastname: 1,
+              profile_pic_url: 1,
+              office_hour: 1,
+              profile_url: 1,
+              specialty: 1,
+              date: 1,
+              address: 1,
+              work_place: 1
+          }
+          model.user.findOne({ user_id: req.body.id},projection,function(err,data){
+              if(err) throw err;
+              res.send(data);
+          })
+        }
+    });
+
+    //patient searching for a phamarcy to forward his prescription route handlers.
+    router.get("/patient/getAllPhamarcy",function(req,res){
+        //gets all phamarcy in the database based on patient's location.
+        var projection = {
+            name: 1,
+            address: 1,
+            city: 1,
+            country: 1,
+            rating: 1,
+            profile_pic_url: 1,
+            user_id: 1,
+            type:1
+        }
+        model.user.find({type:"Phamarcy",city:"Enugu"},projection,function(err,data){ //remenber to replace "Enugu" with req.user.city
+            if(err) throw err;
+            res.send(data);
+        });
+    });
+
+    router.put("/patient/phamarcy/refined-search",function(req,res){
+        //coming from thesame controller as above. finds the phamarcy based on the patient search criteria in the req.body.
+        console.log(req.body)
+        var projection = {
+            name: 1,
+            address: 1,
+            city: 1,
+            country: 1,
+            rating: 1,
+            profile_pic_url: 1,
+            user_id: 1,
+            type: 1
+        }
+        model.user.find(req.body,projection,function(err,data){
+            if(err) throw err;
+            res.send(data);
+        })
+    });
+
+    router.put("/patient/pharmacy/referral-by-patient",function(req,res){
+      //this route handle patients sending his prescription to a pharmacy by himself.Therefore the prescription obj already exist. justs to
+      //add the prescription object to the chosen pharmacy.
+      if(req.user){
+        console.log(req.body)
+        model.user.findOne(
+          {
+            user_id: req.body.user_id
+          },
+          {
+            referral: 1,
+            diagnostic_center_notification:1
+
+          }).exec(function(err,pharmacy){
+            var date = new Date();
+            var ref_id = Math.floor(Math.random() * 9999999);
+            var title = (req.user.type === "Doctor") ? 'Dr.': "";            
+            var refObj = {
+              ref_id: ref_id,
+              referral_firstname: req.user.firstname,
+              referral_lastname: req.user.lastname,
+              referral_title: title,
+              referral_id: req.body.id,    
+              date: date,
+              phamarcy: req.body
+            }
+            var phamarcyNotification = {
+              sender_firstname: req.user.firstname,
+              sender_lastname: req.user.lastname,
+              sender_title : title,
+              sent_date: date,
+              ref_id: ref_id,
+              note_id: ref_id,
+              sender_profile_pic_url: req.user.profile_pic_url,
+              message: 'Hi, I need your services'
+            }
+
+            pharmacy.referral.push(refObj);
+            pharmacy.diagnostic_center_notification.push(phamarcyNotification);
+
+            pharmacy.save(function(err,info){
+              if(err) throw err;
+              console.log(info);
+            });
+
+           res.send({success:true,ref_id: ref_id}); 
+          });
+
+      } else {
+        res.end("Unauthorized access. You need to log in")
+      }
+
+    })
+
+    router.put("/patient/phamarcy/referral",function(req,res){
+      //if prescription is forwarded by a doctor to a phamarcy it talks different form. ie doctor can send prescription
+      //straight to a phamarcy. later the patient will be notified. 
+      //this block represents doctor action by forwarding prescription to a phamarcy.
+      //any data sent to a diagnostic center other than to the patient himself is seens a a referral by this application.      
+      if(req.user){
+       console.log(req.body)        
+         model.user.findOne(
+          {
+            user_id: req.body.user_id
+          },
+          {
+            referral: 1,
+            name:1,
+            address:1,
+            diagnostic_center_notification:1
+
+          }).exec(function(err,phamarcy){ 
+          console.log(phamarcy)           
+            if(err) throw err;            
+            var date = new Date();
+            var ref_id = Math.floor(Math.random() * 9999999);
+            var preObj = {              
+              allergy: req.body.allergy,
+              date: date,
+              prescriptionId: req.body.prescriptionId,
+              doctor_firstname: req.user.firstname,
+              doctor_lastname: req.user.lastname,
+              doctor_address: req.user.address,   
+              doctor_id: req.user.user_id,
+              doctor_work_place: req.user.work_place,
+              doctor_city: req.user.city,
+              doctor_country: req.user.country,
+              lab_analysis: req.body.lab_analysis,
+              scan_analysis: req.body.scan_analysis,
+              Doctor_profile_pic_url: req.user.profile_pic_url,
+              patient_id : req.body.patient_id,
+              patient_profile_pic_url: req.body.patient_profile_pic_url,
+              patient_firstname: req.body.firstname,
+              patient_lastname: req.body.lastname,
+              patient_address: req.body.address,
+              patient_gender: req.body.gender,
+              patient_age: req.body.age,
+              patient_city: req.body.city,
+              patient_country: req.body.country,
+              prescription_body: req.body.prescriptionBody
+            }
+            var title = (req.user.type === "Doctor") ? 'Dr.': "";            
+            var refObj = {
+              ref_id: ref_id,
+              referral_firstname: req.user.firstname,
+              referral_lastname: req.user.lastname,
+              referral_title: title,
+              referral_id: req.body.id,    
+              date: date,
+              phamarcy: preObj
+            }
+            var phamarcyNotification = {
+              sender_firstname: req.user.firstname,
+              sender_lastname: req.user.lastname,
+              sender_title : title,
+              sent_date: date,
+              ref_id: ref_id,
+              note_id: ref_id,
+              sender_profile_pic_url: req.user.profile_pic_url,
+              message: 'Please kindly administer the following prescriptions to my patient.'
+            }
+
+            phamarcy.referral.push(refObj);
+            phamarcy.diagnostic_center_notification.push(phamarcyNotification);
+
+            model.user.findOne({user_id: req.body.patient_id},{patient_notification:1,firstname:1,lastname:1}).exec(function(err,data){
+              if(err) throw err;
+               var date = new Date();
+               var msg = "your prescription has been forwarded to " + phamarcy.name + " @ " + phamarcy.address +
+                " by Dr. " + req.user.firstname + req.user.lastname +
+               " on " + date + "<br/>" + " Referrence number is " + ref_id;        
+                data.patient_notification.push({
+                doctor_firstname: req.user.firstname,
+                doctor_lastname: req.user.lastname,
+                doctor_profile_pic_url: req.user.profile_pic_url,
+                doctor_specialty: req.user.specialty,
+                doctor_id: req.user.user_id,
+                date: date,
+                message: msg,
+
+              });
+
+              data.save(function(err,info){
+                if(err) throw err;
+                console.log("patient notified");            
+              });
+            });
+
+            phamarcy.save(function(err,info){             
+              if(err) throw err;             
+              console.log("prescription saved");                           
+            });
+
+            res.send({success:true,ref_id: ref_id}); 
+        });        
+     
+      } else {
+        res.end("Unauthorized Access");
+      }   
+    });    
+
+    //prescription foewarded by the doctor to a patient inbox
+    router.put("/patient/forwarded-prescription",function(req,res){     
+      if(req.user){         
+        model.user.findOne(
+          {
+            user_id: req.body.id
+          },           
+          {
+            medications: 1,          
+          }).exec(function(err,result){            
+            if(err) throw err;            
+            var date = new Date();                
+            var preObj = {              
+              allergy: req.body.allergy,
+              date: date,
+              prescriptionId: req.body.prescriptionId,
+              doctor_firstname: req.user.firstname,
+              doctor_lastname: req.user.lastname,
+              doctor_address: req.user.address,   
+              doctor_id: req.user.user_id,
+              doctor_work_place: req.user.work_place,
+              doctor_city: req.user.city,
+              doctor_country: req.user.country,
+              lab_analysis: req.body.lab_analysis,
+              scan_analysis: req.body.scan_analysis,
+              Doctor_profile_pic_url: req.user.profile_pic_url,
+              patient_id: req.body.patient_id,
+              patient_profile_pic_url: req.body.patient_profile_pic_url,
+              patient_firstname: req.body.firstname,
+              patient_lastname: req.body.lastname,
+              patient_address: req.body.address,
+              patient_gender: req.body.gender,
+              patient_age: req.body.age,
+              patient_city: req.body.city,
+              patient_country: req.body.country,
+              prescription_body: req.body.prescriptionBody
+            }           
+            result.medications.push(preObj);
+            result.save(function(err,info){             
+              if(err) throw err;             
+              console.log("prescription saved");          
+            });
+        });
+
+        model.user.findOne({user_id: req.body.id},{patient_notification:1,firstname:1,lastname:1}).exec(function(err,data){
+          if(err) throw err;
+           var date = new Date(); 
+            data.patient_notification.push({
+            doctor_firstname: req.user.firstname,
+            doctor_lastname: req.user.lastname,
+            doctor_profile_pic_url: req.user.profile_pic_url,
+            doctor_specialty: req.user.specialty,
+            doctor_id: req.user.user_id,
+            date: date,
+            message: "You have new unread prescription!"
+          });
+
+          data.save(function(err,info){
+            if(err) throw err;            
+            res.send("success! prescription forwarded to " + data.firstname + " " + data.lastname);                 
+          });
+        });
+                     
+      }
+    });
     
     //route for funding wallet
     router.patch("/user/fundwallet",function(req,res){
@@ -624,8 +1057,9 @@ var basicRoute = function (model) {
         })
     });
 
-    router.get("/user/webrtc",function(req,res){
-        res.send(true);
+    router.get("/gcamon",function(req,res){
+        var identity = "gcamon";
+        res.send(JSON.stringify({ token: token(identity), identity: identity }))
     });
 
     router.get("/user/logout",function(req,res){

@@ -54,7 +54,7 @@
                                 <div class="collapse navbar-collapse" id="tg-navigation">
                                     <ul>
                                         <li>
-                                            <a href="/">Home</a>                                           
+                                            <a href="/home">Home</a>                                           
                                         </li>
                                         <li>
                                             <a href="#">Top Ranking</a>
@@ -209,12 +209,12 @@
 					</div>
 				</div>
 			</div>
-			<div class="tg-pagebar tg-haslayout">
+			<div class="tg-pagebar tg-haslayout" ng-controller="doctorBarNotificationController">
 				<div class="container">
 					<div class="row">
-						<div class="col-xs-12">
+						<div class="col-xs-4 col-md-8">
 							<h1>dashboard</h1>
-							<ol class="tg-breadcrumb">
+							<!--<ol class="tg-breadcrumb">
 								<li><a href="/">Home</a></li>
 								<li class="active">dashboard</li>
 								<li style="position:relative">
@@ -223,8 +223,58 @@
 										<li></li>
 									</ul>
 								</li>
-							</ol>
+							</ol>-->
 						</div>
+                        <div class="col-xs-8 col-md-4">                            
+                            <ul class="notify">
+                                <li class="noti note notify-icon">
+                                    <i class="fa fa-bell-o" style="font-size:24px;color:rgba(0,180,0,0.8);position:relative"><span style="display:inline-block;width:24px;height:24px;background-color:#fff;left: 15px; top:-23px; border-radius: 15px;
+                                        position:absolute;text-align:center;color:#000;" ng-if="<%= person.doctor_notification.length %> > 0 "><%= person.doctor_notification.length %></span></i>
+                                    <ul class="all-notify">
+                                        <li> <h6 style="text-align: center">Notification(s)</h6> </li>
+                                        <% for(var i = person.doctor_notification.length -1; i >= 0; i--) { %>
+                                            <li class="note-field" ng-click="viewNote('<%= person.doctor_notification[i].doctor_id %>')">                                                
+                                                <img src="<%= person.doctor_notification[i].doctor_profile_pic_url %>" style="width: 50px; height: 50px">
+                                                <div>{{getData("<%= person.doctor_notification[i].doctor_firstname%>","<%= person.doctor_notification[i].doctor_lastname %>","<%= person.doctor_notification[i].date %>","<%= person.doctor_notification[i].doctor_profile_pic_url %>","<%= person.doctor_notification[i].consultation_fee %>","<%= person.firstname %>","<%= person.ewallet.available_amount %>","<%= person.doctor_notification[i].doctor_id %>","<%= person.doctor_notification[i].service_access %>","<%= person.doctor_notification[i].doctor_specialty %>")}}</div>
+                                                <span>{{convertDate('<%= person.doctor_notification[i].date %>')}}</span>    
+
+                                                <span> From Dr. <%= person.doctor_notification[i].doctor_firstname %> <%= person.doctor_notification[i].doctor_lastname %></span>
+                                                <span style="display:block">{{realDate | date: "medium"}}</span>
+                                            </li>
+                                        <% } %>
+
+                                    </ul>
+                                </li>
+                                <li class="noti chat notify-icon">
+                                    <i class="fa fa-commenting-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
+                                    <ul class="all-notify">
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                    </ul>
+                                </li>
+                                <li class="noti video notify-icon">
+                                    <i class="fa fa-phone" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
+                                    <ul class="all-notify">
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                        <li>hello</li>
+                                    </ul>
+                                </li>
+                                <li class="noti chat">
+                                    <img src="<%= person.profile_pic_url %>" style= "width:35px;height:35px;border-radius: 20px">
+                                    <p style="color:rgba(255,255,255,0.8);
+                                    padding-left: 20px"><%= person.firstname %> <%=person.lastname %></p>
+                                    <ul class="all-notify">
+                                        <li style="text-align:center; cursor:pointer" ng-click="logout()">SIGNOUT</a></li>                                       
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
 					</div>
 				</div>
 			</div>
@@ -236,7 +286,7 @@
 				Main Start
 		*************************************-->
 		<main id="main" class="tg-main-section tg-haslayout">
-			<div class="container">
+			<div class="container-fluid">
 				<div class="row">
 					<div class="col-lg-9 col-md-9 col-sm-8 col-xs-12 pull-right" ng-controller="inDoctorDashboardController">
 						<div class="tg-dashboard tg-haslayout">
@@ -249,26 +299,48 @@
                                     </div>
 								</div>
 								<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 tg-expectwidth">
-								<div class="row">
-									<div class="tg-support">
-										<div class="tg-heading-border tg-small">
-											<h3><a href="#">get support</a></h3>
-										</div>
-										<ul class="tg-doccontactinfo">
-											<li>
-												<i class="fa fa-map-marker"></i>
-												<address>1 Nwodo street GRA Enugu</address>
-											</li>
-											<li>
-												<i class="fa fa-phone"></i>
-												<span>+234 8064245256</span>
-											</li>
-											<li>
-												<i class="fa fa-envelope-o"></i>
-												<a href="#">info@Fareland.com</a>
-											</li>									
-										</ul>
-									</div>
+								<div class="row">									
+                                <aside id="tg-sidebar">                            
+                                <div class="tg-widget tg-tab-widget" ng-controller="checkingOutDoctorController">
+                                <h3>My Patients</h3>
+                                <div>
+                                    <ul style="height: 600px; overflow-x: auto">
+                                        <% if(person.doctor_patients_list.length > 0) { %> 
+                                            <% for(var k =  person.doctor_patients_list.length - 1; k >= 0; k--) { %>
+                                            <li style="list-style-type: none; padding: 10px;border-bottom: 1px dashed rgba(0,0,0,0.2);border-radius: 20px;cursor: pointer" class="clearfix">
+                                                <div style="cursor: pointer;" ng-click="userPatient('<%= person.doctor_patients_list[k].patient_id %>')">                                           
+                                                    <img src="<%= person.doctor_patients_list[k].patient_profile_pic_url %>" style="width:32px;height:32px" alt="image description">
+                                                    <span style="font-size: 12px; padding-left: 10px"> <%= person.doctor_patients_list[k].patient_firstname %> <%= person.doctor_patients_list[k].patient_lastname %> </span>                                                  
+                                                </div>
+                                                <div>
+                                                </div>
+                                            </li>
+                                            <% } %>
+                                        <% } %>
+                                    </ul>
+                                </div>
+                                <div class="tg-support">
+                                        <div class="tg-heading-border tg-small">
+                                            <h3><a href="#">get support</a></h3>
+                                        </div>
+                                        <ul class="tg-doccontactinfo">
+                                            <li>
+                                                <i class="fa fa-map-marker"></i>
+                                                <address>1 Nwodo street GRA Enugu</address>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-phone"></i>
+                                                <span>+234 8064245256</span>
+                                            </li>
+                                            <li>
+                                                <i class="fa fa-envelope-o"></i>
+                                                <a href="#">info@Fareland.com</a>
+                                            </li>                                   
+                                        </ul>
+                                    </div>
+                                
+                                    </div>
+                                </aside>
 								</div>
 							</div>
 							</div>
@@ -435,66 +507,73 @@
 							<div class="tg-widget tg-widget-accordions">
 								<h3> Doctor Dashboard</h3>
 								<ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-									<li class="panel panel-default active">
-										<div class="tg-panel-heading" role="tab" id="headingOne">
-											<h3 class="panel-title">
-												<a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseOne" aria-expanded="true" aria-controls="collapseOne">Insights</a>
-											</h3>
-										</div>
-										<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-											<div class="panel-body">
-												<p><%= person.introductory %></p>
-											</div>
-										</div>
-									</li>
-									<li class="panel panel-default">
-										<div class="tg-panel-heading" role="tab" id="headingTwo">
-											<h3 class="panel-title">
-												<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">Patients</a>
-											</h3>
-
-										</div>
-										<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-											<div class="panel-body">
-												<ol>
-													<li>
-														<h6 style="margin:0 auto">Ede Obinna</h6>														
-														<button>delete</button>&nbsp;&nbsp;&nbsp;&nbsp;
-														<button>view</button>
-														
-													</li>													
-												</ol>
-											</div>
-										</div>
-									</li>
-									<li class="panel panel-default">
-										<div class="tg-panel-heading" role="tab" id="headingThree">
-											<h3 class="panel-title">
-												<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseThree" aria-expanded="false" aria-controls="collapseThree">Schedule</a>
-											</h3>
-										</div>
-										<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-											<div class="panel-body">
-												<p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
-											</div>
-										</div>
-									</li>
-									<li class="panel panel-default">
-										<div class="tg-panel-heading" role="tab" id="headingFour">
-											<h3 class="panel-title">
-												<a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseFour" aria-expanded="false" aria-controls="collapseThree">My Account</a>
-											</h3>
-										</div>
-										<div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
-											<div class="panel-body">
-												<p>Lorem ipsum dolor sit amet, conser adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volupat amitsh sangi.</p>
-											</div>
-										</div>
-									</li>
-									<li class="panel panel-default">
-										<h3 class="panel-title"><a href="/user/logout">Signout</a></h3>
-									</li>
-								</ul>
+                                    <li class="panel panel-default">
+                                        <a href="#/welcome"><i class="fa fa-home" style="font-size: 32px; color: rgba(0,100,0,0.7);float:left" title="Back to dashboard home"></i></a>                                  
+                                        
+                                    </li>                       
+                                    <li class="panel panel-default">
+                                        <div class="tg-panel-heading" role="tab" id="headingSix">
+                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseSix" aria-expanded="false" aria-controls="collapseSix" style="color:rgba(0,180,0,0.6); font-size: 18px;">Appointments(0)</a>
+                                            </h3>
+                                        </div>
+                                        <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
+                                            <div class="panel-body">
+                                                <ol>
+                                                <% for(var k = 0; k < person.medications.length; k++) { %>
+                                                <li ng-click="viewPrescription(<%= person.appointments[k].doctor_id %>)" style="padding: 5px 2px; cursor: pointer"> </li>
+                                                <% } %>
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </li>                                                                  
+                                    <li class="panel panel-default">
+                                        <div class="tg-panel-heading" role="tab" id="headingTwo">
+                                            <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
+                                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseTwo" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Account profile</a>
+                                            </h3>
+                                        </div>
+                                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                            <div class="panel-body">
+                                                <p><a href="#/edit-profile">Edit your profile</a></p>                                                
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="panel panel-default">
+                                        <div class="tg-panel-heading" role="tab" id="headingTwo">
+                                            <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
+                                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseFive" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Chat History</a>
+                                            </h3>
+                                        </div>
+                                        <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
+                                            <div class="panel-body">
+                                                <ol>
+                                                <% for(var k = 0; k < person.medications.length; k++) { %>
+                                                <li ng-click="viewPrescription(<%= person.medications[k].doctor_id %>)" style="padding: 5px 2px; cursor: pointer"> </li>
+                                                <% } %>
+                                                </ol>                                                   
+                                            </div>
+                                        </div>
+                                    </li>                                                  
+                                    <li class="panel panel-default">
+                                        <div class="tg-panel-heading" role="tab" id="headingFour">
+                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseFour" aria-expanded="false" aria-controls="collapseThree" style="color:rgba(0,180,0,0.6); font-size: 18px;">Payment & Wallet</a>
+                                            </h3>
+                                        </div>
+                                        <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+                                            <div class="panel-body">
+                                                {{convertToDollar('<%= person.ewallet.available_amount %>')}}
+                                                <p>Avalaible amount | <strong>{{amount | currency}}</strong></p>
+                                                <p><a href="#/wallet">Fund wallet</a></p>
+                                                <p><a href="#/wallet">View all Transactions</a></p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="panel panel-default">
+                                        <h3 class="panel-title"><a href="/user/logout">Signout</a></h3>
+                                    </li>
+                                </ul>
 							</div>
 						</aside>
 					</div>

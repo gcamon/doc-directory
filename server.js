@@ -6,10 +6,11 @@ var express = require('express'),
     config = require('./config'),
     route = require('./route'),
     signupRoute = require('./signup'),
-    loginRoute = require('./login'),
+    loginRoute = require('./login'),    
     app = express(),
-    model = db(),
+    model = db(), 
     port = process.env.PORT || 1986;
+
 
 app.listen(port);
 mongoose.Promise = global.Promise;
@@ -18,6 +19,8 @@ config.configuration(app,model);
 route(model);
 signupRoute(model);
 loginRoute(model);
+
+
 
 
 

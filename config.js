@@ -1,5 +1,6 @@
 'use strict';
 var express = require('express');
+var path = require("path");
 var multer = require('multer');
 var bodyParser = require('body-parser');
 var router = express.Router();
@@ -45,12 +46,6 @@ var configuration = function (app,model) {
 		done(err, user);
 	});
 	});
-
-	app.use(function(err, req, res, next) {
-	  res.status(err.status || 500);
-	  res.sendFile(path.join(__dirname + "/404.html"));
-	});
-
 
 }
 

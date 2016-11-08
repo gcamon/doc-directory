@@ -212,11 +212,11 @@
                     </div>
                 </div>
             </div>
-            <div class="tg-pagebar tg-haslayout" ng-controller = "pharmacyCenterNotificationController">
+            <div class="tg-pagebar tg-haslayout" ng-controller = "phamarcistNotificationController">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-xs-4 col-md-8">
-                            <h1>Pharmacy dashboard</h1>
+                            <h1>Phamarcist dashboard</h1>
                             <!--<ol class="tg-breadcrumb">
                                 <li><a href="#">Home</a></li>
                                 <li class="active">Patient dashboard</li>                                
@@ -225,23 +225,20 @@
                         <div class="col-xs-8 col-md-4">                            
                             <ul class="notify">
                                 <li class="noti note notify-icon">
-                                    <i class="fa fa-bell-o" style="font-size:24px;color:rgba(0,180,0,0.8);position:relative"><span style="display:inline-block;width:24px;height:24px;background-color:#fff;left: 15px; top:-23px; border-radius: 15px;
-                                        position:absolute;text-align:center;color:#000;" ng-if="<%= userInfo.diagnostic_center_notification.length %> > 0 "><%= userInfo.diagnostic_center_notification.length %></span></i>
-                                    <ul class="all-notify">                                        
+                                    <i class="fa fa-bell-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
+                                    <ul class="all-notify">
                                         <li> <h6 style="text-align: center">Notification(s)</h6> </li>
-                                        <li>
-                                            <p style="cursor: pointer; color:green;text-decoration: underline" ng-click="addAllNote()">Add all notification to attendance list</p>
-                                        </li>                     
-                                        <% for(var i = userInfo.diagnostic_center_notification.length - 1; i >= 0; i--) { %>
-                                            <li class="pharmacy_notification" ng-click="viewNote(<%= userInfo.diagnostic_center_notification[i].ref_id  %>)">
-                                                <img src="<%= userInfo.diagnostic_center_notification[i].sender_profile_pic_url %>" style="width: 32px; height:32px">
-                                                <aside>
-                                                    <p><%= userInfo.diagnostic_center_notification[i].sender_firstname %> <%= userInfo.diagnostic_center_notification[i].sender_lastname %>
-                                                    <span><%= userInfo.diagnostic_center_notification[i].message %></span>
-                                                    <span><%= userInfo.diagnostic_center_notification[i].sent_date %></span></p>                                                 
-                                                </aside>                                                
+                                        <% for(var i = userInfo.patient_notification.length -1; i >= 0; i--) { %>
+                                            <li class="note-field" ng-click="viewNote('<%= userInfo.patient_notification[i].doctor_id %>')">                                                
+                                                <img src="<%= userInfo.patient_notification[i].doctor_profile_pic_url %>" style="width: 50px; height: 50px">
+                                                <div>{{getData("<%= userInfo.patient_notification[i].doctor_firstname%>","<%= userInfo.patient_notification[i].doctor_lastname %>","<%= userInfo.patient_notification[i].date %>","<%= userInfo.patient_notification[i].doctor_profile_pic_url %>","<%= userInfo.patient_notification[i].consultation_fee %>","<%= userInfo.firstname %>","<%= userInfo.ewallet.available_amount %>","<%= userInfo.patient_notification[i].doctor_id %>","<%= userInfo.patient_notification[i].service_access %>","<%= userInfo.patient_notification[i].doctor_specialty %>")}}</div>
+                                                <span>{{convertDate('<%= userInfo.patient_notification[i].date %>')}}</span>    
+
+                                                <span> From Dr. <%= userInfo.patient_notification[i].doctor_firstname %> <%= userInfo.patient_notification[i].doctor_lastname %></span>
+                                                <span style="display:block">{{realDate | date: "medium"}}</span>
                                             </li>
-                                        <% } %> 
+                                        <% } %>
+
                                     </ul>
                                 </li>
                                 <li class="noti chat notify-icon">
@@ -282,7 +279,7 @@
         <main id="main" class="tg-main-section tg-haslayout">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-lg-9 col-md-9 col-sm-8 pull-right" ng-controller="pharmacyCenterDashboardController">
+                    <div class="col-lg-9 col-md-9 col-sm-8 pull-right" ng-controller="diagnosisCenterDashboardController">
                         <div class="row">
                             <div class="col-sm-12 col-md-9 col-lg-9">
                                 <div class="view-animate-container row" >  
@@ -293,17 +290,21 @@
                             <div class="col-sm-12 col-md-3 col-lg-3" style="padding: 0px 3px">
                                 <aside id="tg-sidebar">                                                           
                                 <div class="tg-widget tg-tab-widget" ng-controller="checkingOutPatientController">
-                                <h3>Attendance list</h3>
-                                <form>
-                                    <input type="text" placeholder="Look up a patient in this list"/>
-                                    <input type="button" value="Find"/>
-                                </form>
+                                <h3>My doctor(s)</h3>
                                 <div>
                                     <ul style="height: 600px; overflow-x: auto">
-                                        <li ng-repeat="person in attendanceList" style="list-style: none; margin-bottom: 10px; border-bottom: 1px dashed rgba(0,0,0,0.3);padding-bottom: 5px; cursor:pointer" ng-click="patientPrescription(person.ref)">
-                                            <img ng-src="{{person.profile_pic_url}}" style="width:32px; height:32px"/>
-                                            <span>{{person.firstname}}  {{person.lastname}}</span>
-                                        </li>
+                                        <% if(userInfo.accepted_patients.length > 0) { %> 
+                                            <% for(var k = 0; k < userInfo.accepted_patients.length; k++) { %>
+                                            <li style="list-style-type: none; padding: 10px;border-bottom: 1px dashed rgba(0,0,0,0.2);border-radius: 20px;cursor: pointer" class="clearfix" ng-click="checkoutDoctor()">
+                                                <div style="cursor: pointer;" ng-click="ViewPatient('<%= userInfo.accepted_patients[k].patient_id %>')">                                                
+                                                    <img src="<%= userInfo.accepted_doctors[k].doctor_profile_pic_url %>" style="width:32px;height:32px" alt="image description">
+                                                    <span style="font-size: 12px">Dr. <%= userInfo.accepted_doctors[k].doctor_firstname %> <%= userInfo.accepted_doctors[k].doctor_lastname %> </span>                                                    
+                                                </div>
+                                                <div>
+                                                </div>
+                                            </li>
+                                            <% } %>
+                                        <% } %>
                                     </ul>
                                 </div>
                                </aside>
@@ -317,7 +318,8 @@
                                 <h3>Dashboard</h3>
                                 <ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                 <li class="panel panel-default">
-                                        <span ng-click="dashboardhome()"><i class="fa fa-home" style="font-size: 32px; color: rgba(0,100,0,0.7);margin-right: 10px; cursor:pointer" title="Back to dashboard home"></i></span>                                        
+                                        <span ng-click="dashboardhome()"><i class="fa fa-home" style="font-size: 32px; color: rgba(0,100,0,0.7);margin-right: 10px; cursor:pointer" title="Back to dashboard home"></i></span>
+                                        <span ng-click="viewPrescription()" style="cursor:pointer"><i class="icon-Pills icon-style" title="View all prescriptions"></i></span>
                                         
                                     </li>                                                          
                                     
