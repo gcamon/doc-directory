@@ -21,7 +21,7 @@
 		    <h6>Address: <span style="font-weight: 200; color:black;font-size: 12px">{{docInfo.doctor_work_place}}</span> | <span style="font-style:italic; color:black;font-size:12px">{{docInfo.doctor_address}}</span></h6>
 		    <h6>City: <span style="font-weight: 200; color:black">{{docInfo.doctor_city}}</span></h6>        
 		    <h6>Experience: <span style="color:black">{{docInfo.doctor_experience + " years"}}</span></h6>        
-		    <p style="font-size: 18px; font-weight: 100; margin-top: 20px">PRESCRIPTION DETAILS:</p>
+		    <p style="font-size: 18px; font-weight: 100; margin-top: 20px">PRESCRIPTION DETAILS:</p>		    	
 		    	<div class="row">
 		    		<div class="col-sm-12 col-md-4 col-lg-4"> 
 		    			<p><strong>Date</strong> : <span>{{docInfo.date| date: "medium"}}</span></p>
@@ -60,13 +60,23 @@
 		    					</tbody>
 		    				</tr>
 		    			</table>
-		    			<div class="pull-right">
-		    				<i class="fa fa-download" aria-hidden="true" style="color:green;font-size: 18px;margin-right:20px;cursor:pointer" title="Download this prescription" ng-click="downloadPrescription(docInfo.drugId)"></i>
-		    				<i class="fa fa-arrow-right" aria-hidden="true" style="color:green;font-size:18px;margin-right:20px;cursor:pointer" title="Forward this prescription to a Phamarcy" ng-click="forwardPrescription(docInfo.prescriptionId)"></i>
-		    				<span ng-click="deletePrescription(docInfo.prescriptionId)"><i class="fa fa-remove" style="color:green;font-size: 18px;margin-right:20px;cursor:pointer" title="Delete this prescription" ></i></span>
-		    				 				
-		    			</div>        				
-		    				
+		    			<div class="row">
+		    				<div class="col-sm-12 col-md-4 col.lg-4 pull-right">
+		    					<div class="pull-right">
+				    				<i class="fa fa-download" aria-hidden="true" style="color:green;font-size: 18px;margin-right:20px;cursor:pointer" title="Download this prescription" ng-click="downloadPrescription(docInfo)"></i>
+				    				<i class="fa fa-arrow-right" aria-hidden="true" style="color:green;font-size:18px;margin-right:20px;cursor:pointer" title="Forward this prescription to a Phamarcy" ng-click="forwardPrescription(docInfo)"></i>
+				    				<span ng-click="deletePrescription(docInfo.prescriptionId)"><i class="fa fa-remove" style="color:green;font-size: 18px;margin-right:20px;cursor:pointer" title="Delete this prescription" ></i></span>
+			    				</div>
+		    				</div>
+		    				 <div class="col-sm-12 col-md-8 col-lg-8">
+		    				 	<p style="cursor:pointer; text-decoration: underline;color:green" ng-click="trackedPrescription(docInfo.prescriptionId,docInfo)">Where prescriptions go?</p>
+		    				 </div>			
+		    			</div>
+		    			<div class="row">
+		    				<div class="col-sm-12 col-md-12 col-lg-12">
+		    					
+		    				</div>       				
+		    			</div>
 		    		</div>
 		    	</div>
         </div>

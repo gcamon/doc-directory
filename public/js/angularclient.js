@@ -88,9 +88,9 @@ app.config(function($routeProvider){
   controller: "viewPrescriptionFromNoticeTemplateController"
  })
  
- .when("/search/phamarcy",{
+ .when("/search/pharmacy",{
   templateUrl: "/assets/pages/search-phamarcy.html",
-  controller: "searchForPhamarcyController"
+  controller: "searchForPharmacyController"
  })
 
  .when("/referred-patients",{
@@ -106,6 +106,11 @@ app.config(function($routeProvider){
  .when("/patient/selected-center/:id",{
   templateUrl: "/assets/pages/selected-center.html",
   controller: "selectedCenterController"
+ })
+
+ .when("/patient/view-prescription-history/:id",{
+  templateUrl : "/assets/pages/patient-view-prescription-history.html",
+  controller : "trackedPrescriptionController"
  })
   
 });
@@ -146,8 +151,10 @@ app.service('templateService',[function(){
   this.holdIdForFindingRecord;
   //this holds prescription for patientview request controller.
   this.holdAllPrescriptionForOtherCtrl;
-  //holds prescription to be forwarded to a phamarcy.
+  //holds prescription to be forwarded to a phamarcy.note this can hold for prescription that can be forward from doctor to pharmacy, patient
+  //to pharmacy and pharmacy to pharmacy.
   this.holdPrescriptionToBeForwarded;
+  
 
   //hol attendance list
   this.holdList = [];
@@ -160,6 +167,11 @@ app.service('templateService',[function(){
 
   //holds referral data for pharmacy
   this.holdPharmacyReferralData;
+
+  //holds where prescriptions has been sent to.
+  this.holdTrackRecord;
+  //holds prescription for where prescriptions have been sent.
+  this.holdPrescriptionForTrackRecord;
 
 
   //hodls fn to call when patients wants to view prescription from the notification template.
@@ -255,17 +267,28 @@ app.controller('loginController',["$scope","$http","$location","$window","ModalS
         .success(function(data) {
         console.log(data)              
           if (data.isLoggedIn) {
-            if(data.typeOfUser === "Patient") {
-              $window.location.href = '/patient/dashboard';  
-            } else if(data.typeOfUser === "Doctor") {
-              $window.location.href = '/doctor/dashboard';  
-            } else if(data.typeOfUser === "Hospital" || data.typeOfUser === "Clinic" || data.typeOfUser === "Phamarcy" || 
-              data.typeOfUser === "Radiology Center" || data.typeOfUser === "Laboratory Center" || data.typeOfUser === "Fitness Center" ) {
-              $window.location.href = "/medical-center/view";  
-            }  else {
-              $scope.error ="type not identified"
+            switch(data.typeOfUser) {
+              case "Patient":
+                $window.location.href = '/patient/dashboard';  
+              break;
+              case "Doctor":
+               $window.location.href = '/doctor/dashboard';   
+              break;
+              case "Pharmacy":
+                $window.location.href = "/medical-center/pharmacy"; 
+              break;
+              case "Laboratory":
+                $window.location.href = "/medical-center/laboratory"; 
+              break;
+              case "Radiology":
+                $window.location.href = "/medical-center/radiology"; 
+              break;
+              default:
+                $window.location.href = "/medical-center/view"; 
+              break; 
+
             }
-                       
+            
           } else {       
             $scope.error = "Email or Password incorrect!";            
           }
@@ -1263,15 +1286,15 @@ app.controller("patientProfileEditController",["$scope","$location","$http","$wi
     $scope.userData = templateService.changedProfilePic;      
   });
      
- $http({
-        method  : 'GET',
-        url     : "/profile/getDetails",
-        headers : {'Content-Type': 'application/json'} 
-        })
-      .success(function(data) {
-        $scope.userData = data;
+  $http({
+    method  : 'GET',
+    url     : "/profile/getDetails",
+    headers : {'Content-Type': 'application/json'} 
+    })
+  .success(function(data) {
+    $scope.userData = data;
+  });
 
-      });
   $scope.user = {};
    
    $scope.update = function(){
@@ -1296,29 +1319,47 @@ app.controller("medicalRecordTemplateController",["$scope","$location","$http","
 app.controller("prescriptionTemplateController",["$scope","$location","$http","templateService",function($scope,$location,$http,templateService){
     var prescriptionObjs = [];
     templateService.holdPrescriptions.forEach(function(prescription){
-    var random = Math.floor(Math.random() * 999999999999 ); //remember to delete this line when you clean up the database.
-    prescription.prescriptionId = random;    
-      console.log(prescription.prescriptionId)
+    //var random = Math.floor(Math.random() * 999999999999 ); remember to delete this line when you clean up the database.
+    //prescription.prescriptionId = random;    
+      //console.log(prescription.prescriptionId)
       prescriptionObjs.unshift(prescription);
+    });
 
-    })
     $scope.prescriptionRecordsResult = prescriptionObjs;
 
+    var hasBeenSentTo = {};
 
-    $scope.downloadPrescription = function (id) {
+    $http({
+      method  : 'GET',
+      url     : "/patient/get-prescription/track-record",        
+      headers : {'Content-Type': 'application/json'} 
+      })
+    .success(function(data) {
+      console.log(data)
+      hasBeenSentTo.trackRecord = data;
+    });
 
+    $scope.trackedPrescription = function(id,prescription){   
+      var holdRecord = [];
+      hasBeenSentTo.trackRecord.forEach(function(record){
+        if(record.prescriptionId === id) {
+          holdRecord.unshift(record);
+        }
+      });
+      templateService.holdTrackRecord = holdRecord;
+      templateService.holdPrescriptionForTrackRecord = prescription;
+      $location.path("/patient/view-prescription-history/" + id);
+    }
+
+
+    $scope.downloadPrescription = function (prescription) {
     }
 
     //this fn is invoked when patient wish to forward prescription by himself to a phamarcy.
-    $scope.forwardPrescription = function (id) {
-      for(var i = 0; i < $scope.prescriptionRecordsResult.length; i++){
-        if($scope.prescriptionRecordsResult[i].prescriptionId === id){
-          templateService.holdPrescriptionToBeForwarded = $scope.prescriptionRecordsResult[i];
-          templateService.holdPrescriptionToBeForwarded.sender = "patient";          
-          $location.path("/search/phamarcy");          
-        }
-      }
-
+    $scope.forwardPrescription = function (prescription) {       
+      templateService.holdPrescriptionToBeForwarded = prescription;
+      templateService.holdPrescriptionToBeForwarded.sender = "patient";          
+      $location.path("/search/pharmacy");         
     }
     
     //this fn is invoked when a patient wish to delete a prescription.
@@ -1332,45 +1373,58 @@ app.controller("prescriptionTemplateController",["$scope","$location","$http","t
 
 }]);
 
+app.controller("trackedPrescriptionController",["$scope","$location","templateService",function($scope,$location,templateService){
+  $scope.presInfo = templateService.holdPrescriptionForTrackRecord;
+  $scope.trackedPrescription = templateService.holdTrackRecord;
+
+  //this fn is invoked when patient wish to forward prescription by himself to a phamarcy.
+  $scope.forwardPrescription = function (prescription) {       
+    templateService.holdPrescriptionToBeForwarded = prescription;
+    console.log(prescription)
+    templateService.holdPrescriptionToBeForwarded.sender = "patient";          
+    $location.path("/search/pharmacy");         
+  }
+}])
+
 //this controls the search for phamarcy template. when a patient wish to forward his prescription to a desired phamarcy.
-app.controller("searchForPhamarcyController",["$scope","$location","$http","templateService","ModalService",
+app.controller("searchForPharmacyController",["$scope","$location","$http","templateService","ModalService",
   function($scope,$location,$http,templateService,ModalService){
   //for phamarcy
-  $scope.phamarcy = {};
+  $scope.pharmacy = {};
 
   $http({
         method  : 'GET',
-        url     : "/patient/getAllPhamarcy",
+        url     : "/patient/getAllPharmacy",
         headers : {'Content-Type': 'application/json'} 
         })
-      .success(function(data) {
-        console.log(data);
-        $scope.phamarcyData = data;
-        $scope.phamarcy.city = data[0].city;
+      .success(function(data) {        
+        $scope.pharmacyData = data;
+        console.log(data)        
+        $scope.pharmacy.city = data[0].city;
     });
     
-    $scope.findPhamarcy = function () {
+    $scope.findPharmacy = function () {
       var searchObj = {};
-      for(var i in $scope.phamarcy){
-        if($scope.phamarcy.hasOwnProperty(i) && $scope.phamarcy[i] !== ""){
-          searchObj[i] = $scope.phamarcy[i];
+      for(var i in $scope.pharmacy){
+        if($scope.pharmacy.hasOwnProperty(i) && $scope.pharmacy[i] !== ""){
+          searchObj[i] = $scope.pharmacy[i];
         }
       }
-       searchObj.type = "Phamarcy";
+       searchObj.type = "Pharmacy";
        $http({
         method  : 'PUT',
-        url     : "/patient/phamarcy/refined-search", 
+        url     : "/patient/pharmacy/refined-search", 
         data    : searchObj,
         headers : {'Content-Type': 'application/json'} 
         })
       .success(function(data) {
-        $scope.phamarcyData = data;
+        $scope.pharmacyData = data;
       });
     }
     //when a desired phamarcy is clicked by the patient this function runs to store that center details to a service which will be use for display
     //in selectedCenterController.
     $scope.forwardPrescriptionTo = function (id) {
-    $scope.phamarcyData.forEach(function(center){
+    $scope.pharmacyData.forEach(function(center){
       if(center.user_id === id){
         templateService.holdTheCenterToFowardPrescriptionTo = center;
         return;
@@ -1403,11 +1457,13 @@ app.controller("selectedCenterController",["$scope","$location","$http","templat
   $scope.sendReferral = function (id,type) {
       //id refers to the user_id of the phamarcy referred to.
       switch (type) {
-        case "Phamarcy":
+        case "Pharmacy":
           if(templateService.holdPrescriptionToBeForwarded.sender === "doctor"){
-            sending(id,type,"/patient/phamarcy/referral");
+            sending(id,type,"/patient/pharmacy/referral");
           } else if (templateService.holdPrescriptionToBeForwarded.sender ==="patient") {
             sending(id,type,"/patient/pharmacy/referral-by-patient");
+          } else if(templateService.holdPrescriptionToBeForwarded.sender ==="Pharmacy") {
+             sending(id,type,"/patient/pharmacy/referral-by-pharmacy");
           }
         break;
 
@@ -1426,7 +1482,7 @@ app.controller("selectedCenterController",["$scope","$location","$http","templat
   }
 
   var sending = function(id,type,url) {      
-      if(type === 'Phamarcy'){   
+      if(type === 'Pharmacy'){   
         templateService.holdPrescriptionToBeForwarded.user_id = id; //user_id is the id of the phamarcy patient is forwarding prescription to.               
         console.log(templateService.holdPrescriptionToBeForwarded);
       }      
@@ -1439,6 +1495,7 @@ app.controller("selectedCenterController",["$scope","$location","$http","templat
         headers : {'Content-Type': 'application/json'} 
         })
       .success(function(data) {
+        console.log(data)
         $scope.sendGif = false;
         $scope.message = {};
         $scope.message.ref = data.ref_id;
@@ -1484,8 +1541,7 @@ app.controller("myDoctorController",["$scope","$location","$http","templateServi
   var arr = path.split("/");  
   var user = arr[arr.length-1];
   doctor.id = templateService.holdIdForSpecificDoc || user;
-   console.log(localManager.getValue("currentPageForPatients"))
-   console.log(localManager.getValue("currentPage"))
+   
    $http({
         method  : 'PUT',
         url     : "/patient/specific-doctor",
@@ -1591,18 +1647,23 @@ app.controller("myPatientController",["$scope","$http","$location","templateServ
       
     }
 
-    $scope.toPhamarcy = function(){ 
+    $scope.toPharmacy = function(){ 
     //doctor creates a prescription object like above but saves it to a service called holdPrescriptionToBeForwarded. which will later be forwarded
     //to the backend after the doctor have searched and found the phamarcy to forward the prescription to.  
-      templateService.holdPrescriptionToBeForwarded = patient; 
-      $location.path("/search/phamarcy");
+      templateService.holdPrescriptionToBeForwarded = patient;
+      $location.path("/search/pharmacy");
     }
 }]);
 
 //for phamarcists
 app.controller("pharmacyCenterDashboardController",["$scope","$location","templateService","localManager",
-  function($scope,$location,templateService,localManager){ 
-    $location.path("/referred-patients");
+  function($scope,$location,templateService,localManager){
+    var currPage = localManager.getValue("currPageForPharmacy");
+    if(currPage) {
+     $location.path(localManager.getValue("currPageForPharmacy"));
+    } else {
+      $location.path("/referred-patients");
+    }
     $scope.attendanceList = templateService.holdList; 
 }]);
 
@@ -1614,14 +1675,16 @@ app.controller("pharmacyCenterNotificationController",["$scope","$location","$ht
       url     : "/pharmacy/get-referral",      
       headers : {'Content-Type': 'application/json'} 
       })
-    .success(function(data) {      
+    .success(function(data) {
       templateService.holdPharmacyReferralData = data;
+      localManager.setValue("pharmacyData",data);
   }); 
 
   $scope.logout = function () {
     localManager.removeItem("userInfo");
     localManager.removeItem("currentPage");
     localManager.removeItem("currentPageForPatients");
+    localManager.removeItem("currPageForPharmacy");
      $http({
         method  : 'GET',
         url     : "/user/logout",
@@ -1635,51 +1698,81 @@ app.controller("pharmacyCenterNotificationController",["$scope","$location","$ht
 
   $scope.viewNote = function(id){
     templateService.holdId = id;
-    $location.path("/pharmacy/view-prescription/" + id);
+    var pageUrl = "/pharmacy/view-prescription/" + id;
+    $location.path(pageUrl);
+    localManager.setValue("currPageForPharmacy",pageUrl);
   }
 
 
   //this fn gets all notification from the back end and adds to the attendance list. this is similar to toList fn jst that instead of 
   //adding patients to the list one by one you simply all add all together.
-  $scope.addAllNotification = function(){
-
-
-    var toStr = ref_id.toString();
-    if(!templateService.checkInTheList.hasOwnProperty(toStr)) {      
-      templateService.checkInTheList[toStr] = true;
-      templateService.holdList.push(listObj);
-    }
+  $scope.addAllNote = function(){
+    templateService.holdPharmacyReferralData.forEach(function(data){
+      var listObj = {};
+      listObj.firstname = data.pharmacy.patient_firstname;
+      listObj.lastname = data.pharmacy.patient_lastname;
+      listObj.profile_pic_url = data.pharmacy.patient_profile_pic_url;
+      listObj.ref = data.ref_id;
+      listObj.date = data.date;
+      var toStr = data.ref_id.toString();
+      if(!templateService.checkInTheList.hasOwnProperty(toStr)) {      
+        templateService.checkInTheList[toStr] = true;
+        templateService.holdList.push(listObj);
+      }
+    });
   }
 
 }]);
 
 app.controller("pharmacyViewPrescriptionController",["$scope","$location","templateService","localManager",
-  function($scope,$location,templateService,localManager){
-  var pharmacyData = templateService.holdPharmacyReferralData;
-  var refId = templateService.holdId; 
+  function($scope,$location,templateService,localManager){ 
+  var pharmacyData = templateService.holdPharmacyReferralData = localManager.getValue("pharmacyData");  
+  var getCurrentPage = localManager.getValue("currPageForPharmacy");
+  var getIdOfCurrentPage = getCurrentPage.split("/");
+  var getLastItem = getIdOfCurrentPage[getIdOfCurrentPage.length-1];
+  var convertToInt = parseInt(getLastItem);
+  var refId = templateService.holdId || convertToInt;
+
   pharmacyData.forEach(function(data){      
     if(refId === data.ref_id) {
-      data.phamarcy.prescription_body.picked;
       $scope.refData = data;       
       return;
     }
   });
 
- 
-
-  $scope.toAnotherPharmacy = function(){
-    
-
+  $scope.toAnotherPharmacy = function(){      
+    var unavailableDrugArr = [];
+    $scope.refData.pharmacy.prescription_body.forEach(function(drug){ //remember to replace phamarcy with the correct spelling pharmacy.   
+      if(!drug.picked || drug.picked !== true) {
+        var filter = {};
+        filter.sn = drug.sn;
+        filter.drug_name = drug.drug_name;
+        filter.dosage = drug.dosage;
+        filter.duration = drug.duration;
+        filter.frequency = drug.frequency;
+        unavailableDrugArr.push(filter);
+      }
+    });
+    console.log(unavailableDrugArr)
+    templateService.holdPharmacyReferralData.forEach(function(data){      
+      if(refId === data.ref_id) {
+        $location.path("/search/pharmacy"); 
+        data.pharmacy.prescription_body = unavailableDrugArr;
+        templateService.holdPrescriptionToBeForwarded = data;
+        templateService.holdPrescriptionToBeForwarded.sender = "Pharmacy";     
+        return;
+      }
+    });    
+                          
   }
 
-  
-  $scope.toList = function(firstname,lastname,profilePicUrl,ref_id){
+  $scope.toList = function(firstname,lastname,profilePicUrl,ref_id,date){
     var listObj = {};
     listObj.firstname = firstname;
     listObj.lastname = lastname;
     listObj.profile_pic_url = profilePicUrl;
     listObj.ref = ref_id;
-
+    listObj.date = date;
     var toStr = ref_id.toString();
     if(!templateService.checkInTheList.hasOwnProperty(toStr)) {      
       templateService.checkInTheList[toStr] = true;
@@ -1693,23 +1786,116 @@ app.controller("pharmacyViewPrescriptionController",["$scope","$location","templ
  
 }]);
 
-app.controller("checkingOutPatientController",["$scope","$location","templateService",function($scope,$location,templateService){
+app.controller("checkingOutPatientController",["$scope","$location","templateService","localManager",
+  function($scope,$location,templateService,localManager){
   $scope.patientPrescription = function(id){
     templateService.holdList.forEach(function(item){
       if(item.ref === id){
         templateService.holdId = id;
-        $location.path("/pharmacy/view-prescription/" + id); 
+         var pageUrl = "/pharmacy/view-prescription/" + id;
+        localManager.setValue("currPageForPharmacy",pageUrl); 
+        $location.path(pageUrl);
+
       } 
-    });
-       
+    }); 
   }
 }]);
 
 
-//for phamarcists
+//for pharmacists
 app.controller("referredPatientsController",["$scope","$location","$http","templateService",function($scope,$location,$http,templateService) {
-  
-}])
+  $scope.patient = {};
+
+  $scope.isNotOption = true;
+
+  $scope.showOption = function(){
+     $scope.isNotOption = false;
+     if(!$scope.isOption){
+      $scope.isOption = true;
+     } else {
+      $scope.isNotOption = true;
+      $scope.isOption = false;
+     }
+  }
+
+  $scope.findPrescription = function(){
+    if($scope.patient.ref_id){
+      $scope.patient.criteria = "refIdCriteria";      
+    } else if($scope.patient.phone) {
+      $scope.patient.criteria = "phoneCriteria";
+    }
+    typeOfSearch($scope.patient);
+  }
+    
+
+  var typeOfSearch = function(criteria) {
+    var foundData = [];      
+    $http({
+          method  : 'PUT',
+          url     : "/pharmacy/find-patient/prescription",
+          data    : criteria,
+          headers : {'Content-Type': 'application/json'} 
+          })
+        .success(function(data) { 
+          console.log(data)
+          if(data){
+            var convertToNum = parseInt($scope.patient.ref_id);      
+            data.referral.forEach(function(referalData){
+              if(referalData.ref_id === convertToNum){
+                 foundData.push(referalData);
+                 $scope.foundRefData = foundData;
+               } else {
+                 $scope.error = "Patient prescription not found!";
+               }
+            });
+          } 
+      });
+  }
+
+  $scope.viewPatientPrescription = function(id){
+    templateService.holdId = id;
+    var pageUrl = "/pharmacy/view-prescription/" + id;
+    $location.path(pageUrl);
+    localManager.setValue("currPageForPharmacy",pageUrl);
+  }
+    
+
+    /*var selected = {};
+    var foundData = [];
+    if($scope.patient.ref_id){
+      selected.typeOfSearch = "refIdCriteria";
+    } else if($scope.patient.phone) {
+      selected.typeOfSearch = "phoneCriteria";
+    }
+    selected.criteria = $scope.patient.ref_id || $scope.patient.phone;
+    templateService.holdPharmacyReferralData.forEach(function(referalData){
+      var toStr = referalData.ref_id.toString();
+      if($scope.patient.ref_id === toStr){
+        foundData.push(referalData);
+        $scope.foundRefData = foundData;
+        console.log(foundData);        
+      } else {
+        console.log("it entered backend");
+        $http({
+            method  : 'PUT',
+            url     : "/pharmacy/find-patient/prescription",
+            data    : selected,
+            headers : {'Content-Type': 'application/json'} 
+            })
+          .success(function(data) { 
+            if(data.found){      
+              data.found.forEach(function(referalData){
+               foundData.push(referalData);
+               $scope.foundRefData = foundData;
+              });
+            } else {
+              $scope.error = data.errMessage;
+            }
+        });
+      }
+    });*/    
+
+}]);
 
 
 /*$scope.talk="talk the talk";

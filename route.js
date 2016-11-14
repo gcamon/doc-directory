@@ -17,10 +17,21 @@ var basicRoute = function (model) {
          break;
         case "Patient":
           res.render("patient",{"userInfo": req.user});
-          break;        
+          break;
+        case "Pharmacy":
+          res.render("pharmacy",{"userInfo":req.user});
+          break;
+        case "Laboratory":
+          res.render("laboratory",{"userInfo":req.user});
+          break;
+        case "Radiology":
+          res.render("radiology",{"userInfo":req.user});
+          break;              
         default:
-         res.render("medical",{"person":req.user});
+         res.render("medical",{"userInfo":req.user});
          break;
+
+         //do for fitness center and physiotherapy
      }
     } else {
      res.render('index',{"message":""});
@@ -46,22 +57,49 @@ var basicRoute = function (model) {
         } else {
           res.redirect('/');
         }
+
   });
 
-  router.get("/medical-center/view",function(req,res){
+   router.get("/medical-center/view",function(req,res){
       if(req.user){
          res.render("medical",{"userInfo": req.user});        
       } else {
         res.redirect('/');
       }
+  });
+
+  router.get("/medical-center/pharmacy",function(req,res){
+      if(req.user){
+         res.render("pharmacy",{"userInfo": req.user});        
+      } else {
+        res.redirect('/');
+      }
+  });
+
+  router.get("/medical-center/radiology",function(req,res){
+      if(req.user){
+         res.render("radiology",{"userInfo": req.user});        
+      } else {
+        res.redirect('/');
+      }
   })
+
+  router.get("/medical-center/laboratory",function(req,res){
+      if(req.user){
+         res.render("laboratory",{"userInfo": req.user});        
+      } else {
+        res.redirect('/');
+      }
+  })//do for fitness center and physiotherapy
+
+
 
   /*router.get("/medical-center/view",function(req,res){
       if(req.user){
-         res.render("phamarcy",{"userInfo": req.user});
+         res.render("pharmacy",{"userInfo": req.user});
         switch(req.user.type){
-          case "Phamarcy":
-           res.render("phamarcy",{"userInfo": req.user});
+          case "Pharmacy":
+           res.render("pharmacy",{"userInfo": req.user});
            break;
           case "Laboratory":
             res.render("laboratory",{"userInfo": req.user});
@@ -342,8 +380,8 @@ var basicRoute = function (model) {
                     }             
                 }).limit(10);               
                 break;
-            case "phamarcy":
-                model.user.find({type:"Phamarcy"},{firstname:1,lastname:1,address:1,profile_url:1,profile_pic_url: 1},function(err,data){
+            case "pharmacy":
+                model.user.find({type:"Pharmacy"},{firstname:1,lastname:1,address:1,profile_url:1,profile_pic_url: 1},function(err,data){
                     if(err) throw err;                                     
                     if(data) {
                         res.render("list-view",{"userInfo":data});
@@ -413,8 +451,8 @@ var basicRoute = function (model) {
                         case "Clinic":
                            allUsers.total_clinics++;
                         break;
-                        case "Phamarcy":
-                           allUsers.total_phamarcy++;
+                        case "Pharmacy":
+                           allUsers.total_pharmacy++;
                         break;
                         case "Laboratory":
                            allUsers.total_radiology++;
@@ -629,10 +667,13 @@ var basicRoute = function (model) {
       res.send(req.user.patient_notification);
     });
 
+    //this route gets all referral for a pharmacy.
     router.get("/pharmacy/get-referral",function(req,res){
       res.send(req.user.referral);
     });
 
+    //this route gets a notifications for the fn getAllNotification for pharmacy on the client.
+    
     //11/4/2016
     router.put("/doctor/specific-patient",function(req,res){
       if(req.user){
@@ -761,6 +802,17 @@ var basicRoute = function (model) {
 
     });
 
+  // this route runs when the patients wants to view his prescription track record. ie patient wants to see 
+    //where all his prescriptions has been send sent to.
+    router.get("/patient/get-prescription/track-record",function(req,res){
+      if(req.user){
+        console.log(req.user.prescription_tracking);
+        res.send(req.user.prescription_tracking);
+      } else {
+        res.end("Unauthorized access");
+      }
+    });
+
     router.put("/patient/specific-doctor",function(req,res){
         //finds specific doctor and sends to the client.
         if(req.user){
@@ -782,27 +834,31 @@ var basicRoute = function (model) {
         }
     });
 
-    //patient searching for a phamarcy to forward his prescription route handlers.
-    router.get("/patient/getAllPhamarcy",function(req,res){
-        //gets all phamarcy in the database based on patient's location.
-        var projection = {
-            name: 1,
-            address: 1,
-            city: 1,
-            country: 1,
-            rating: 1,
-            profile_pic_url: 1,
-            user_id: 1,
-            type:1
+    //patient searching for a pharmacy to forward his prescription route handlers.
+    router.get("/patient/getAllPharmacy",function(req,res){
+        //gets all pharmacy in the database based on patient's location.
+        if(req.user){
+          var projection = {
+              name: 1,
+              address: 1,
+              city: 1,
+              country: 1,
+              rating: 1,
+              profile_pic_url: 1,
+              user_id: 1,
+              type:1
+          }
+          model.user.find({type:"Pharmacy",city:'Enugu'},projection,function(err,data){ //remenber to replace "Enugu" with req.user.city
+              if(err) throw err;
+              res.send(data);
+          });
+        } else {
+          res.end("Unauthorized access!")
         }
-        model.user.find({type:"Phamarcy",city:"Enugu"},projection,function(err,data){ //remenber to replace "Enugu" with req.user.city
-            if(err) throw err;
-            res.send(data);
-        });
     });
 
-    router.put("/patient/phamarcy/refined-search",function(req,res){
-        //coming from thesame controller as above. finds the phamarcy based on the patient search criteria in the req.body.
+    router.put("/patient/pharmacy/refined-search",function(req,res){
+        //coming from thesame controller as above. finds the pharmacy based on the patient search criteria in the req.body.
         console.log(req.body)
         var projection = {
             name: 1,
@@ -831,7 +887,10 @@ var basicRoute = function (model) {
           },
           {
             referral: 1,
-            diagnostic_center_notification:1
+            diagnostic_center_notification:1,
+            city:1,
+            name:1,
+            country:1
 
           }).exec(function(err,pharmacy){
             var date = new Date();
@@ -844,9 +903,9 @@ var basicRoute = function (model) {
               referral_title: title,
               referral_id: req.body.id,    
               date: date,
-              phamarcy: req.body
+              pharmacy: req.body
             }
-            var phamarcyNotification = {
+            var pharmacyNotification = {
               sender_firstname: req.user.firstname,
               sender_lastname: req.user.lastname,
               sender_title : title,
@@ -857,8 +916,26 @@ var basicRoute = function (model) {
               message: 'Hi, I need your services'
             }
 
+            var track_record = {
+                date: date,
+                center_name: pharmacy.name,
+                address: pharmacy.address,
+                ref_id: ref_id,
+                city: pharmacy.city,
+                country: pharmacy.country,
+                prescriptionId: req.body.prescriptionId
+            };
+
+            model.user.findOne({user_id: req.user.user_id},{prescription_tracking:1}).exec(function(err,patient){
+              patient.prescription_tracking.unshift(track_record);
+              patient.save(function(err,info){
+                if(err) throw err;
+                console.log(info);
+              });
+            });
+
             pharmacy.referral.push(refObj);
-            pharmacy.diagnostic_center_notification.push(phamarcyNotification);
+            pharmacy.diagnostic_center_notification.push(pharmacyNotification);
 
             pharmacy.save(function(err,info){
               if(err) throw err;
@@ -872,15 +949,83 @@ var basicRoute = function (model) {
         res.end("Unauthorized access. You need to log in")
       }
 
-    })
+    });
 
-    router.put("/patient/phamarcy/referral",function(req,res){
-      //if prescription is forwarded by a doctor to a phamarcy it talks different form. ie doctor can send prescription
-      //straight to a phamarcy. later the patient will be notified. 
-      //this block represents doctor action by forwarding prescription to a phamarcy.
-      //any data sent to a diagnostic center other than to the patient himself is seens a a referral by this application.      
+    router.put("/patient/pharmacy/referral-by-pharmacy",function(req,res){
+      //this route takes runs when a pharmacy wish to forward unavailable drugs in the center to another pharmacy.
       if(req.user){
-       console.log(req.body)        
+        model.user.findOne(
+          {
+            user_id: req.body.user_id
+          },
+          {
+            referral: 1,
+            diagnostic_center_notification:1,
+            name:1,
+            city:1,
+            address:1,
+            country: 1
+
+          }).exec(function(err,pharmacy){
+            var date = new Date();
+            var note_id = Math.floor(Math.random() * 9999999);
+            var title = (req.user.type === "Doctor") ? 'Dr.': req.user.name;            
+            var refObj = {
+              ref_id: req.body.ref_id,              
+              referral_title: title,
+              referral_id: req.user.user_id,    
+              date: date,
+              pharmacy: req.body.pharmacy 
+            }
+            var pharmacyNotification = {              
+              sender_firstname : title,
+              sent_date: date,
+              ref_id: req.body.ref_id,
+              note_id: note_id,
+              sender_profile_pic_url: req.user.profile_pic_url,
+              message: 'Hi, please we dont have the following drugs,maybe you can help.'
+            }
+
+            var track_record = {
+                date: date,
+                center_name: pharmacy.name,
+                address: pharmacy.address,
+                city: pharmacy.city,
+                country: pharmacy.country,
+                ref_id: req.body.ref_id,
+                prescriptionId: req.body.pharmacy.prescriptionId
+            };
+
+            model.user.findOne({user_id:req.body.pharmacy.patient_id},{prescription_tracking:1}).exec(function(err,patient){
+              if(err) throw err;
+              patient.prescription_tracking.unshift(track_record);
+              patient.save(function(err,info){
+                if(err) throw err;
+                console.log("track record save " + "----" + info)
+              })
+            })
+
+            pharmacy.referral.push(refObj);
+            pharmacy.diagnostic_center_notification.push(pharmacyNotification);
+            pharmacy.save(function(err,info){
+              if(err) throw err;
+              console.log(info);
+            });
+
+           res.send({success:true,ref_id: req.body.ref_id}); 
+          });
+
+      } else {
+        res.end("Unauthorized access. You need to log in")
+      }
+    });
+
+    router.put("/patient/pharmacy/referral",function(req,res){
+      //if prescription is forwarded by a doctor to a pharmacy it talks different form. ie doctor can send prescription
+      //straight to a pharmacy. later the patient will be notified. 
+      //this block represents doctor action by forwarding prescription to a pharmacy.
+      //any data sent to a diagnostic center other than to the patient himself is seens a a referral by this application.      
+      if(req.user){        
          model.user.findOne(
           {
             user_id: req.body.user_id
@@ -889,13 +1034,16 @@ var basicRoute = function (model) {
             referral: 1,
             name:1,
             address:1,
-            diagnostic_center_notification:1
+            diagnostic_center_notification:1,
+            city:1,
+            country:1
 
-          }).exec(function(err,phamarcy){ 
-          console.log(phamarcy)           
+          }).exec(function(err,pharmacy){ 
+          console.log(pharmacy)           
             if(err) throw err;            
             var date = new Date();
             var ref_id = Math.floor(Math.random() * 9999999);
+
             var preObj = {              
               allergy: req.body.allergy,
               date: date,
@@ -921,7 +1069,8 @@ var basicRoute = function (model) {
               patient_country: req.body.country,
               prescription_body: req.body.prescriptionBody
             }
-            var title = (req.user.type === "Doctor") ? 'Dr.': "";            
+
+            var title = (req.user.type === "Doctor") ? 'Dr.': "";                        
             var refObj = {
               ref_id: ref_id,
               referral_firstname: req.user.firstname,
@@ -929,9 +1078,10 @@ var basicRoute = function (model) {
               referral_title: title,
               referral_id: req.body.id,    
               date: date,
-              phamarcy: preObj
+              pharmacy: preObj
             }
-            var phamarcyNotification = {
+
+            var pharmacyNotification = {
               sender_firstname: req.user.firstname,
               sender_lastname: req.user.lastname,
               sender_title : title,
@@ -942,13 +1092,16 @@ var basicRoute = function (model) {
               message: 'Please kindly administer the following prescriptions to my patient.'
             }
 
-            phamarcy.referral.push(refObj);
-            phamarcy.diagnostic_center_notification.push(phamarcyNotification);
+            pharmacy.referral.push(refObj);
+            pharmacy.diagnostic_center_notification.push(pharmacyNotification);
 
-            model.user.findOne({user_id: req.body.patient_id},{patient_notification:1,firstname:1,lastname:1}).exec(function(err,data){
+            model.user.findOne(
+              {user_id: req.body.patient_id},{patient_notification:1,firstname:1,lastname:1,prescription_tracking:1,medications:1}
+              ).exec(function(err,data){
               if(err) throw err;
+              console.log(data);
                var date = new Date();
-               var msg = "your prescription has been forwarded to " + phamarcy.name + " @ " + phamarcy.address +
+               var msg = "your prescription has been forwarded to " + pharmacy.name + " @ " + pharmacy.address +
                 " by Dr. " + req.user.firstname + req.user.lastname +
                " on " + date + "<br/>" + " Referrence number is " + ref_id;        
                 data.patient_notification.push({
@@ -962,13 +1115,26 @@ var basicRoute = function (model) {
 
               });
 
+              var track_record = {
+                date: date,
+                center_name: pharmacy.name,
+                address: pharmacy.address,
+                ref_id: ref_id,
+                city: pharmacy.city,
+                country: pharmacy.country,
+                prescriptionId: req.body.prescriptionId
+              };
+
+              data.medications.push(preObj);
+              data.prescription_tracking.unshift(track_record);
+
               data.save(function(err,info){
                 if(err) throw err;
                 console.log("patient notified");            
               });
             });
 
-            phamarcy.save(function(err,info){             
+            pharmacy.save(function(err,info){             
               if(err) throw err;             
               console.log("prescription saved");                           
             });
@@ -1045,6 +1211,14 @@ var basicRoute = function (model) {
         });
                      
       }
+    });
+    
+    //this router takes call of pahrmacy search for a patient prescription from the data base;
+    router.put("/pharmacy/find-patient/prescription",function(req,res){
+      model.user.findOne({email:req.user.email},{referral:1},function(err,data){
+        console.log(data);
+        res.send(data);
+      });
     });
     
     //route for funding wallet

@@ -37,6 +37,16 @@ var myModel = function () {
 		duration: String
 	});
 
+	var statusSchema = Schema({
+		date: Date,
+		center_name: String,
+		address: String,
+		city:String,
+		country: String,
+		ref_id: Number,
+		prescriptionId: Number
+	});
+
 	var prescriptionSchema = Schema({
 		prescriptionId: Number,
 		allergy: String,
@@ -55,13 +65,14 @@ var myModel = function () {
 		Doctor_profile_pic_url: String,
 		patient_profile_pic_url: String,
 		patient_firstname: String,
+		patient_id: String,
 		patient_lastname: String,
 		patient_address: String,
 		patient_gender: String,
 		patient_age: Number,
 		patient_city: String,
 		patient_country: String,
-		prescription_body: [prescriptionBodySchema]
+		prescription_body: [prescriptionBodySchema],
 	});
 
 	var transactionSchema = Schema({
@@ -182,7 +193,7 @@ var myModel = function () {
 		date: Date,		
 		laboratory: laboratory_refSchema,
 		radiology: radiology_refSchema,
-		phamarcy: prescriptionSchema
+		pharmacy: prescriptionSchema
 	});
 
 	var appointment_schema = Schema({
@@ -261,7 +272,8 @@ var myModel = function () {
 		name: String,
 		diagnostic_center_notification:[ref_notificationSchema],
 		accepted_patients: [patient_briefSchema],
-		appointment:[appointment_schema]		
+		appointment:[appointment_schema],
+		prescription_tracking: [statusSchema]		
 	},{
 		collections: "userinfos"
 	})

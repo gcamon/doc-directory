@@ -226,11 +226,11 @@
                             <ul class="notify">
                                 <li class="noti note notify-icon">
                                     <i class="fa fa-bell-o" style="font-size:24px;color:rgba(0,180,0,0.8);position:relative"><span style="display:inline-block;width:24px;height:24px;background-color:#fff;left: 15px; top:-23px; border-radius: 15px;
-                                        position:absolute;text-align:center;color:#000;" ng-if="<%= userInfo.diagnostic_center_notification.length %> > 0 "><%= userInfo.diagnostic_center_notification.length %></span></i>
+                                        position:absolute;text-align:center;color:#000" ng-if="<%= userInfo.diagnostic_center_notification.length %> > 0 "><%= userInfo.diagnostic_center_notification.length %></span></i>
                                     <ul class="all-notify">                                        
                                         <li> <h6 style="text-align: center">Notification(s)</h6> </li>
                                         <li>
-                                            <p style="cursor: pointer; color:green;text-decoration: underline" ng-click="addAllNote()">Add all notification to attendance list</p>
+                                            <p style="cursor: pointer; color:green;text-decoration: underline" ng-click="addAllNote()">Add all notifications to attendance list</p>
                                         </li>                     
                                         <% for(var i = userInfo.diagnostic_center_notification.length - 1; i >= 0; i--) { %>
                                             <li class="pharmacy_notification" ng-click="viewNote(<%= userInfo.diagnostic_center_notification[i].ref_id  %>)">
