@@ -108,7 +108,7 @@
 		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="searchController">
 			<div class="tg-searcharea tg-haslayout">
 				<div class="container">
-					<div class="row">
+					<div class="row">                        
 						<form class="tg-searchform">
 							<div class="col-md-2 col-sm-2 col-xs-12">
 								<div class="form-group">
@@ -511,17 +511,21 @@
                                         <a href="#/welcome"><i class="fa fa-home" style="font-size: 32px; color: rgba(0,100,0,0.7);float:left" title="Back to dashboard home"></i></a>                                  
                                         
                                     </li>                       
-                                    <li class="panel panel-default">
+                                    <li class="panel panel-default" ng-controller="docAppointmentController">
                                         <div class="tg-panel-heading" role="tab" id="headingSix">
                                              <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
-                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseSix" aria-expanded="false" aria-controls="collapseSix" style="color:rgba(0,180,0,0.6); font-size: 18px;">Appointments(0)</a>
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseSix" aria-expanded="false" aria-controls="collapseSix" style="color:rgba(0,180,0,0.6); font-size: 18px;">Appointments(<%= person.appointment.length %>)</a>
                                             </h3>
                                         </div>
                                         <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
                                             <div class="panel-body">
                                                 <ol>
-                                                <% for(var k = 0; k < person.medications.length; k++) { %>
-                                                <li ng-click="viewPrescription(<%= person.appointments[k].doctor_id %>)" style="padding: 5px 2px; cursor: pointer"> </li>
+                                                <% for(var k = 0; k < person.appointment.length; k++) { %>
+                                                <li ng-click="viewAppointment(<%= person.appointment[k].session_id %>)" style="padding: 5px 2px; cursor: pointer"> 
+                                                    <p>{{getDateTime("<%=person.appointment[k].date %>","<%= person.appointment[k].time %>")}}</p>                                                   
+                                                    <%= person.appointment[k].firstname %> <%= person.appointment[k].lastname %><br> 
+                                                    <span style="padding-right: 20px">{{date | date : "mediumDate"}}</span> <span>{{ time | date: "mediumTime" }}</span> 
+                                                </li>
                                                 <% } %>
                                                 </ol>
                                             </div>
@@ -788,14 +792,15 @@
 	<!--************************************
 		Sign In Sign Up Light Box End
 	*************************************-->
-		<script src="/assets/js/vendor/jquery-library.js"></script>
+		
+        <script src="/assets/js/vendor/jquery-library.js"></script>
         <script src="/assets/js/vendor/bootstrap.min.js"></script>
         <script type="text/javascript" src="/assets/js/source.js"></script>
         <script type="text/javascript" src="/assets/js/angularclient.js"></script>
         <script type="text/javascript" src="/assets/js/ngroute.js"></script>
         <script src="/assets/js/jquery-ui.js"></script>
-        <script src="http://maps.google.com/maps/api/js?sensor=false"></script>
-        <script src="/assets/js/map/jquery.gomap.js"></script>
+        <!--<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <script src="/assets/js/map/jquery.gomap.js"></script>-->
         <script src="/assets/js/map/markerclusterer.min.js"></script>
         <script src="/assets/js/countdown.js"></script>
         <script src="/assets/js/jquery.nicescroll.js"></script>
@@ -808,6 +813,10 @@
         <script src="/assets/js/angularAnimate.js"></script>
         <script src="/assets/js/modalService.js"></script>
         <script src="/assets/js/main.js"></script>
+        <script src="/assets/js/angular-touch.min.js"></script>
+        <script src="/assets/js/angular-carousel.js"></script>     
+        
+
 	  
     
 	<script>

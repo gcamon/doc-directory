@@ -17,10 +17,10 @@
 		<input type="button" value="Find patient Prescription" ng-click="findPrescription()" style="padding: 20px; background-color:green;color:#fff;border-radius: 2px;box-shadow: 0px 2px 3px rgba(0,0,0,0.6)"/>
 	</form>
 
-	<div ng-repeat = "prescription in foundRefData" ng-click="viewPatientPrescription(precription.ref_id)" style="padding: 20px; cursor:pointer">
-		<img ng-src="{{prescription.pharmacy.patient_profile_pic_url}}" style="width:100px; height: 100px">
-		<span>{{prescription.pharmacy.patient_firstname}} {{prescription.pharmacy.patient_lastname}}</span>
-		<span>{{prescription.ref_id}}</span>
+	<div ng-click="viewPatientPrescription(foundData.ref_id)" style="padding: 20px; cursor:pointer">
+		<img ng-src="{{foundData.pharmacy.patient_profile_pic_url}}" style="width:100px; height: 100px">
+		<span>{{foundData.pharmacy.patient_firstname}} {{foundData.pharmacy.patient_lastname}}</span>
+		<span>{{foundData.ref_id}}</span>
 	</div>
 	<p style="text-align: center; font-size: 22px">{{error}}</p>
 </div>

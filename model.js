@@ -138,7 +138,8 @@ var myModel = function () {
 		service_access: String,
 		doctor_specialty: String,
 		work_place: String,
-		office_hour:[periodSchema]		
+		office_hour:[periodSchema],
+		presence: Boolean		
 	});
 
 	var patient_briefSchema = Schema({
@@ -151,9 +152,10 @@ var myModel = function () {
 		Patient_country: String,
 		patient_gender: String,
 		patient_age: Number,
-		patient_body_weight: String
+		patient_body_weight: String,
+		presence: Boolean
 	});
-
+	//this holds records for lab,prescription and scan for the patient
 	var diagnosisSchema = Schema({
 		doctor_note: String,
 		doctor_firstname: String,
@@ -162,20 +164,37 @@ var myModel = function () {
 		illness: String
 	});
 
-	var medical_recordSchema = Schema({		
-		files: [fileSchema],		
-		diagnosis: [diagnosisSchema],		
-		prescription: [prescriptionSchema]
+	var patient_TestSchema = Schema({ 
+		test_to_run: Array,
+		center_address: String,
+		center_city: String,
+		center_country: String,
+		ref_id: Number,
+		referral_firstname: String,
+		referral_lastname: String,
+		referral_title: String,
+		sent_date: String,
+		report: String,
+		conclusion: String,
+		session_id: Number
+	});
+	
+
+	
+	//this holds the sent test to ba ran by the laboratory center
+	var center_refSchema = Schema({
+		test_to_run: Array,
+		patient_firstname: String,
+		patient_lastname: String,
+		patient_profile_pic_url: String,
+		patient_title: String,
+		session_id: Number,
+		patient_id: String,
+		test_id: Number,
+		attended: Boolean
 	});
 
-	var laboratory_refSchema = Schema({
-		test_to_run: String
-	});
-
-	var radiology_refSchema = Schema({
-		test_to_run: String
-	});
-
+	
 	var drug_refSchema = Schema({
 		dosage: String,
 	    drugName: String,
@@ -190,18 +209,26 @@ var myModel = function () {
 		referral_lastname: String,
 		referral_title: String,
 		referral_id: String,		
-		date: Date,		
-		laboratory: laboratory_refSchema,
-		radiology: radiology_refSchema,
+		date: String,
+		type_of_test: String,		
+		laboratory: center_refSchema,
+		radiology: center_refSchema,
 		pharmacy: prescriptionSchema
+
 	});
 
 	var appointment_schema = Schema({
-		date: Date,
+		date: String,
 		time: String,
+		last_meeting: String,
 		firstname: String,
 		lastname: String,
-		ref_id: String
+		title: String,
+		patient_id: String,
+		address: String,
+		session_id: Number,
+		typeOfSession: String,
+		profilePic: String
 	});
 
 	var ref_notificationSchema = Schema({
@@ -214,7 +241,53 @@ var myModel = function () {
 		sender_profile_pic_url: String,
 		message: String
 	});
+//for session
+	var conversationSchema = Schema({
+		date: Date,
+		messages: String
+	});
 
+	var testResultSchema = Schema({ //note received date will be set as pending if the test has not returned. other be updated to date when returned
+		receive_date: String,
+		test_to_run: Array,
+		report: String,
+		conclusion: String,
+		sent_date: String,
+		test_ran_by: String,
+		test_id: Number
+	});
+
+	var docDignosisSchema = Schema({
+		presenting_complain: String,
+		history_of_presenting_complain: String,
+		past_medical_history: String,
+		social_history: String,
+		family_history: String,
+		drug_history: String,
+		summary: String,
+		provisional_diagnosis: String,
+		general_examination: String,
+		systemic_examination: String,
+		diagnosis: String,
+		laboratory_test_results: [testResultSchema],
+		radiology_test_results: [testResultSchema],
+		ecg_test_result: [testResultSchema],
+		others: [testResultSchema],
+		final_diagnosis: String
+	});
+
+	var sessionSchema = Schema({
+		date: String,
+		session_id: Number,
+		patient_id: String,
+		prescription_id: Number,
+		typeOfSession: String,
+		files: fileSchema,
+		conversations: conversationSchema,
+		diagnosis: docDignosisSchema
+	});
+
+//end for session
 	var userSchema = Schema({	  
 		firstname: String,
 		lastname: String,
@@ -226,6 +299,7 @@ var myModel = function () {
 		address: String,
 		state: String,
 		city: String,
+		title: String,
 		marital_status: String,
 		medications: [prescriptionSchema],
 		date: Date,
@@ -268,12 +342,19 @@ var myModel = function () {
 		record_access:[accessSchema],
 		accepted_doctors: [doc_briefSchema],
 		doctor_patients_list : [patient_briefSchema],
-		medical_records: [medical_recordSchema],
+		medical_records: {
+			files: [fileSchema],		
+			diagnosis: [diagnosisSchema],		
+			prescription: [prescriptionSchema],
+			laboratory_test: [patient_TestSchema],
+			radiology_test: [patient_TestSchema]
+		},
 		name: String,
 		diagnostic_center_notification:[ref_notificationSchema],
 		accepted_patients: [patient_briefSchema],
 		appointment:[appointment_schema],
-		prescription_tracking: [statusSchema]		
+		prescription_tracking: [statusSchema],
+		doctor_patient_session: [sessionSchema]		
 	},{
 		collections: "userinfos"
 	})
@@ -281,6 +362,7 @@ var myModel = function () {
 	var models = {};
 	models.user = mongoose.model('userinfos', userSchema);
 	models.files = mongoose.model('fileinfo', fileSchema);
+	models.patient = mongoose.model("patientinfo",patient_briefSchema)
 	/*models.award = mongoose.model('awardinfo', AwardSchema);
 	models.education = mongoose.model('educationinfo', EducationSchema);
 	models.prescribtion = mongoose.model("prescribtioninfo", prescribtionSchema);

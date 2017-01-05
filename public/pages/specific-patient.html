@@ -25,7 +25,7 @@
 				<div>
 					<span style="font-size: 24px; font-weight: 100">Contact Through: </span>
 					<i class="fa fa-phone" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px" title="Make an audio call to this patient"></i>				
-					<i class="fa fa-desktop" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px" title="Video chat with this patient"></i>	
+					<i class="fa fa-desktop" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px" title="Video chat with this patient" ng-click="makeVideoCall()"></i>	
 					<i class="fa fa-comments" style="font-size:32px;color:green;padding: 20px; cursor:pointer" title="Chat with this patient"></i>			
 				</div>			
 			</div>
@@ -40,7 +40,7 @@
 				<span ng-click="viewMedicalHistory()" style="cursor:pointer"><i class="icon-FirstAidKit icon-style" title="View patient's medical record"></i></span>				
 			</div>
 			<div style="margin-top: 10px">
-				<span ng-click="viewMedicalHistory()" style="cursor:pointer"><i class="fa fa-flask" title="View patient's medical record"
+				<span ng-click="viewMedical()" style="cursor:pointer"><i class="fa fa-flask" title="View patient's medical record"
 					style="font-size:32px;color:rgba(0,150,0,0.9); cursor:pointer"></i></span>	
 
 			</div>
@@ -48,7 +48,7 @@
 		</div>
 		<div class="col-sm-12 col-md-10 col-lg-10">
 			<div class="prescriptionArea" ng-if="isToPrescribe" style="border-top: 1px solid rgba(0,0,0,0.4)">
-				<h6 style="cursor:pointer" ng-click="writeNew()">Write new prescription</h6>
+				<h6 style="cursor:pointer;text-decoration:underline" ng-click="writeNew()">Write new prescription</h6>
 				<div ng-if="isNewPrescription">
 					
 					<table>
@@ -80,7 +80,33 @@
 						<button ng-click="toPharmacy()">Forward prescription to a Phamarcy</button>
 					</div>							
 				</div>
-				<h6 style="cursor:pointer">View prescription history</h6>
+				<h6 style="cursor:pointer;text-decoration:underline;margin-top: 30px" ng-click="viewPreviousPrescription()">View prescription history</h6>
+				<div ng-if="isToViewOldPrescription">					
+					<table ng-repeat="prescription in wroteByThisDoctor">
+						<caption style="border-bottom: 1px dashed rgba(0,0,0,0.3)"></caption>
+						<caption><strong>Date</strong>| {{prescription.date | date: "mediumDate"}}</caption>
+						<caption><strong>Provisional diagnosis</strong>| {{prescription.allergy || "pulmonary mal-function"}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Time</strong>| {{prescription.date| date: "mediumTime"}}</caption>
+						<tr>
+							<thead>
+								<th><strong>S/N</strong></th>
+								<th><strong>Drug name</strong></th>
+								<th><strong>Dosage</strong></th>
+								<th><strong>Frequency</strong></th>
+								<th><strong>Duration</strong></th>
+							</thead>
+						</tr>
+						<tr>
+							<tbody ng-repeat= "drug in prescription.prescription_body">								
+								<td>{{drug.sn}}</td>
+								<td>{{drug.drug_name}}</td>
+								<td>{{drug.dosage}}</td>
+								<td>{{drug.frequency}}</td>
+								<td>{{drug.duration}}</td>
+							</tbody style="box-shadow: 0px 2px 5px rgba(0,0,0,0.7)">
+						</tr>
+												
+					</table>					
+				</div>
 			</div>
 			<div class="medical-record-Area" ng-if="isToSeeRecord" style="border-top: 1px solid rgba(0,0,0,0.4)">
 				<h3>Hey iam record</h3>

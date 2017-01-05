@@ -251,6 +251,42 @@ form fieldset{
   display: none !important;
 }
 
+/*my lab test style*/
+.lab-test button{
+	padding: 10px; 
+	text-decoration: underline;	
+	background-color: #eee!important;
+	color: green!important;
+}
+
+.lab-tests-section li {
+	list-style: none;
+	padding: 5px
+}
+
+.lab-tests-section input[type="checkbox"] {
+	width: 30px;
+	height: 20px
+}
+
+.search-lab input {
+	width: 300px;
+	color: green;
+	font-size: 18px;
+}
+.search-lab input:focus{
+	border: 1px solid rgba(0,0,0,0.5);
+}
+
+.a-lab {
+	padding-left: 20px;
+}
+
+.a-lab:hover {
+	
+	border-bottom: 1px solid rgba(0,0,0,0.5);
+	box-shadow: 1px 5px 8px rgba(0,0,0,0.6)
+}
 /*my communication button */
 .communication-btn {
 	margin-top: 20px;
@@ -327,6 +363,8 @@ form fieldset{
 	width: 50px;
 	border:  1px solid rgba(0,0,0,0.5)
 }
+
+
 
 ul.dosage {
 	display: inline-block;

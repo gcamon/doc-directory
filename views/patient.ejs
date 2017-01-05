@@ -225,6 +225,7 @@
                                         position:absolute;text-align:center;color:#000;" ng-if="<%= userInfo.patient_notification.length %> > 0 "><%= userInfo.patient_notification.length %></span></i>
                                     <ul class="all-notify">
                                         <li> <h6 style="text-align: center">Notification(s)</h6> </li>
+                                        {{getPatientId(<%= userInfo.user_id %>, <%= userInfo.firstname %>, <%= userInfo.lastname %>)}}
                                         <% for(var i = userInfo.patient_notification.length -1; i >= 0; i--) { %>
                                             <li class="note-field" ng-click="viewNote('<%= userInfo.patient_notification[i].doctor_id %>')">                                                
                                                 <img src="<%= userInfo.patient_notification[i].doctor_profile_pic_url %>" style="width: 50px; height: 50px">
@@ -594,15 +595,15 @@
                                     <li class="panel panel-default active">
                                         <div class="tg-panel-heading" role="tab" id="headingOne">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
-                                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Consultations(<%= userInfo.medical_records.length %>)</a>
+                                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Treatment(s)</a>
                                             </h3>
                                         </div>                                        
                                         <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
                                             <div class="panel-body">
                                                 <ol style="color:rgba(0,110,0,0.8)">
-                                                    <% for(var k = 0; k < userInfo.medical_records.length; k++) { %>
-                                                    <li ng-click="viewTreatment(<%= userInfo.medical_records[k].patient_id %>)" style="padding: 5px 2px; cursor: pointer">
-                            Treatment by <%= userInfo.medical_records[k].doctor_firstname %> <%= userInfo.medical_records[k].doctor_lastname %></span>                                                     
+                                                    <% for(var k = 0; k < 1; k++) { %>
+                                                    <li ng-click="viewTreatment()" style="padding: 5px 2px; cursor: pointer">
+                                                                               
                                                     </li>
                                                     <% } %>                                                     
                                                 </ol>
@@ -1053,9 +1054,10 @@
     <!--************************************
         Sign In Sign Up Light Box End
     *************************************-->
-        <script src="https://media.twiliocdn.com/sdk/js/common/v0.1/twilio-common.min.js"></script>        
+        <!--<script src="https://media.twiliocdn.com/sdk/js/common/v0.1/twilio-common.min.js"></script>        
         <script src="https://media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
-        <script src="https://media.twiliocdn.com/sdk/rtc/js/ip-messaging/v0.10/twilio-ip-messaging.min.js"></script>
+        <script src="https://media.twiliocdn.com/sdk/rtc/js/ip-messaging/v0.10/twilio-ip-messaging.min.js"></script>-->
+        
         <script src="/assets/js/vendor/jquery-library.js"></script>
         <script src="/assets/js/vendor/bootstrap.min.js"></script>
         <script type="text/javascript" src="/assets/js/source.js"></script>
@@ -1079,7 +1081,7 @@
         <script src="/assets/js/angular-touch.min.js"></script>
         <script src="/assets/js/angular-carousel.js"></script>
         
-
+        
 
 
    <!--<script src="http://angular-ui.github.com/bootstrap/ui-bootstrap-tpls-0.2.0.js"></script>-->

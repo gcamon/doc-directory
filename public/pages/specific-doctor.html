@@ -25,12 +25,13 @@
         <p style="margin-top: 10px"><a ng-href= "{{docInfo.doctor_profile_url}}" style="color:rgba(0,0,0,0.6)">view doctor's detail</a></p>
         <div class="in-patient-com">
             <p style="font-size: 22px; font-weight: 100; margin-top: 50px">CONTACT DOC THROUGH:</p> 
-            <button>VIDEO CALL</button>
-            <button>AUDIO CALL</button>                       
+            <button ng-click="videoRequest()">VIDEO CALL</button>
+            <button ng-click="audioRequest()">AUDIO CALL</button>                       
             <div></div>            
-            <button>LIVE CHAT</button> 
-            <button>SEND FILES</button>
-            <div></div>            
+            <button ng-click="chatRequest()">LIVE CHAT</button> 
+            
+            <div></div> 
+            <button>SEND FILES</button>           
             <button>BOOK IN-PERSON APPOINTMENT</button>
             <button>PRESCRIBE REQUEST</button>                     
         </div>      

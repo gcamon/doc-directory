@@ -9,7 +9,7 @@ var express = require('express'),
     loginRoute = require('./login'),    
     app = express(),
     model = db(), 
-    port = process.env.PORT || 1986;
+    port = process.env.PORT || 9000;
 
 
 app.listen(port);
@@ -19,8 +19,4 @@ config.configuration(app,model);
 route(model);
 signupRoute(model);
 loginRoute(model);
-
-
-
-
 

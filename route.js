@@ -4,8 +4,8 @@ var route = require('./config');
 var router = route.router;
 var fs = require("fs");
 var dateTime = require("node-datetime");
-var token = require("./twilio");
-var randomUserName = require("./randos");
+//var token = require("./twilio");
+//var randomUserName = require("./randos");
 
 var basicRoute = function (model) {
 
@@ -52,7 +52,6 @@ var basicRoute = function (model) {
 
   router.get("/patient/dashboard",function(req,res){
         if(req.user){
-          console.log(req.user)
           res.render("patient",{"userInfo": req.user});
         } else {
           res.redirect('/');
@@ -473,7 +472,7 @@ var basicRoute = function (model) {
             }).limit(1000);                
     });
 
-  router.get("/ranking/views/:id",function(req,res){
+    router.get("/ranking/views/:id",function(req,res){
         model.user.findOne({user_id: req.params.id},function(err,user){            
             if(err) throw err;
             res.render("doctor-details",{"userInfo":user});
@@ -664,12 +663,27 @@ var basicRoute = function (model) {
 
     //this route send all notification to the front end as soon as the patient logs in.
     router.get("/patient/get-notification",function(req,res){
-      res.send(req.user.patient_notification);
+      // You can set time interval on this block to notify patients on real time.
+      if(req.user) {
+        model.user.findOne({email:req.user.email},{patient_notification:1},function(err,patient_notification){
+          if(err) throw err;
+          res.send(patient_notification);
+        });
+        
+      } else {
+        res.end("Unauthorized access! Please log in")
+      }
     });
 
     //this route gets all referral for a pharmacy.
     router.get("/pharmacy/get-referral",function(req,res){
-      res.send(req.user.referral);
+      if(req.user){
+        model.user.findOne({email:req.user.email},{referral:1},function(err,referral){
+          res.send(referral);
+        });        
+      } else {
+        res.end("Unauthorized access!! Please log in")
+      }
     });
 
     //this route gets a notifications for the fn getAllNotification for pharmacy on the client.
@@ -699,6 +713,23 @@ var basicRoute = function (model) {
 
       } else {
         res.end("Not allowed");
+      }
+    });
+
+    router.put("/doctor/get-patient/medication",function(req,res){
+      model.user.findOne({user_id: req.body.id},{medications:1},function(err,prescriptions){
+        if(err) throw err;
+        res.send(prescriptions);
+      });
+    });
+
+    router.put("/doctor/get-patient/medical-record",function(req,res){
+      if(req.user){
+        model.user.findOne({user_id: req.body.id},{medical_records:1},function(err,records){
+          res.send(records);
+        });
+      } else {
+        res.end("Unauthorized access!! Please Log in ");
       }
     });
 
@@ -1215,10 +1246,241 @@ var basicRoute = function (model) {
     
     //this router takes call of pahrmacy search for a patient prescription from the data base;
     router.put("/pharmacy/find-patient/prescription",function(req,res){
-      model.user.findOne({email:req.user.email},{referral:1},function(err,data){
-        console.log(data);
-        res.send(data);
-      });
+       if(req.user){     
+        model.user.findOne({email:req.user.email},{referral:1},function(err,data){
+            if (err) throw err;           
+              switch(req.body.criteria) {
+                case "refIdCriteria":
+                  var toNum = parseInt(req.body.ref_id);                
+                  var elementPos = data.referral.map(function(x) {return x.ref_id; }).indexOf(toNum);
+                  var objectFound = data.referral[elementPos];
+                  console.log(objectFound)
+                  if(objectFound === undefined) {
+                   res.send({error: "Patient prescription not found"})
+                  } else {
+                    res.send({data: objectFound});
+                  }
+                  break;
+
+                case "phoneCriteria":
+                  var elementPos = data.referral.map(function(x) {return x.phone; }).indexOf(req.body.phone);
+                  var objectFound = data.referral[elementPos];
+                  if(objectFound === undefined) {
+                   res.send({error: "Patient prescription not found"})
+                  } else {
+                    res.send({data: objectFound});
+                  }
+                  break;
+
+                default:
+                  res.send({error: "Please enter search creteria"});
+                  break
+              }            
+        });
+      } else {
+        res.end("Unauthorized access");
+      }
+    });
+
+    router.put("/laboratory/find-patient/lab-test",function(req,res){
+      if(req.user){     
+        model.user.findOne({email:req.user.email},{referral:1},function(err,data){
+            if (err) throw err;           
+              switch(req.body.criteria) {
+                case "refIdCriteria":
+                  var toNum = parseInt(req.body.ref_id);                
+                  var elementPos = data.referral.map(function(x) {return x.ref_id; }).indexOf(toNum);
+                  var objectFound = data.referral[elementPos];
+                  console.log(objectFound)
+                  if(objectFound === undefined) {
+                   res.send({error: "Patient lab test not found"})
+                  } else {
+                    res.send({data: objectFound});
+                  }
+                  break;
+
+                case "phoneCriteria":
+                  var elementPos = data.referral.map(function(x) {return x.phone; }).indexOf(req.body.phone);
+                  var objectFound = data.referral[elementPos];
+                  if(objectFound === undefined) {
+                   res.send({error: "Patient lab test not found"})
+                  } else {
+                    res.send({data: objectFound});
+                  }
+                  break;
+
+                default:
+                  res.send({error: "Please enter search creteria"});
+                  break;
+              } 
+        });
+      } else {
+        res.end("Unauthorized access");
+      }
+    });
+
+    router.get("/laboratory/get-referral",function(req,res){
+      if(req.user){
+        model.user.findOne({password:req.user.password},{referral:1},function(err,data){
+          res.send(data.referral);
+        })
+      } else {
+        res.end("Unauthorized access")
+      }
+
+    });
+
+    router.get("/radiology/get-referral", function(req,res){
+       if(req.user){
+        model.user.findOne({password:req.user.password},{referral:1},function(err,data){
+          res.send(data.referral);
+        })
+      } else {
+        res.end("Unauthorized access")
+      }
+    });
+
+    //this route handles test result sent by a laboratory to update existing doctor/patient session that initiated such test request.
+    router.put("/laboratory/test-result/session-update",function(req,res){
+      //note that sms will be sent to patient and doctor when a lab test result is available.
+      if(req.user) {       
+        model.user.findOne({"doctor_patient_session.session_id": req.body.laboratory.session_id},{doctor_patient_session:1}).exec(function(err,data){
+          if(err) throw err;
+          var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(req.body.laboratory.session_id);
+          var objectFound = data.doctor_patient_session[elementPos];
+          
+
+          var testResult = { //note received date will be set as pending if the test has not returned. otherwise be updated to date when returned
+            receive_date: req.body.laboratory.date,
+            test_to_run: req.body.laboratory.test_to_run,
+            report: req.body.laboratory.report,
+            conclusion: req.body.laboratory.conclusion,
+            sent_date: req.body.date,
+            test_ran_by: req.user.name
+            //remember the center signature will be required in the future.
+          }
+
+          var pos = objectFound.diagnosis.laboratory_test_results.map(function(x) { return x.test_id;}).indexOf(req.body.laboratory.test_id)
+          var theObj = objectFound.diagnosis.laboratory_test_results[pos];         
+          theObj.receive_date = req.body.laboratory.date;
+          theObj.test_to_run = req.body.laboratory.test_to_run;
+          theObj.report = req.body.laboratory.report;
+          theObj.conclusion = req.body.laboratory.conclusion;
+          theObj.sent_date = req.body.date;
+          theObj.test_ran_by = req.user.name;
+           
+          
+          //the doctors session for a patient is updated, and patient dashboard is called for update.
+          //objectFound.diagnosis.laboratory_test_results.unshift(testResult);          
+          data.save(function(err,info){
+            if(err) {
+              res.send({status: "error"})
+            } else {         
+              updatePatient();
+              updateTheCenter();
+            }
+          });        
+
+        });
+
+        function updatePatient() {
+          //here patient test result is updated.
+          model.user.findOne({user_id: req.body.laboratory.patient_id},{medical_records: 1}).exec(function(err,data){
+            if(err) throw err;
+            var elementPos = data.medical_records.laboratory_test.map(function(x) {return x.session_id; }).indexOf(req.body.laboratory.session_id);
+            var objectFound = data.medical_records.laboratory_test[elementPos];           
+            objectFound.report = req.body.laboratory.report || objectFound.report;
+            objectFound.conclusion = req.body.laboratory.conclusion || objectFound.conclusion;
+            objectFound.test_to_run = req.body.laboratory.test_to_run || objectFound.test_to_run;
+            objectFound.sent_date = req.body.laboratory.date || objectFound.sent_date;
+            objectFound.test_ran_by = req.user.name;
+
+            data.save(function(err,info){
+              if(err) res.send({status: "error"});           
+              res.send({status: "success"});
+            });
+          });
+        }
+
+        function updateTheCenter() {
+          model.user.findOne({email: req.user.email},{referral:1}).exec(function(err,data){
+            if(err) throw err;
+            var elementPos = data.referral.map(function(x) {return x.session_id; }).indexOf(req.body.laboratory.session_id);
+            var objectFound = data.referral[elementPos];
+            objectFound.laboratory.attended = true; // this makes a lab that has been sent to a doctor and no longer on the pending list of front end
+
+            data.save(function(err,info){
+              if(err) throw err;
+            });
+          });
+        }
+
+      } else {
+        res.end("Unauthorized access");
+      }
+    });
+
+    
+    //updating radiology result in doctor's treatment page with patient.
+    router.put("/radiology/test-result/session-update",function(req,res){
+      if(req.user) {        
+        model.user.findOne({"doctor_patient_session.session_id": req.body.radiology.session_id},{doctor_patient_session:1}).exec(function(err,data){
+          if(err) throw err;
+          var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(req.body.radiology.session_id);
+          var objectFound = data.doctor_patient_session[elementPos];
+
+          var testResult = { //note received date will be set as pending if the test has not returned. otherwise be updated to date when returned
+            receive_date: req.body.radiology.date,
+            test_to_run: req.body.radiology.test_to_run,
+            report: req.body.radiology.report,
+            conclusion: req.body.radiology.conclusion,
+            sent_date: res.body.date
+          }
+          //the doctors session for a patient is updated, and patient dashboard is called for update.
+          objectFound.diagnosis.radiology_test_results.unshift(testResult);          
+          data.save(function(err,info){
+            if(err) res.send({status: "error"});         
+            updatePatient();
+            updateTheCenter()
+          });        
+
+        });
+
+        function updatePatient() {
+          //here patient test result is updated.
+          model.user.findOne({user_id: req.body.radiology.patient_id},{medical_records: 1}).exec(function(err,data){
+            if(err) throw err;
+            var elementPos = data.medical_records.radiology_test.map(function(x) {return x.session_id; }).indexOf(req.body.radiology.session_id);
+            var objectFound = data.medical_records.radiology_test[elementPos];           
+            objectFound.report = req.body.radiology.report || objectFound.report;
+            objectFound.conclusion = req.body.radiology.conclusion || objectFound.conclusion;
+            objectFound.test_to_run = req.body.radiology.test_to_run || objectFound.test_to_run;
+            objectFound.sent_date = req.body.radiology.date || objectFound.sent_date;
+
+            data.save(function(err,info){
+              if(err) res.send({status: "error"});           
+              res.send({status: "success"});
+            });
+          });
+        }
+
+        function updateTheCenter() {
+          model.user.findOne({email: req.user.email},{referral:1}).exec(function(err,data){
+            if(err) throw err;
+            var elementPos = data.referral.map(function(x) {return x.session_id; }).indexOf(req.body.radiology.session_id);
+            var objectFound = data.referral[elementPos];
+            objectFound.radiology.attended = true; // this makes a lab that has been sent to a doctor and no longer on the pending list of front end
+
+            data.save(function(err,info){
+              if(err) throw err;
+            });
+          });
+        }
+
+      } else {
+        res.end("Unauthorized access");
+      }
+
     });
     
     //route for funding wallet
@@ -1228,13 +1490,801 @@ var basicRoute = function (model) {
           console.log("wallet funded");
           console.log(result);
           res.end();
-        })
+        });
     });
 
-    router.get("/gcamon",function(req,res){
+    
+    router.get("/doctor/call",function(req,res){
+      if(req.user){
+        res.render("video-chat",{"person":req.user})
+      } else {
+        res.end("Unauthorized access!")
+      }
+
+    });
+
+    router.get("/patient/call",function(req,res){
+      if(req.user){
+        res.render("video-chat2",{"person":req.user})
+      } else {
+        res.end("Unauthorized access!")
+      }
+
+    });
+
+    router.get("/chat",function(req,res){
+      
+    });
+
+    //doctor creates session with a patient
+    router.post("/doctor/patient-session",function(req,res){
+      if(req.user){        
+        var session_id = Math.floor(Math.random() * 99999999999999922888);
+
+        var connectObj = {
+          presenting_complain: req.body.complain,
+          history_of_presenting_complain: req.body.historyOfComplain,
+          past_medical_history: req.body.pastMedicalHistory,
+          social_history: req.body.socialHistory,
+          family_history: req.body.familyHistory,
+          drug_history: req.body.drugHistory,
+          summary: req.body.summary,
+          provisional_diagnosis: req.body.provisionalDiagnosis,
+        }
+
+        if(req.body.appointment){
+          var getNames = {
+            firstname : req.body.appointment.firstname,
+            lastname: req.body.appointment.lastname,
+            patient_id: req.body.patient_id
+          }
+          req.body.appointment.firstname = req.user.firstname;
+          req.body.appointment.lastname = req.user.lastname;
+          req.body.appointment.address = req.body.appointment.address || req.user.address;
+          req.body.appointment.title = "Dr";
+          req.body.appointment.profilePic = req.user.profile_pic_url;   
+          model.user.findOne({user_id:req.body.patient_id},{appointment:1}).exec(function(err,result){            
+            if(err) throw err;
+            result.appointment.unshift(req.body.appointment);
+            result.save(function(err,info){
+              if(err) throw err;
+              if(info)
+                tellDoctor(getNames);
+            });
+          });
+        }
+
+        var tellDoctor = function(names){          
+          req.body.appointment.last_meeting = req.body.date;
+          req.body.appointment.firstname = names.firstname;
+          req.body.appointment.lastname = names.lastname;
+          req.body.appointment.session_id = session_id;
+          req.body.appointment.typeOfSession = req.body.typeOfSession,
+          req.body.appointment.profilePic = req.body.appointment.profilePic;        
+          model.user.findOne({user_id: req.user.user_id},{appointment:1}).exec(function(err,result){
+            result.appointment.unshift(req.body.appointment);
+            result.save(function(err,info){
+              if(err) throw err;
+              console.log(info);              
+            });
+          });
+        }
+
+        model.user.findOne({email:req.user.email},{doctor_patient_session:1}).exec(function(err,result){
+          if(err) throw err;          
+          req.body.session_id = session_id;
+          result.doctor_patient_session.unshift(req.body);
+          result.doctor_patient_session[0].diagnosis = connectObj;
+          result.save(function(err,info){
+            if(err) throw err;            
+            res.send("success");
+          });
+        });
+      } else {
+        res.end("Unauthorized access!");
+      }
+    });
+
+    router.put("/doctor/appointment/view",function(req,res){
+      if(req.user){
+        model.user.findOne({"appointment.session_id": req.body.id},{appointment:1,_id:0},function(err,data){     
+          if(err) throw err;
+          var elementPos = data.appointment.map(function(x) {return x.session_id; }).indexOf(req.body.id);
+          var objectFound = data.appointment[elementPos];          
+          res.send(objectFound);         
+        });
+      } else {
+        res.end("Unauthorized access")
+      }
+    });
+
+    router.post("/doctor/get-session",function(req,res){
+      if(req.user){
+
+        model.user.findOne({"doctor_patient_session.session_id": req.body.sessionId},{doctor_patient_session:1},function(err,data){
+          if(err) throw err;
+          var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(req.body.sessionId);
+          var objectFound = data.doctor_patient_session[elementPos];      
+          var sessionType = {
+            typeOfSession: objectFound.typeOfSession,
+            session_id: objectFound.session_id,
+            patient_id: objectFound.patient_id
+          }
+          res.send(sessionType);         
+        });
+      } else {
+        res.end("Unauthorized access");
+      }
+    });
+
+    router.get("/treatment",function(req,res){
+      if(req.user){
+        model.user.findOne({email:req.user.email},function(err,user){
+          if(err) throw err;
+          res.render("treatment",{"person":user});
+        });     
+      } else {
+        res.end("Unauthorized access!");
+      }
+    });
+
+    //doctor finds the patient's lab tests if
+    router.put("/doctor/get-test-result",function(req,res){
+        if(req.user){         
+          model.user.findOne({email: req.user.email},{doctor_patient_session:1}).exec(function(err,data){
+            if(err) throw err;
+            var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(req.body.id);
+            var objectFound = data.doctor_patient_session[elementPos];
+            var sentObjArr = [];
+            var count = 0;
+            
+            
+            while(objectFound.diagnosis.laboratory_test_results.length > count) {             
+              var ranTest = [];
+              var testAndReport = [];
+              var objectArr = objectFound.diagnosis.laboratory_test_results.map(function(x) {return x });              
+              var objFound = objectArr[count];
+             
+              for(var i = 0; i < objFound.test_to_run.length; i++) {                
+                if(objFound.test_to_run[i].select === true){
+                  ranTest.push(objFound.test_to_run[i]);
+                }
+              }
+              var splitReport = objFound.report.split(",");                            
+              for(var j = 0; j < splitReport.length; j++) {
+                var testObj = {};
+                var seperateTestAndReport = splitReport[j].split(":");
+                testObj['test'] = seperateTestAndReport[0];
+                testObj['report'] = seperateTestAndReport[1];
+                testAndReport.push(testObj);                
+              }
+              
+              
+              objFound.refinedReport = testAndReport;
+              objFound.ranTest = ranTest;
+              count++;
+              
+              var newObjToSend = {};
+              newObjToSend.report = testAndReport;
+              newObjToSend.ranTest = ranTest;
+              newObjToSend.test_to_run = objFound.test_to_run;
+              newObjToSend.conclusion = objFound.conclusion;
+              newObjToSend.receive_date = objFound.receive_date;
+              newObjToSend.sent_date = objFound.sent_date;
+
+              sentObjArr.push(newObjToSend);           
+            }
+            
+            res.json({result:sentObjArr})
+          });
+        } else {
+          res.end("Unauthorized access!")
+        }
+    });
+    //doctors finds the patient's scan if any
+    router.put("/doctor/get-scan-result",function(req,res){
+        if(req.user){
+          model.user.findOne({email: req.user.email},{doctor_patient_session:1}).exec(function(err,data){
+            if(err) throw err;
+            var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(req.body.id);
+            var objectFound = data.doctor_patient_session[elementPos];
+            var sentObjArr = [];
+            var count = 0;
+            
+            
+            while(objectFound.diagnosis.radiology_test_results.length > count) {             
+              var ranTest = [];
+              var testAndReport = [];
+              var objectArr = objectFound.diagnosis.radiology_test_results.map(function(x) {return x });              
+              var objFound = objectArr[count];
+             
+              for(var i = 0; i < objFound.test_to_run.length; i++) {                
+                if(objFound.test_to_run[i].select === true){
+                  ranTest.push(objFound.test_to_run[i]);
+                }
+              }
+              var splitReport = objFound.report.split(",");                            
+              for(var j = 0; j < splitReport.length; j++) {
+                var testObj = {};
+                var seperateTestAndReport = splitReport[j].split(":");
+                testObj['test'] = seperateTestAndReport[0];
+                testObj['report'] = seperateTestAndReport[1];
+                testAndReport.push(testObj);                
+              }
+              
+              
+              objFound.refinedReport = testAndReport;
+              objFound.ranTest = ranTest;
+              count++;
+              
+              var newObjToSend = {};
+              newObjToSend.report = testAndReport;
+              newObjToSend.ranTest = ranTest;
+              newObjToSend.test_to_run = objFound.test_to_run;
+              newObjToSend.conclusion = objFound.conclusion;
+              newObjToSend.receive_date = objFound.receive_date;
+              newObjToSend.sent_date = objFound.sent_date;
+
+              sentObjArr.push(newObjToSend);           
+            }
+          });
+        } else {
+          res.end("Unauthorized access!")
+        }
+    });
+
+
+    router.get("/doctor/find-laboratory",function(req,res){
+      if(req.user){
+        model.user.find({type: "Laboratory",city: req.user.city,country: req.user.country},
+          {name:1,address:1,user_id:1,city:1,country:1,profile_pic_url:1,type:1},
+          function(err,data){
+          if(err) throw err;
+          res.send(data);
+        }).limit(5000);
+      } else {
+        res.end("Unauthorized access!");
+      }
+    });
+
+    router.put("/doctor/find-laboratory/search",function(req,res){
+      if(req.user){
+          if(!req.body.country)
+            req.body.country = req.user.country;
+          if(!req.body.city) 
+            req.body.city = req.user.city;
+
+          model.user.find({type: "Laboratory",city: req.body.city,country: req.body.country},
+            {name:1,address:1,user_id:1,city:1,country:1,profile_pic_url:1,type:1},
+            function(err,data){
+            if(err) throw err;
+            res.send(data);
+          }).limit(5000);
+        } else {
+          res.end("Unauthorized access!")
+        }
+    });
+    
+    //this route takes care doctor sending new test to a laboratory.
+    router.post("/doctor/send-test",function(req,res){
+        if(req.user) {  
+        var random = Math.floor(Math.random() * 9999999);
+        var testId = Math.floor(Math.random() * 9999999999999999);       
+        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1})        
+        .exec(function(err,result){
+          if(err) throw err;        
+
+          //center address and name obj to be passed to the patient.
+          var centerObj = {
+            name: result.name,
+            address: result.address,
+            city: result.city,
+            country: result.country
+          }
+
+          var refObj = {
+            ref_id: random,
+            referral_firstname: req.user.firstname,
+            referral_lastname: req.user.lastname,
+            referral_title: req.user.title,
+            referral_id: req.user.user_id,    
+            date: req.body.date,        
+            laboratory: {
+              test_to_run : req.body.lab_test_list,
+              patient_firstname: req.body.patient_firstname,
+              patient_lastname: req.body.patient_lastname,
+              patient_profile_pic_url: req.body.patient_profilePic,
+              patient_title: req.body.patient_title,
+              patient_phone: req.body.phone,
+              session_id: req.body.session_id,
+              patient_id: req.body.patient_id,
+              test_id: testId,
+              attended: false
+            }                         
+          }
+
+          //this is notification for the center.
+          var refNotification = {
+            sender_firstname: req.user.firstname,
+            sender_lastname: req.user.lastname,
+            sender_title : req.user.title,
+            sent_date: req.body.date,
+            ref_id: random,
+            note_id: random,
+            sender_profile_pic_url: req.user.profile_pic_url,
+            message: "Please run the test for my patient"
+          }
+
+          result.referral.push(refObj);
+          result.diagnostic_center_notification.push(refNotification);
+
+          result.save(function(err,info){
+            if(err) throw err;            
+          });
+          tellPatient(centerObj);
+        });
+
+        var tellPatient = function(centerInfo){
+          //remember sms will be sent to the patient
+          model.user.findOne({user_id: req.body.patient_id},{medical_records: 1}).exec(function(err,record){            
+            if(err) throw err;     
+            var recordObj = {
+              test_to_run: req.body.lab_test_list,
+              center_address: centerInfo.address,
+              center_city: centerInfo.city,
+              center_country: centerInfo.country,
+              ref_id: random,
+              referral_firstname: req.user.firstname,
+              referral_lastname: req.user.lastname,
+              referral_title: req.user.title,
+              sent_date: req.body.date,
+              session_id: req.body.session_id,
+              test_id: testId,
+              report: "Pending",
+              conclusion: "Pending"
+            }
+            record.medical_records.laboratory_test.unshift(recordObj);
+            record.save(function(err,info){
+              if(err) {
+                throw err;
+                res.end('500: Internal server error')
+              }
+              updateSession(req.body.session_id);
+              res.json({success:true,ref_no:random});
+            });
+
+          });
+        }
+
+        var updateSession = function(session_id) {
+          model.user.findOne({email: req.user.email},{doctor_patient_session:1}).exec(function(err,data){
+            if(err) throw err;           
+            var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(session_id);
+            var objFound = data.doctor_patient_session[elementPos];            
+            var testResult = {
+              test_to_run: req.body.lab_test_list,
+              receive_date: "Pending",
+              sent_date: req.body.date,
+              report: "Pending",
+              test_id: testId,
+              conclusion: "Pending"
+            }          
+           
+            objFound.diagnosis.laboratory_test_results.unshift(testResult); 
+            data.save(function(err,info){
+              if(err) throw err;
+            })
+          });
+        }
+      } else {
+        res.end("Unauthorized access!")
+      }
+    });
+  
+
+    //this route takes care of  un ran test which was forwarded to another center by a center.
+    router.post("/center/send-test",function(req,res){    
+        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1})
+        .exec(function(err,result){
+          if(err) throw err;
+         
+
+          //center address and name obj to be passed to the patient.
+          var centerObj = {
+            name: result.name,
+            address: result.address,
+            city: result.city,
+            country: result.country
+          }
+
+          var refObj = {
+            ref_id: req.body.ref_id,
+            referral_firstname: req.user.firstname,
+            referral_lastname: req.user.lastname,
+            referral_title: req.user.title,
+            referral_id: req.user.user_id,    
+            date: req.body.date,            
+            laboratory: {
+              test_to_run : req.body.laboratory.test_to_run,
+              patient_firstname: req.body.laboratory.patient_firstname,
+              patient_lastname: req.body.laboratory.patient_lastname,
+              patient_profile_pic_url: req.body.laboratory.patient_profilePic,
+              patient_title: req.body.laboratory.patient_title,
+              patient_phone: req.body.laboratory.phone,
+              session_id: req.body.laboratory.session_id,
+              patient_id: req.body.laboratory.patient_id,
+              attended: false
+            }             
+          }
+
+          //this is notification for the center.
+          var refNotification = {
+            sender_firstname: req.user.firstname,
+            sender_lastname: req.user.lastname,
+            sender_title : req.user.title,
+            sent_date: req.body.date,
+            ref_id: req.body.ref_id,
+            note_id: req.body.ref_id,
+            sender_profile_pic_url: req.user.profile_pic_url,
+            message: "Please run the test for my patient"
+          }
+
+          result.referral.push(refObj);
+          result.diagnostic_center_notification.push(refNotification);
+
+          result.save(function(err,info){
+            if(err) throw err;            
+          });
+          tellPatient(centerObj);
+        });
+
+        var tellPatient = function(centerInfo){
+          //remember sms will be sent to the patient
+          model.user.findOne({user_id: req.body.laboratory.patient_id},{medical_records: 1}).exec(function(err,record){
+            if(err) throw err;     
+            var recordObj = {
+              test_to_run: req.body.laboratory.test_to_run,
+              center_address: centerInfo.address,
+              center_city: centerInfo.city,
+              center_country: centerInfo.country,
+              ref_id: req.body.ref_id,
+              referral_firstname: req.user.firstname,
+              referral_lastname: req.user.lastname,
+              referral_title: req.user.title,
+              sent_date: req.body.date,
+              session_id: req.body.session_id,
+              report: "Pending",
+              conclusion: "Pending"
+            }
+            record.medical_records.laboratory_test.unshift(recordObj);
+            record.save(function(err,info){
+              if(err) {
+                throw err;
+                res.end('500: Internal server error')
+              }
+              res.json({success:true,ref_no:req.body.ref_id});
+            });
+
+          });
+        }
+    });
+
+
+    //radiology continued
+
+    router.put("/radiology/find-patient/scan-test",function(req,res){
+      if(req.user){     
+        model.user.findOne({email:req.user.email},{referral:1},function(err,data){
+            if (err) throw err;           
+              switch(req.body.criteria) {
+                case "refIdCriteria":
+                  var toNum = parseInt(req.body.ref_id);                
+                  var elementPos = data.referral.map(function(x) {return x.ref_id; }).indexOf(toNum);
+                  var objectFound = data.referral[elementPos];
+                  if(objectFound === undefined) {
+                   res.send({error: "Patient scan test not found"})
+                  } else {
+                    res.send({data: objectFound});
+                  }
+                  break;
+
+                case "phoneCriteria":
+                  var elementPos = data.referral.map(function(x) {return x.phone; }).indexOf(req.body.phone);
+                  var objectFound = data.referral[elementPos];
+                  if(objectFound === undefined) {
+                   res.send({error: "Patient scan test not found"})
+                  } else {
+                    res.send({data: objectFound});
+                  }
+                  break;
+
+                default:
+                  res.send({error: "Please enter search creteria"});
+                  break;
+              } 
+        });
+      } else {
+        res.end("Unauthorized access");
+      }
+
+    });
+
+//doctor activities for radiology centers.
+  router.get("/doctor/find-radiology",function(req,res){
+      if(req.user){
+        model.user.find({type: "Radiology",city: req.user.city,country: req.user.country},
+          {name:1,address:1,user_id:1,city:1,country:1,profile_pic_url:1,type:1},
+          function(err,data){
+          if(err) throw err;
+          res.send(data);
+        }).limit(5000);
+      } else {
+        res.end("Unauthorized access!");
+      }
+    });
+
+    router.put("/doctor/find-radiology/search",function(req,res){
+      if(req.user){
+          if(!req.body.country)
+            req.body.country = req.user.country;
+          if(!req.body.city) 
+            req.body.city = req.user.city;
+
+          model.user.find({type: "Radiology",city: req.body.city,country: req.body.country},
+            {name:1,address:1,user_id:1,city:1,country:1,profile_pic_url:1,type:1},
+            function(err,data){
+            if(err) throw err;
+            res.send(data);
+          }).limit(5000);
+        } else {
+          res.end("Unauthorized access!")
+        }
+    });
+    
+    //this route takes care doctor sending new test to a radiology.
+    router.post("/doctor/radiology/send-test",function(req,res){  
+        if(req.user) {
+        console.log(req.body)  
+        var random = Math.floor(Math.random() * 9999999);
+        var testId = Math.floor(Math.random() * 9999999999999999);       
+        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1})        
+        .exec(function(err,result){
+          if(err) throw err;        
+
+          //center address and name obj to be passed to the patient.
+          var centerObj = {
+            name: result.name,
+            address: result.address,
+            city: result.city,
+            country: result.country
+          }
+
+          var refObj = {
+            ref_id: random,
+            referral_firstname: req.user.firstname,
+            referral_lastname: req.user.lastname,
+            referral_title: req.user.title,
+            referral_id: req.user.user_id,    
+            date: req.body.date,        
+            radiology: {
+              test_to_run : req.body.lab_test_list,
+              patient_firstname: req.body.patient_firstname,
+              patient_lastname: req.body.patient_lastname,
+              patient_profile_pic_url: req.body.patient_profilePic,
+              patient_title: req.body.patient_title,
+              patient_phone: req.body.phone,
+              session_id: req.body.session_id,
+              patient_id: req.body.patient_id,
+              test_id: testId,
+              attended: false
+            }                         
+          }
+
+          //this is notification for the center.
+          var refNotification = {
+            sender_firstname: req.user.firstname,
+            sender_lastname: req.user.lastname,
+            sender_title : req.user.title,
+            sent_date: req.body.date,
+            ref_id: random,
+            note_id: random,
+            sender_profile_pic_url: req.user.profile_pic_url,
+            message: "Please run the test for my patient"
+          }
+
+          result.referral.push(refObj);
+          result.diagnostic_center_notification.push(refNotification);
+
+          result.save(function(err,info){
+            if(err) throw err;            
+          });
+          tellPatient(centerObj);
+        });
+
+        var tellPatient = function(centerInfo){
+          //remember sms will be sent to the patient
+          model.user.findOne({user_id: req.body.patient_id},{medical_records: 1}).exec(function(err,record){            
+            if(err) throw err;     
+            var recordObj = {
+              test_to_run: req.body.lab_test_list,
+              center_address: centerInfo.address,
+              center_city: centerInfo.city,
+              center_country: centerInfo.country,
+              ref_id: random,
+              referral_firstname: req.user.firstname,
+              referral_lastname: req.user.lastname,
+              referral_title: req.user.title,
+              sent_date: req.body.date,
+              session_id: req.body.session_id,
+              test_id: testId,
+              report: "Pending",
+              conclusion: "Pending"
+            }
+            record.medical_records.radiology_test.unshift(recordObj);
+            record.save(function(err,info){
+              if(err) {
+                throw err;
+                res.end('500: Internal server error')
+              }
+              updateSession(req.body.session_id);
+              res.json({success:true,ref_no:random});
+            });
+
+          });
+        }
+
+        var updateSession = function(session_id) {
+          model.user.findOne({email: req.user.email},{doctor_patient_session:1}).exec(function(err,data){
+            if(err) throw err;           
+            var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(session_id);
+            var objFound = data.doctor_patient_session[elementPos];
+            console.log(objFound);            
+            var testResult = {
+              test_to_run: req.body.lab_test_list,
+              receive_date: "Pending",
+              sent_date: req.body.date,
+              report: "Pending",
+              test_id: testId,
+              conclusion: "Pending"
+            }          
+           
+            objFound.diagnosis.radiology_test_results.unshift(testResult); 
+            data.save(function(err,info){
+              if(err) throw err;
+              console.log("OK!")
+            })
+          });
+        }
+      } else {
+        res.end("Unauthorized access!")
+      }
+    });
+  
+
+    //this route takes care of  un ran test which was forwarded to another center by a center.
+    router.post("/center/radiology/send-test",function(req,res){    
+        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1})
+        .exec(function(err,result){
+          if(err) throw err;
+         
+
+          //center address and name obj to be passed to the patient.
+          var centerObj = {
+            name: result.name,
+            address: result.address,
+            city: result.city,
+            country: result.country
+          }
+
+          var refObj = {
+            ref_id: req.body.ref_id,
+            referral_firstname: req.user.firstname,
+            referral_lastname: req.user.lastname,
+            referral_title: req.user.title,
+            referral_id: req.user.user_id,    
+            date: req.body.date,            
+            radiology: {
+              test_to_run : req.body.radiology.test_to_run,
+              patient_firstname: req.body.radiology.patient_firstname,
+              patient_lastname: req.body.radiology.patient_lastname,
+              patient_profile_pic_url: req.body.radiology.patient_profilePic,
+              patient_title: req.body.radiology.patient_title,
+              patient_phone: req.body.radiology.phone,
+              session_id: req.body.radiology.session_id,
+              patient_id: req.body.radiology.patient_id,
+              attended: false
+            }             
+          }
+
+          //this is notification for the center.
+          var refNotification = {
+            sender_firstname: req.user.firstname,
+            sender_lastname: req.user.lastname,
+            sender_title : req.user.title,
+            sent_date: req.body.date,
+            ref_id: req.body.ref_id,
+            note_id: req.body.ref_id,
+            sender_profile_pic_url: req.user.profile_pic_url,
+            message: "Please run the test for my patient"
+          }
+
+          result.referral.push(refObj);
+          result.diagnostic_center_notification.push(refNotification);
+
+          result.save(function(err,info){
+            if(err) throw err;            
+          });
+          tellPatient(centerObj);
+        });
+
+        var tellPatient = function(centerInfo){
+          //remember sms will be sent to the patient
+          model.user.findOne({user_id: req.body.laboratory.patient_id},{medical_records: 1}).exec(function(err,record){
+            if(err) throw err;     
+            var recordObj = {
+              test_to_run: req.body.radiology.test_to_run,
+              center_address: centerInfo.address,
+              center_city: centerInfo.city,
+              center_country: centerInfo.country,
+              ref_id: req.body.ref_id,
+              referral_firstname: req.user.firstname,
+              referral_lastname: req.user.lastname,
+              referral_title: req.user.title,
+              sent_date: req.body.date,
+              session_id: req.body.session_id,
+              report: "Pending",
+              conclusion: "Pending"
+            }
+            record.medical_records.laboratory_test.unshift(recordObj);
+            record.save(function(err,info){
+              if(err) {
+                throw err;
+                res.end('500: Internal server error')
+              }
+              res.json({success:true,ref_no:req.body.ref_id});
+            });
+
+          });
+        }
+    });
+
+    
+
+    /*router.get("/gcamon",function(req,res){
         var identity = "gcamon";
         res.send(JSON.stringify({ token: token(identity), identity: identity }))
+    });*/
+
+    router.get("/center/notification",function(req,res){
+      if(req.user) {
+        model.user.findOne({email:req.user.email},{diagnostic_center_notification:1},function(err,data){
+          if(err) throw err;
+          res.send(data.diagnostic_center_notification);
+        })
+      } else {
+        res.end("Unauthorized access");
+      }
     });
+
+    router.delete("/center/delete-notification",function(req,res){
+      if(req.user){        
+        model.user.findOne({email: req.user.email},{diagnostic_center_notification:1}).exec(function(err,data){
+          if(err) throw err;
+          req.body.forEach(function(note){
+            console.log(note)
+            var elementPos = data.diagnostic_center_notification.map(function(x) {return x.ref_id; }).indexOf(note.ref_id);                      
+            data.diagnostic_center_notification.splice(elementPos,1); 
+            data.save(function(err,info){
+              if(err) throw err;
+            });   
+          });
+        });
+      } else {
+        res.end("Unauthorized access")
+      }
+    });
+
+
 
     router.get("/user/logout",function(req,res){
         req.logout();
