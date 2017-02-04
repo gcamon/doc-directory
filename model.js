@@ -166,17 +166,23 @@ var myModel = function () {
 
 	var patient_TestSchema = Schema({ 
 		test_to_run: Array,
+		center_name: String,
+		center_phone: String,
 		center_address: String,
 		center_city: String,
 		center_country: String,
+		center_id: String,
+		patient_id: String,
 		ref_id: Number,
 		referral_firstname: String,
 		referral_lastname: String,
 		referral_title: String,
 		sent_date: String,
+		receive_date: String,
 		report: String,
 		conclusion: String,
-		session_id: Number
+		session_id: Number,
+		files: Array
 	});
 	
 
@@ -254,7 +260,8 @@ var myModel = function () {
 		conclusion: String,
 		sent_date: String,
 		test_ran_by: String,
-		test_id: Number
+		test_id: Number,
+		files: Array
 	});
 
 	var docDignosisSchema = Schema({
@@ -282,9 +289,26 @@ var myModel = function () {
 		patient_id: String,
 		prescription_id: Number,
 		typeOfSession: String,
-		files: fileSchema,
 		conversations: conversationSchema,
 		diagnosis: docDignosisSchema
+	});
+
+	var requestSchema = Schema({
+		status: String,
+		sender_firstname: String,
+		sender_lastname: String,
+		sender_profile_pic_url: String,
+		sender_id: String,
+		conclusion: String,
+		type_of_test: String,
+    center_name: String,
+    center_address: String,
+    cente_city: String,
+    center_country: String,
+    test_result: Array,
+    files: Array,
+    date_sent: String,
+    ref_id: Number
 	});
 
 //end for session
@@ -342,8 +366,7 @@ var myModel = function () {
 		record_access:[accessSchema],
 		accepted_doctors: [doc_briefSchema],
 		doctor_patients_list : [patient_briefSchema],
-		medical_records: {
-			files: [fileSchema],		
+		medical_records: {					
 			diagnosis: [diagnosisSchema],		
 			prescription: [prescriptionSchema],
 			laboratory_test: [patient_TestSchema],
@@ -354,7 +377,8 @@ var myModel = function () {
 		accepted_patients: [patient_briefSchema],
 		appointment:[appointment_schema],
 		prescription_tracking: [statusSchema],
-		doctor_patient_session: [sessionSchema]		
+		doctor_patient_session: [sessionSchema],
+		doctor_prescriptionRequest: [requestSchema]		
 	},{
 		collections: "userinfos"
 	})

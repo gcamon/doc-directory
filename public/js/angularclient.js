@@ -205,8 +205,38 @@ app.config(function($routeProvider){
  .when('/radiology/selected-radiology/:id',{
   templateUrl: "/assets/pages/radiology/selected-radiology.html",
   controller: "radiologySelectedRadioController"
- });
+ })
+
+ .when("/pending/lab-test",{
+  templateUrl: "/assets/pages/pending-test.html",
+  controller: "pendingLabTestController"
+ })
+
+ .when("/pending/scan-test",{
+  templateUrl: "/assets/pages/pending-test.html",
+  controller: "pendingRadioTestController"
+ })
+
+ .when("/patient/laboratory-test",{
+  templateUrl:"/assets/pages/laboratory/lab-test.html",
+  controller: "patientLabTestController"
+ })
+
+ .when("/patient/radiology-test",{
+  templateUrl:"/assets/pages/radiology/scan-test.html",
+  controller: "patientRadioTestController"
+ })
+
+ .when("/patient/my-doctors",{
+  templateUrl:"/assets/pages/patient/my-doctors.html",
+  controller: "chooseDoctorController"
+ })
   
+ .when("/patient/selected-doctor",{
+  templateUrl: "/assets/pages/patient/selected-doctor.html",
+  controller: "selectedDoctorToSendTestController"
+ })
+
 });
 
 app.service('templateService',[function(){
@@ -273,6 +303,18 @@ app.service('templateService',[function(){
   //holds prescription for where prescriptions have been sent.
   this.holdPrescriptionForTrackRecord;
 
+  //holds all lab test from the back end
+  this.holdAllLabTest;
+
+  //holds all scan test from the back end
+  this.holdAllRadioTest;
+
+  //holds all pending laboratory
+  this.pendingLab;
+
+  //holds all pending radiolography
+  this.pendingScan; 
+
 
   //hodls fn to call when patients wants to view prescription from the notification template.
   this.holdFnToViewNotification = function(fn) {
@@ -307,10 +349,26 @@ app.service('templateService',[function(){
 
   this.holdTheRadiologyToFowardTestTo;
 
+  //holds  test to be forwarded to another center;
+  this.holdTestToBeForwarded;
+
+  //holds patients accepted doctors for chooseDoctorController
+  this.holdMyDoctorsForSendingTest;
+
+  //holds selected doctor obj
+  this.holdSelectedDoctorToSendTest;
+
+  //holds the scan images for a particular referral in any 
+  this.holdScanImageList;
+
+  //holds the list of precription request for the doctor
+  this.holdPrescriptionRequestData
+    
 }])
 
 app.service("multiData",["$http","$window","templateService",function($http,$window,templateService){
 	this.sendPic = function(url,data){
+    console.log(data)
 		var fd = new FormData();
 		for(var key in data){
 			fd.append(key,data[key]);
@@ -322,6 +380,9 @@ app.service("multiData",["$http","$window","templateService",function($http,$win
     .success(function(response){
       templateService.changedProfilePic = response;
       templateService.isUpdated = true;
+      templateService.holdScanImageList = response;
+      console.log(response)
+      alert("sent!!!")
     });
 	}
 }]);
@@ -464,19 +525,31 @@ app.directive("fileModel",["$parse",function($parse){
     link: function(scope,element,attrs){
       var model = $parse(attrs.fileModel);
       var modelSetter = model.assign;
-      element.bind("change",function(){
-        scope.$apply(function(){
-          modelSetter(scope,element[0].files[0])
-        })
-      })
+      var isMultiple = attrs.multiple;
+      element.bind('change', function () {
+          var values = [];          
+          angular.forEach(element[0].files, function (item) {
+              console.log(item)
+              var value = item
+              values.push(value);
+          });
+          scope.$apply(function () {
+              if (isMultiple) {
+                  modelSetter(scope, values);
+              } else {
+                  modelSetter(scope, values[0]);
+              }
+          });
+      });
     }
   }
 }]);
 
 app.controller('pictureController',["$scope","$http","$location","multiData",function($scope,$http,$location,multiData) {
    $scope.user = {};
-   $scope.user.type = "picture";
-   $scope.update = function(){
+    
+   $scope.update = function(typeOfFile){
+    $scope.user.type = typeOfFile;
     var uploadUrl = "/user/update";     
      multiData.sendPic(uploadUrl,$scope.user);    
 	  } 
@@ -995,6 +1068,47 @@ app.controller("doctorBarNotificationController",["$scope","$location","$http","
     $location.path("/granted-request/" + id);
   }
 
+
+  //get the list of prescription request from the backend.
+   $http({
+      method  : 'GET',
+      url     : "/doctor/get-patient-prescription-request",
+      headers : {'Content-Type': 'application/json'} 
+      })
+    .success(function(data) { 
+    console.log(data); 
+      var filterList = [];
+      var filter = {};
+      var dataList = data.doctor_prescriptionRequest;
+      for(var i = 0; i < dataList.length; i++){
+        if(!filter.hasOwnProperty(dataList[i].sender_id)) {
+           filter[dataList[i].sender_id] = "";
+           filterList.push(dataList[i]);       
+        } 
+      }
+
+      
+      templateService.holdPrescriptionRequestData =  data.doctor_prescriptionRequest;
+      var request =  filterList;
+      if(request.length > 0) {
+        $scope.isNew = true;
+        $scope.len = request.length;
+        $scope.allRequest = request;
+      } else {
+        $scope.noRequest = "Prescription request list empty";
+      }
+    });
+
+    $scope.viewPatient = function(id){
+      var callerId = templateService.holdDoctorIdForCommunication;
+      localManager.setValue("receiver",id);
+      localManager.setValue('caller',callerId);    
+      templateService.holdIdForSpecificPatient = id;
+      var page = "/doctor-patient/treatment/" + id;
+      localManager.setValue("currentPage",page);
+      $location.path("/doctor-patient/treatment/" + id);
+    }  
+
 }]);
 
 app.controller("docAppointmentController",["$scope","$location","$http","$window","templateService","localManager",
@@ -1053,7 +1167,9 @@ app.controller("selectedAppointmentController",["$scope","$location","$http","$w
 
 app.controller("inTreatmentController",["$scope","$http","localManager","$location","templateService",
   function($scope,$http,localManager,$location,templateService){
-  $scope.sessionData = localManager.getValue("heldSessionData");  
+  $scope.sessionData = localManager.getValue("heldSessionData");
+
+  
 
   templateService.holdForSpecificPatient = $scope.sessionData;
   
@@ -1075,7 +1191,7 @@ app.controller("inTreatmentController",["$scope","$http","localManager","$locati
 
    //for radiology
   $scope.radiology = function(){
-    if($scope.testResult) {
+    if($scope.testResult) { 
       $scope.testResult = [];
     }
     investigation("/doctor/get-scan-result");
@@ -1097,9 +1213,7 @@ app.controller("inTreatmentController",["$scope","$http","localManager","$locati
       headers : {'Content-Type': 'application/json'} 
       })
     .success(function(data) {
-      if(data.result){
-        consoloe.log("it hapm")
-        console.log(data.result)       
+      if(data.result){               
         $scope.testResult = data.result;
       } else {
         $scope.message = "No test result for this patient";
@@ -1108,18 +1222,220 @@ app.controller("inTreatmentController",["$scope","$http","localManager","$locati
  }
   
 
-  $scope.sendToScan = function(){
+  $scope.sendToScan = function () {
     
     
   }
 
-  $scope.sendToECG = function(){
+  $scope.sendToECG = function () {
     
   }
 
-  $scope.otherCheck = function(){
+  $scope.otherCheck = function () {
     
   }
+
+  var check = 0;// scope watch count to show save changes button on ui this is bcos newVal is set when the controller is initialized.
+  //when count is 2 the watch should display the save changes button on the ui.
+  
+  $scope.$watch("sessionData.diagnosis",function(newVal,oldVal){
+    check++;
+    if(check > 1)
+      $scope.isChanges = true;
+  },true);
+
+  $scope.saveChanges = function () {
+    var filter = {}
+    for(var i in $scope.sessionData.diagnosis) {
+      if($scope.sessionData.diagnosis.hasOwnProperty(i) && typeof $scope.sessionData.diagnosis[i] !== "object") {
+        if($scope.sessionData.diagnosis[i] !== "") {
+          filter[i] = $scope.sessionData.diagnosis[i];
+        } else {
+          alert( "Field" + " '" + i + "'" + " cannot be empty")
+          return;
+        }
+      }
+    }
+
+    filter.session_id = $scope.sessionData.session_id;
+    $http({
+      method  : 'PUT',
+      url     : "/doctor/session-update/save-changes",
+      data    : filter,
+      headers : {'Content-Type': 'application/json'} 
+      })
+    .success(function(data) {
+      console.log(data);
+      if(data.success)
+        alert("Changes saved successfully!!!");
+      if(data.error)
+        alert("Oops! Error occured. Changes not saved!,Try again");
+    });            
+  }
+
+
+  //treatment logic on the ui
+  $scope.isPharmacy = false;
+  $scope.isSurgery = false;
+  $scope.isPhysiotherapy = false;
+  $scope.isOther = false;
+
+  
+  $scope.pharmacy = function(){
+    if($scope.isPharmacy === false) {
+      $scope.isPharmacy = true;
+    } else {
+      $scope.isPharmacy = false;
+    }
+  }
+
+  $scope.surgery = function(){
+    if($scope.isSurgery === false) {
+      $scope.isSurgery = true;
+    } else {
+      $scope.isSurgery = false;
+    }
+  }
+
+  $scope.physiotherapy = function(){
+    if($scope.isPhysiotherapy === false) {
+      $scope.isPhysiotherapy = true;
+    } else {
+      $scope.isPhysiotherapy = false;
+    }
+  }
+
+  $scope.other = function(){
+    if($scope.isOther === false) {
+      $scope.isOther = true;
+    } else {
+      $scope.isOther = false;
+    }
+  }
+
+
+  //treatment by pharmaceutical control
+
+  $scope.isNewPrescription = false;
+  $scope.isOldPrescription = false;
+
+  var patient = {};
+
+  $scope.writeNew = function() {
+    if($scope.isNewPrescription === false) {      
+      var random = Math.floor(Math.random() * 99999999999999 );
+      patient.id = $scope.sessionData.patient_id;
+      $http({
+        method  : 'PUT',
+        url     : "/doctor/specific-patient",
+        data    : patient,
+        headers : {'Content-Type': 'application/json'} 
+        })
+      .success(function(data) {
+        $scope.patientInfo = data;        
+        patient.prescriptionId = random;
+        patient.patient_id = patient.id;    
+        patient.firstname = $scope.patientInfo.firstname;
+        patient.lastname = $scope.patientInfo.lastname;
+        patient.gender = $scope.patientInfo.gender;
+        patient.age = $scope.patientInfo.age;
+        patient.address = $scope.patientInfo.address;
+        patient.city = $scope.patientInfo.city;
+        patient.country = $scope.patientInfo.country;
+        patient.patient_profile_pic_url = $scope.patientInfo.profile_pic_url;        
+        patient.title = $scope.patientInfo.title;
+        patient.sender = "doctor";        
+      });
+      $scope.isNewPrescription = true;
+    } else {
+      $scope.isNewPrescription = false;
+    }
+  }
+
+  $scope.viewOld = function() {
+    patient.id = $scope.sessionData.patient_id;
+    console.log($scope.sessionData)
+    if($scope.isOldPrescription === false) {
+      getPatientMedication("/doctor/get-patient/medication");
+    } else {
+      $scope.isOldPrescription = false;
+    }
+  }
+
+//view previously writen prescription by this doctor for this patient
+  var getPatientMedication = function(url){
+    $http({
+      method  : 'PUT',
+      url     : url,
+      data    : patient,
+      headers : {'Content-Type': 'application/json'} 
+      })
+    .success(function(data) {
+      console.log(data)      
+      var myFoundPrescriptions = [];
+      for(var i = data.medications.length-1; i >= 0; i--){
+        if(data.medications[i].doctor_id === data.user) {
+          myFoundPrescriptions.push(data.medications[i]);
+          $scope.wroteByThisDoctor = myFoundPrescriptions;
+        }
+      }        
+    });
+    $scope.isOldPrescription = true;
+  }
+
+  //creates drug object for the ng-repeat on the view.
+    var drug = {};
+    var count = {};
+    count.num = 1;
+    drug.sn = count.num;
+    $scope.drugList = [drug]; // this populates the array for the view ng-repeat. this is the prescription body as the doctor writes it.
+
+    $scope.addDrug = function(){
+      var newDrug = {};
+      count.num++;
+      newDrug.sn = count.num;
+      $scope.drugList.push(newDrug);
+    }
+
+    $scope.removeDrug = function(){
+      if(count.num > 1){
+        $scope.drugList.pop(drug);
+        count.num--;
+      }
+    }
+
+
+    
+    patient.prescriptionBody = $scope.drugList;// adds prescription body to the prescription object as the doctor 
+    //prepares to send it to the back end.
+   
+
+
+    $scope.toPatient = function(){
+      //doctor creates the prescription object and sends it the the back end. url is "patient/forwarded-prescription", other informations that
+      //comes with the prescription object added to the prescription object on the backend.
+      templateService.holdPrescriptionToBeForwarded = patient;
+      $http({
+        method  : 'PUT',
+        url     : "/patient/forwarded-prescription",
+        data    : patient,
+        headers : {'Content-Type': 'application/json'} 
+        })
+      .success(function(data) {      
+        console.log(data);
+        alert(data);
+        $scope.isNewPrescription = false;
+      });
+      
+    }
+
+    $scope.toPharmacy = function(){   
+      templateService.holdPrescriptionToBeForwarded = patient;
+      $location.path("/search/pharmacy");
+      $scope.isNewPrescription = false;
+    }
+
+
 }]);
 
 /**********************Laboratory tests list **********************/
@@ -1661,7 +1977,6 @@ app.controller("previewLabTestController",["$scope","localManager","$location","
 
 app.controller("previewScanTestController",["$scope","localManager","$location","templateService",
   function($scope,localManager,$location,templateService){
-  console.log("yesssssssssssssss")
   var list = templateService.holdSelectedLabTest;
   $scope.labTest = list;
 
@@ -1981,8 +2296,11 @@ app.controller('patientWelcomeController',["$scope",function($scope){
 
 }]);
 
-app.controller("patientNotificationController",["$scope","$location","$http","$window","templateService","localManager",function($scope,$location,$http,
-  $window,templateService,localManager){  
+
+// this controller gets  the patient medical records from the backend and seperates laboratory tsest from radiology test 
+//to store then templateService. Note patient prescription  is not amonge the data filtered so far.
+app.controller("patientNotificationController",["$scope","$location","$http","$window","templateService","localManager",
+  function($scope,$location,$http, $window,templateService,localManager){  
   var filter = {};
   $scope.getPatientId = function(id,firstname,lastname){
     var tostr = id.toString();
@@ -1996,6 +2314,56 @@ app.controller("patientNotificationController",["$scope","$location","$http","$w
     templateService.holdPatientIdForCommunication = comObj;
     
   }
+
+  $http({
+    method  : 'GET',
+    url     : "/patient-panel/get-medical-record",
+    headers : {'Content-Type': 'application/json'} 
+    })
+  .success(function(data) {
+    if(data){      
+      templateService.holdAllLabTest = data.medical_records.laboratory_test;
+      templateService.holdAllRadioTest = data.medical_records.radiology_test;     
+      
+      // this fns checks the list to see if any test is pending for both laboratory and radiology
+      checkIsLabPending(data.medical_records.laboratory_test);
+      checkIsRadioPending(data.medical_records.radiology_test);
+    }  
+
+  });
+
+  var checkIsLabPending = function (list) {
+    var pendingLab = [];      
+    for(var test = 0; test < list.length; test++) {
+      if(list[test].conclusion === "Pending" || list[test].report === "Pending") {
+        pendingLab.unshift(list[test]);
+      }
+    }
+
+    if(pendingLab.length > 0) {
+      $scope.isLabP = true;
+      $scope.labLenPending = pendingLab.length;
+      templateService.pendingLab = pendingLab;
+    }
+  }
+
+  var checkIsRadioPending = function (list) {
+    var pendingScan = [];      
+    for(var test = 0; test < list.length; test++) {
+      if(list[test].conclusion === "Pending" || list[test].report === "Pending") {
+        pendingScan.unshift(list[test]);
+      }
+    }
+
+    if(pendingScan.length > 0) { 
+      $scope.isScanP = true;
+      $scope.scanLenPending = pendingScan.length;
+      templateService.pendingScan = pendingScan;
+    }
+  }
+
+
+  //
   
 
   $scope.getData = function(firstname,lastname,date,pic,fee,patientName,wallet_amount,doc_id,service_access,specialty,message){
@@ -2028,7 +2396,9 @@ app.controller("patientNotificationController",["$scope","$location","$http","$w
     localManager.removeItem("currentPage");
     localManager.removeItem("currentPageForPatients");
     localManager.removeItem("receiver");
-    localManager.removeItem('caller');    
+    localManager.removeItem('caller');
+    localManager.removeItem("doctorInfoforCommunication")
+    localManager.removeItem("patientInfoforCommunication")    
      $http({
         method  : 'GET',
         url     : "/user/logout",
@@ -2046,9 +2416,84 @@ app.controller("patientNotificationController",["$scope","$location","$http","$w
     $location.path("/granted-request/" + id);
   }
 
+  $scope.viewLabPending = function () {
+    $location.path("/pending/lab-test")
+  }
 
+  $scope.viewRadioPending = function () {
+    $location.path("/pending/scan-test")
+  }
 
 }]);
+
+app.controller("pendingLabTestController",["$scope","templateService","$window","localManager",function($scope,templateService,$window,localManager){
+  $scope.type = "Pending laboratory test(s)";  
+  console.log(templateService.pendingLab);
+  $scope.pendingTest = templateService.pendingLab;
+    
+
+  var page = "/pending/lab-test";
+  $scope.makeVideoCall = function (receiverId,center_name,patienId) {
+    localManager.setValue("receiver",receiverId);
+    localManager.setValue('caller',patienId);
+    localManager.setValue("currentPageForPatients",page);
+    console.log(receiverId)
+    var center = {
+      center_name: center_name
+    }
+    localManager.setValue("doctorInfoforCommunication",center)
+    $window.location.href = "/patient/call";
+  }
+
+  $scope.liveChat = function (receiverId,center_name,patienId) {
+    localManager.setValue("receiver",receiverId);
+    localManager.setValue('caller',patienId);
+    localManager.setValue("currentPageForPatients",page);
+    console.log(receiverId)
+    var center = {
+      center_name: center_name
+    }
+    localManager.setValue("doctorInfoforCommunication",center)
+    //$window.location.href = "/patient/chat";
+  }
+
+}]);
+
+/////handles pending tests list including communications
+app.controller("pendingRadioTestController",["$scope","templateService","$window","localManager",function($scope,templateService,$window,localManager){
+  $scope.type = "Pending radiology test(s)"
+  console.log(templateService.pendingScan);
+  $scope.pendingTest = templateService.pendingScan;
+
+  var page = "/pending/scan-test";
+  $scope.makeVideoCall = function (receiverId,center_name,patienId) {
+    console.log(patienId)
+    localManager.setValue("receiver",receiverId);
+    localManager.setValue('caller',patienId);
+    localManager.setValue("currentPageForPatients",page);
+    console.log(receiverId);
+    var center = {
+      center_name: center_name
+    }
+    localManager.setValue("doctorInfoforCommunication",center)
+    $window.location.href = "/patient/call";
+    
+    
+  }
+
+  $scope.liveChat = function (receiverId,center_name,patienId) {
+    localManager.setValue("receiver",receiverId);
+    localManager.setValue('caller',patienId);
+    localManager.setValue("currentPageForPatients",page);
+    console.log(receiverId)
+    var center = {
+      center_name: center_name
+    }
+    localManager.setValue("doctorInfoforCommunication",center)
+    //$window.location.href = "/patient/chat";
+  }
+
+}])
 
 //patient acknowledgee doctors reply and send confirmation to the backend to be save in both doctors box and patient box.
 app.controller("patientViewRequestController",["$scope","$location","$http","templateService","ModalService",function($scope,$location,$http,templateService,ModalService){
@@ -2152,7 +2597,6 @@ app.controller("viewPrescriptionFromNoticeTemplateController",["$scope","$locati
           headers : {'Content-Type': 'application/json'} 
           })
         .success(function(data) { 
-          console.log("deleted")
           return;
         });
         
@@ -2241,7 +2685,9 @@ app.controller("patientTreatmentController",["$scope","$http","ModalService","re
 
 
 //recieves the patients medical record and presvription from the back end.
-app.controller("patientPanelController",["$scope","$location","$http","templateService",function($scope,$location,$http,templateService){
+app.controller("patientPanelController",["$scope","$location","$http","localManager","templateService",
+  function($scope,$location,$http,localManager,templateService){
+
   var medical = {};  
 
   $http({
@@ -2255,7 +2701,7 @@ app.controller("patientPanelController",["$scope","$location","$http","templateS
       var total = {};
       var filteredPrescriptions = [];
       medical.records = data.medical_records;
-      medical.prescriptions = data.prescriptions;     
+      medical.prescriptions = data.prescriptions;        
       templateService.holdAllPrescriptionForOtherCtrl = data.prescriptions;
       templateService.holdPrescriptions = medical.prescriptions;
       medical.prescriptions.forEach(function(prescription){        
@@ -2282,10 +2728,11 @@ app.controller("patientPanelController",["$scope","$location","$http","templateS
         }
       }
       $scope.filteredPrescriptions = filteredPrescriptions;
-      
     }
+
   });
 
+  
 
   $scope.dashboardhome = function () {
     $location.path("/patient-dashboard");
@@ -2308,7 +2755,8 @@ app.controller("patientPanelController",["$scope","$location","$http","templateS
     }
   }  
 
-  $scope.viewPrescription = function (id) {    
+  $scope.viewPrescription = function (id) {
+    localManager.setValue("currentPageForPatients","/patient-prescriptions"); 
     if(id === undefined){
       templateService.holdPrescriptions = medical.prescriptions;      
       $location.path("/patient-prescriptions");
@@ -2326,8 +2774,213 @@ app.controller("patientPanelController",["$scope","$location","$http","templateS
    
   }
 
+  $scope.viewLabTest = function () {
+    localManager.setValue("currentPageForPatients","/patient/laboratory-test");
+    $location.path("/patient/laboratory-test")
+  }
+
+  $scope.viewScanTest = function () {
+    localManager.setValue("currentPageForPatients","/patient/radiology-test");
+    $location.path("/patient/radiology-test");
+  }
   
 }]);
+
+app.controller("patientLabTestController",["$scope","$location","$http","$window","templateService","localManager",function($scope,$location,$http,
+  $window,templateService,localManager){ 
+
+  $scope.labTest= templateService.holdAllLabTest;
+
+  $scope.makeVideoCall = function (receiverId,center_name,patienId) {
+    localManager.setValue("receiver",receiverId);
+    localManager.setValue('caller',patienId);
+    localManager.setValue("currentPageForPatients","/patient/laboratory-test");
+    var center = {
+      center_name: center_name
+    }
+    localManager.setValue("doctorInfoforCommunication",center)
+    $window.location.href = "/patient/call";
+  }
+
+  $scope.liveChat = function (receiverId,center_name,patienId) {
+    localManager.setValue("receiver",receiverId);
+    localManager.setValue('caller',patienId);
+    localManager.setValue("currentPageForPatients","/patient/laboratory-test");
+    var center = {
+      center_name: center_name
+    }
+    localManager.setValue("doctorInfoforCommunication",center)
+    //$window.location.href = "/patient/chat";
+  }
+
+  $scope.sendDocTest = function(testObj) {
+    testObj.type = "laboratory";
+    templateService.holdTestToBeForwarded = testObj;
+    $http({
+      method  : 'GET',
+      url     : "/patient/my-doctors",        
+      headers : {'Content-Type': 'application/json'} 
+      })
+    .success(function(data) {
+      if(data.accepted_doctors.length > 0) {
+        templateService.holdMyDoctorsForSendingTest = data.accepted_doctors;
+        $location.path("/patient/my-doctors");
+      } else {
+        alert("Sorry, you have no doctors in your list to send this test to.")
+      }
+    });
+    
+  }
+
+  $scope.downloadTest = function(testObj) {
+    console.log(testObj);
+  }
+
+  $scope.forwardTest = function(testObj) {
+    console.log(testObj)
+    templateService.holdTestToBeForwarded = testObj;
+  } 
+    
+  //this fn is invoked when a patient wish to delete a prescription.
+  $scope.deleteTest = function (id) {
+    for(var i = 0; i < $scope.labTest.length; i++){
+      if($scope.labTest[i].ref_id === id){
+        $scope.labTest.splice(i,1);
+      }
+    }
+  }
+
+}]);
+
+app.controller("patientRadioTestController",["$scope","$location","$http","$window","templateService",function($scope,$location,$http,
+  $window,templateService){
+  $scope.labTest= templateService.holdAllRadioTest;
+
+  $scope.makeVideoCall = function (receiverId,center_name,patienId) {
+    localManager.setValue("receiver",receiverId);
+    localManager.setValue('caller',patienId);
+    localManager.setValue("currentPageForPatients","/patient/radiology-test");
+    var center = {
+      center_name: center_name
+    }
+    localManager.setValue("doctorInfoforCommunication",center)
+    $window.location.href = "/patient/call";
+  }
+
+  $scope.liveChat = function (receiverId,center_name,patienId) {
+    localManager.setValue("receiver",receiverId);
+    localManager.setValue('caller',patienId);
+    localManager.setValue("currentPageForPatients","/patient/radiology-test");
+    var center = {
+      center_name: center_name
+    }
+    localManager.setValue("doctorInfoforCommunication",center)
+    //$window.location.href = "/patient/chat";
+  }
+
+  $scope.sendDocTest = function(testObj) {
+    testObj.type = "radiology";
+    templateService.holdTestToBeForwarded = testObj;
+    $http({
+      method  : 'GET',
+      url     : "/patient/my-doctors",        
+      headers : {'Content-Type': 'application/json'} 
+      })
+    .success(function(data) {
+      console.log(data);
+      if(data.accepted_doctors.length > 0) {
+        templateService.holdMyDoctorsForSendingTest = data.accepted_doctors;
+        $location.path("/patient/my-doctors");
+      } else {
+        alert("Sorry, you have no doctors in your list to send this test to.")
+      }
+    });
+  }
+
+  $scope.downloadTest = function(testObj) {
+    console.log(testObj);
+  }
+
+  $scope.forwardTest = function(testObj) {
+    templateService.holdTestToBeForwarded = testObj;
+  } 
+    
+  //this fn is invoked when a patient wish to delete a prescription.
+  $scope.deleteTest = function (id) {
+    for(var i = 0; i < $scope.labTest.length; i++){
+      if($scope.labTest[i].ref_id === id){
+        $scope.labTest.splice(i,1);
+      }
+    }
+  }
+}]);
+
+app.controller("chooseDoctorController",["$scope","$location","$http","$window","templateService",function($scope,$location,$http,
+  $window,templateService){  
+  $scope.doctors = templateService.holdMyDoctorsForSendingTest;
+
+  $scope.selectedDoctor = function(docObj) {
+    templateService.holdSelectedDoctorToSendTest = docObj;
+    $location.path("/patient/selected-doctor");
+  }
+
+}]);
+
+app.controller("selectedDoctorToSendTestController",["$scope","$location","$http","multiData","templateService",
+  function($scope,$location,$http,multiData,templateService){
+
+  $scope.test = templateService.holdTestToBeForwarded;
+  $scope.doctor = templateService.holdSelectedDoctorToSendTest;
+
+  $scope.noSend = function() {
+    $location.path("/patient/my-doctors");
+  }
+
+  $scope.send = function() {
+    console.log($scope.test)
+    var date = new Date;
+    var dataToSend = {
+      type_of_test: $scope.test.type,
+      doctorId: $scope.doctor.doctor_id,
+      center_name: $scope.test.center_name,
+      center_address: $scope.test.center_address,
+      cente_city: $scope.test.center_city,
+      center_country: $scope.test.center_country,
+      test_result: $scope.test.test_to_run,
+      conclusion: $scope.test.conclusion,
+      files: $scope.test.files,
+      date_sent: date,
+      ref_id: $scope.test.ref_id
+    }
+
+    $http({
+    method  : 'PUT',
+    url     : "/patient/test-result/forward",
+    data    : dataToSend,
+    headers : {'Content-Type': 'application/json'} 
+    })
+    .success(function(data) {
+      if(data.status) {
+        alert("Test rssult sent successfully!!!");
+        switch($scope.test.type) {
+          case "laboratory":
+            $location.path("/patient/laboratory-test");
+          break;
+          case "radiology":
+            $location.path("/patient/radiology-test");
+          break;
+          default:
+          break;
+        }
+        
+      } else {
+        alert("Oops! Something went wrong while sending test reusult. Try again...")
+      }
+    }); 
+  }
+
+}]);
+
 //controller runs when patient clicks on the edit profile like on the panel of patient dashboard
 app.controller("patientProfileEditController",["$scope","$location","$http","$window","templateService","multiData",function($scope,$location,$http,
   $window,templateService,multiData){  
@@ -2346,16 +2999,16 @@ app.controller("patientProfileEditController",["$scope","$location","$http","$wi
   });
 
   $scope.user = {};
-   
-   $scope.update = function(){
-    $scope.user.type = "picture";
-    var uploadUrl = "/user/update";     
-     multiData.sendPic(uploadUrl,$scope.user);        
-    }
-    $scope.updateDetails = function(){
-      var uploadUrl = "/patient-profile/update";     
-      multiData.sendPic(uploadUrl,$scope.user);  
-    }
+    
+ $scope.update = function(){
+  $scope.user.type = "picture";
+  var uploadUrl = "/user/update";     
+   multiData.sendPic(uploadUrl,$scope.user);        
+  }
+  $scope.updateDetails = function(){
+    var uploadUrl = "/patient-profile/update";     
+    multiData.sendPic(uploadUrl,$scope.user);  
+  }
 
 }]);
 
@@ -2403,6 +3056,7 @@ app.controller("prescriptionTemplateController",["$scope","$location","$http","t
 
 
     $scope.downloadPrescription = function (prescription) {
+      console.log(prescription)
     }
 
     //this fn is invoked when patient wish to forward prescription by himself to a phamarcy.
@@ -2618,7 +3272,7 @@ app.controller("myDoctorController",["$scope","$location","$http","$window","tem
           title: 'Dr '
         }
         localManager.setValue("doctorInfoforCommunication", holdData);
-        console.log(localManager.getValue('doctorInfoforCommunication'));
+        
     });
 
     $scope.videoRequest = function(){
@@ -2632,8 +3286,8 @@ app.controller("myDoctorController",["$scope","$location","$http","$window","tem
 }]);
 
 //similar the mydoctorController
-app.controller("myPatientController",["$scope","$http","$location","$window","templateService","localManager",
-  function($scope,$http,$location,$window,templateService,localManager){
+app.controller("myPatientController",["$scope","$http","$location","$window","templateService","localManager","ModalService",
+  function($scope,$http,$location,$window,templateService,localManager,ModalService){
   var patient = {}; //patient obj.
   /*
   * the patient refreshing the dashboard page will still keep the patient on the current view template
@@ -2676,7 +3330,7 @@ app.controller("myPatientController",["$scope","$http","$location","$window","te
         }
        
         localManager.setValue("patientInfoForCommunication", holdData);
-        console.log(localManager.getValue("patientInfoForCommunication"))
+        
     });
      
 
@@ -2690,6 +3344,9 @@ app.controller("myPatientController",["$scope","$http","$location","$window","te
     $scope.writePrescription =function(){     
       $scope.isToPrescribe = true;
       $scope.isToSeeRecord = false;
+       $scope.isToViewLabPrescriptionReq = false;
+      $scope.isToViewRadPrescriptionReq = false;
+      $scope.isToViewSession = false;
     }
 
     $scope.viewPreviousPrescription = function(){         
@@ -2706,6 +3363,9 @@ app.controller("myPatientController",["$scope","$http","$location","$window","te
     $scope.viewMedicalHistory = function(){
       $scope.isToSeeRecord = true;
       $scope.isToPrescribe = false;
+       $scope.isToViewLabPrescriptionReq = false;
+      $scope.isToViewRadPrescriptionReq = false;
+      $scope.isToViewSession = false;
       //getPatientMedication("/doctor/get-patient/medical-record")
     }
 
@@ -2727,7 +3387,6 @@ app.controller("myPatientController",["$scope","$http","$location","$window","te
         headers : {'Content-Type': 'application/json'} 
         })
       .success(function(data) {      
-        console.log(data);
         var myFoundPrescriptions = [];
         for(var i = data.medications.length-1; i >= 0; i--){
           if(data.medications[i].doctor_id === templateService.getid) {
@@ -2787,6 +3446,204 @@ app.controller("myPatientController",["$scope","$http","$location","$window","te
       templateService.holdPrescriptionToBeForwarded = patient;
       $location.path("/search/pharmacy");
     }
+
+
+    //other activities
+    $scope.viewSession = function () {      
+      
+      loadSession();
+      $scope.isToSeeRecord = false;
+      $scope.isToPrescribe = false;
+      $scope.isToViewLabPrescriptionReq = false;
+      $scope.isToViewRadPrescriptionReq = false;
+      $scope.isToViewSession = true;
+
+    }
+
+    $scope.viewTreatmentSession = function (session) {
+      console.log(session)
+      localManager.setValue("heldSessionData",session);        
+      $window.location.href = "/treatment";
+    }
+
+    $scope.loadMore = function (){
+      loadSession();
+    }
+
+    $scope.newSession = function () {
+
+    }
+
+    $scope.createNewSession = function(){
+      ModalService.showModal({
+          templateUrl: 'quickFillComplaint.html',
+          controller: "fromModalSessionController"
+      }).then(function(modal) {
+          modal.element.modal();
+          modal.close.then(function(result) {
+             
+          });
+      });
+    }
+
+    $scope.viewLabPrescriptionRequest = function () {
+      $scope.isToSeeRecord = false;
+      $scope.isToPrescribe = false;
+      $scope.isToViewLabPrescriptionReq = true;
+      $scope.isToViewRadPrescriptionReq = false;
+      $scope.isToViewSession = false;      
+    }
+
+    $scope.viewRadioPrescriptionRequest = function () {
+      $scope.isToSeeRecord = false;
+      $scope.isToPrescribe = false;
+      $scope.isToViewLabPrescriptionReq = false;
+      $scope.isToViewRadPrescriptionReq = true;
+      $scope.isToViewSession = false;
+    }
+
+    var sessionList = [];
+
+    function loadSession() {
+      $http({
+        method  : 'PUT',
+        url     : "/doctor/get-patient-sessions",
+        data    : patient,
+        headers : {'Content-Type': 'application/json'} 
+        })
+      .success(function(data) {   
+        for(var i = 1; i < data.length; i++) {          
+          if(sessionList.length >= 10)
+            break;
+          sessionList.push(data[i]);
+        }
+        $scope.recentSession = data[0];
+        $scope.sessionData = sessionList;
+        if(data.length > 0);
+          templateService.holdId = data[0].patient_id;
+      });
+    }
+
+
+    //this filters the prescriptionb reequest based 0on the type of request whether lab test or radio test ia accompanied with the request
+    $scope.labPrescriptionReq = [];
+    $scope.radioPrescriptionReq = [];
+    console.log(templateService.holdPrescriptionRequestData)
+    var theReqList = templateService.holdPrescriptionRequestData;
+    for(var i = 0; i < theReqList.length; i++){
+      if(patient.id === theReqList[i].sender_id) {
+        switch(theReqList[i].type_of_test) {
+          case "laboratory":
+            $scope.labPrescriptionReq.push(theReqList[i]);
+            break;
+          case "radiology":
+            $scope.radioPrescriptionReq.push(theReqList[i]);
+          default:
+          break;
+        }
+      }
+    }
+
+    $scope.labLen = $scope.labPrescriptionReq.length;
+    $scope.radioLen = $scope.radioPrescriptionReq.length;
+
+    //for radio prescription request. Accompanied files can be viewed i.e x-ray files.
+    $scope.viewFile = function(fileArr,resultList){
+      var dataObj = {};
+      dataObj.report = resultList;
+      dataObj.imagery = fileArr;
+      templateService.holdScanImageList = dataObj; //hold the list of urls for the x-ray files.
+      ModalService.showModal({
+          templateUrl: 'X-ray-view.html',
+          controller: "viewXRayFilesController"
+      }).then(function(modal) {
+          modal.element.modal();
+          modal.close.then(function(result) {
+             
+          });
+      });
+    }
+
+    //this fuction takes care of the doctor's prescription within the patient test result.
+    $scope.prescribe = function(testData){
+      console.log(testData)
+    }
+
+
+}]);
+
+//this controller controls the form filled by the doctor when creating new session for a selected patient above.
+app.controller("fromModalSessionController",["$scope","$http","$window","localManager","templateService",
+  function($scope,$http,$window,localManager,templateService){
+  $scope.patient = {};
+  var date = new Date();
+  $scope.patient.date = date;      
+  $scope.patient.patient_id = templateService.holdId;
+  $scope.patient.typeOfSession = "In-person meeting"; 
+
+  $scope.createSession = function () {
+    $http({
+      method  : 'POST',
+      url     : "/doctor/patient-session",
+      data    : $scope.patient,
+      headers : {'Content-Type': 'application/json'} 
+      })
+    .success(function(data) {   
+      if(data.success === "success") {
+        $scope.patient.diagnosis = connectObj;
+        $scope.patient.session_id = data.session_id;
+        localManager.setValue("heldSessionData",$scope.patient);
+        $window.location.href = "/treatment";
+      } else {
+        alert("Error occured while creating this treatment session")
+      }
+    });
+
+    var connectObj = {
+      presenting_complain: $scope.patient.complain,
+      history_of_presenting_complain: $scope.patient.historyOfComplain,
+      past_medical_history: $scope.patient.pastMedicalHistory,
+      social_history: $scope.patient.socialHistory,
+      family_history: $scope.patient.familyHistory,
+      drug_history: $scope.patient.drugHistory,
+      summary: $scope.patient.summary,
+      provisional_diagnosis: $scope.patient.provisionalDiagnosis,
+    }
+
+  }
+
+}]);
+
+app.controller("viewXRayFilesController",["$scope","$http","$window","localManager","templateService",
+  function($scope,$http,$window,localManager,templateService){
+    var fileUrl = templateService.holdScanImageList.imagery;
+    var files = {};
+    files.index = 0
+    $scope.image = fileUrl[files.index];
+    $scope.report = templateService.holdScanImageList.report;
+
+    $scope.finishNex = true;
+    $scope.previous = function() {      
+      files.index--;
+      if(files.index > 0) {
+        $scope.finishPre = true;
+        $scope.finishNex = true;
+      } else {
+        $scope.finishPre = false;
+      }
+      $scope.image = fileUrl[files.index];
+    }
+
+    $scope.next = function() {
+      files.index++;
+      if(files.index === fileUrl.length - 1) {
+        $scope.finishNex = false;
+      } else {
+        $scope.finishNex = true;
+        $scope.finishPre = true;
+      }
+      $scope.image = fileUrl[files.index];
+    }
 }]);
 
 app.controller("communicationDoctorController",["$scope","localManager",function($scope,localManager){
@@ -2810,8 +3667,7 @@ app.controller("VideoDiagnosisController",["$scope","$location","$window","$http
         data    : patient,
         headers : {'Content-Type': 'application/json'} 
         })
-      .success(function(data) {
-        console.log(data)      
+      .success(function(data) { 
         $scope.patientInfo = data;
         patient.prescriptionId = random;
         patient.patient_id = patient.id;    
@@ -2969,7 +3825,7 @@ app.controller("pharmacyCenterNotificationController",["$scope","$location","$ht
       url     : "/pharmacy/get-referral",      
       headers : {'Content-Type': 'application/json'} 
       })
-    .success(function(data) {      
+    .success(function(data) {
       templateService.holdPharmacyReferralData = data.referral;
       localManager.setValue("pharmacyData",data.referral);
   }); 
@@ -3009,6 +3865,7 @@ app.controller("pharmacyCenterNotificationController",["$scope","$location","$ht
       listObj.profile_pic_url = data.pharmacy.patient_profile_pic_url;
       listObj.ref = data.ref_id;
       listObj.date = data.date;
+      console.log(typeof data.ref_id)
       var toStr = data.ref_id.toString();
       if(!templateService.checkInTheList.hasOwnProperty(toStr)) {      
         templateService.checkInTheList[toStr] = true;
@@ -3092,7 +3949,6 @@ app.controller("checkingOutPatientController",["$scope","$location","templateSer
         var pageUrl = "/pharmacy/view-prescription/" + id;
         localManager.setValue("currPageForPharmacy",pageUrl); 
         $location.path(pageUrl);
-
       } 
     }); 
   }
@@ -3104,8 +3960,14 @@ app.controller("checkingOutPatientController",["$scope","$location","templateSer
     $location.path(pageUrl);
   }
 
-  $scope.pendingList = templateService.holdList;
+  $scope.viewRadioTest = function(id){
+    templateService.holdId = id;
+    var pageUrl = "/radiology/view-test/" + id;
+    localManager.setValue("currPageForRadiology",pageUrl);
+    $location.path(pageUrl);
+  }
 
+  $scope.pendingList = templateService.holdList;
 
 }]);
 
@@ -3201,31 +4063,33 @@ app.controller("labCenterNotificationController",["$scope","$location","$http","
       headers : {'Content-Type': 'application/json'} 
       })
     .success(function(data) {
+      console.log(data)
       templateService.holdLaboratoryReferralData = data;
       localManager.setValue("laboratoryData",data);
   }); 
 
-    $scope.logout = function () {
-      localManager.removeItem("userInfo");
-      localManager.removeItem("currentPage");
-      localManager.removeItem("currentPageForPatients");
-      localManager.removeItem("currPageForPharmacy");
-      localManager.removeItem("currPageForLaboratory");
-      localManager.removeItem("laboratoryData");
-      localManager.removeItem("deletedNotifications")
-       $http({
-          method  : 'GET',
-          url     : "/user/logout",
-          headers : {'Content-Type': 'application/json'} 
-          })
-        .success(function(data) {
-          $scope.userData = data;
-          $window.location.href = '/';
-       });
-    }
+  $scope.logout = function () {
+    localManager.removeItem("userInfo");
+    localManager.removeItem("currentPage");
+    localManager.removeItem("currentPageForPatients");
+    localManager.removeItem("currPageForPharmacy");
+    localManager.removeItem("currPageForLaboratory");
+    localManager.removeItem("laboratoryData");
+    localManager.removeItem("deletedNotifications")
+     $http({
+        method  : 'GET',
+        url     : "/user/logout",
+        headers : {'Content-Type': 'application/json'} 
+        })
+      .success(function(data) {
+        $scope.userData = data;
+        $window.location.href = '/';
+     });
+  }
     //this fn gets all notification from the back end and adds to the attendance list. this is similar to toList fn jst that instead of 
   //adding patients to the list one by one you simply all add all together.
   $scope.addAllNote = function(){
+    console.log(templateService.holdLaboratoryReferralData)
     templateService.holdLaboratoryReferralData.forEach(function(data){
       if(!data.laboratory.attended || data.laboratory.attended === false) {
         var listObj = {};
@@ -3254,7 +4118,6 @@ app.controller("labCenterNotificationController",["$scope","$location","$http","
     var elementPos = reverseNote.map(function(x) {return x.ref_id; }).indexOf(id);    
     var deleted = reverseNote.splice(elementPos,1);
     deletedNote.push(deleted[0])
-    console.log(deletedNote)
     localManager.setValue("deletedNotifications",deletedNote); 
   }
 
@@ -3264,8 +4127,7 @@ app.controller("labCenterNotificationController",["$scope","$location","$http","
       url     : "/center/notification",
       headers : {'Content-Type': 'application/json'} 
       })
-    .success(function(data) {
-      console.log(data)      
+    .success(function(data) {     
       for(var i = data.length - 1; i >= 0; i--) {
         reverseNote.push(data[i]);
       }
@@ -3351,7 +4213,7 @@ app.controller("labTestControler",["$scope","$location","$http","templateService
    
     //this deletes the view notiication after the center have viewed it.
     var deleted = localManager.getValue("deletedNotifications");
-    console.log(deleted)
+
     if(localManager.getValue("deletedNotifications") !== null) {
       $http({
         method  : 'DELETE',
@@ -3372,9 +4234,7 @@ app.controller("labTestControler",["$scope","$location","$http","templateService
     var refId = templateService.holdId || convertToInt;
    
     var elementPos = laboratoryData.map(function(x) {return x.ref_id; }).indexOf(refId);
-    var objectFound = laboratoryData[elementPos];
-
-    console.log(objectFound)
+    var objectFound = laboratoryData[elementPos];    
 
     var holdInitialTestToRun = objectFound.laboratory.test_to_run;
     $scope.refInfo = objectFound;
@@ -3655,8 +4515,9 @@ app.controller("radioCenterDashboardController",["$scope","$location","$http","t
     if(currPage) {
      $location.path(currPage);
     } else {
-      $location.path("/referral/radiology-test");
+     $location.path("/referral/radiology-test");
     }
+
     $scope.attendanceList = templateService.holdList;
 
 }]);
@@ -3681,6 +4542,7 @@ app.controller("radioCenterNotificationController",["$scope","$location","$http"
       localManager.removeItem("currPageForPharmacy");
       localManager.removeItem("currPageForLaboratory");
       localManager.removeItem("laboratoryData");
+      localManager.removeItem("radiologyData");
       localManager.removeItem("deletedNotifications");
       localManager.removeItem("currPageForRadiology");
        $http({
@@ -3696,20 +4558,22 @@ app.controller("radioCenterNotificationController",["$scope","$location","$http"
     //this fn gets all notification from the back end and adds to the attendance list. this is similar to toList fn jst that instead of 
   //adding patients to the list one by one you simply all add all together.
   $scope.addAllNote = function(){
+   
     templateService.holdRadiologyReferralData.forEach(function(data){
-      if(!data.radiology.attended || data.radiology.attended === false) {
-        var listObj = {};
-        listObj.firstname = data.radiology.patient_firstname;
-        listObj.lastname = data.radiology.patient_lastname;
-        listObj.profile_pic_url = data.radiology.patient_profile_pic_url;
-        listObj.ref = data.ref_id;
-        listObj.date = data.date;
-        var toStr = data.ref_id.toString();
-        if(!templateService.checkInTheList.hasOwnProperty(toStr)) {      
-          templateService.checkInTheList[toStr] = true;
-          templateService.holdList.push(listObj);
+      if(!data.laboratory)
+        if(!data.radiology.attended || data.radiology.attended === false) {
+          var listObj = {};
+          listObj.firstname = data.radiology.patient_firstname;
+          listObj.lastname = data.radiology.patient_lastname;
+          listObj.profile_pic_url = data.radiology.patient_profile_pic_url;
+          listObj.ref = data.ref_id;
+          listObj.date = data.date;
+          var toStr = data.ref_id.toString();
+          if(!templateService.checkInTheList.hasOwnProperty(toStr)) {      
+            templateService.checkInTheList[toStr] = true;
+            templateService.holdList.push(listObj);
+          }
         }
-      }
     });
   }
 
@@ -3722,9 +4586,9 @@ app.controller("radioCenterNotificationController",["$scope","$location","$http"
     localManager.setValue("currPageForRadiology",pageUrl);
     $location.path(pageUrl);
     var elementPos = reverseNote.map(function(x) {return x.ref_id; }).indexOf(id);    
-    var deleted = reverseNote.splice(elementPos,1);
+    var deleted = reverseNote.splice(elementPos,1); 
     deletedNote.push(deleted[0]);
-    localManager.setValue("deletedNotifications",deletedNote); 
+    localManager.setValue("deletedNotifications",deletedNote);
   }
 
  
@@ -3783,20 +4647,19 @@ app.controller("radioReferredPatientController",["$scope","$location","$http","t
 
   var typeOfSearch = function(criteria) {     
     $http({
-          method  : 'PUT',
-          url     : "/radiology/find-patient/scan-test",
-          data    : criteria,
-          headers : {'Content-Type': 'application/json'} 
-          })
-        .success(function(response) { 
-          console.log(response)  
-          $scope.patient = {};
-          if(response.data) {
-            $scope.test = response.data;            
-          } else {
-            $scope.error = response.error;
-          }
-      });
+        method  : 'PUT',
+        url     : "/radiology/find-patient/scan-test",
+        data    : criteria,
+        headers : {'Content-Type': 'application/json'} 
+        })
+      .success(function(response) { 
+        $scope.patient = {};
+        if(response.data) {
+          $scope.test = response.data;            
+        } else {
+          $scope.error = response.error;
+        }
+    });
   }
 
   $scope.viewLabTest = function(id){
@@ -3815,12 +4678,12 @@ app.controller("radioCenterPanelController",["$scope","$location","$http","templ
     }
 }]);
 
-app.controller("radioTestControler",["$scope","$location","$http","templateService","localManager","ModalService",
-  function($scope,$location,$http,templateService,localManager,ModalService) {
+app.controller("radioTestControler",["$scope","$location","$http","templateService","localManager","ModalService","multiData",
+  function($scope,$location,$http,templateService,localManager,ModalService,multiData) {
    
     //this deletes the view notiication after the center have viewed it.
     var deleted = localManager.getValue("deletedNotifications");
-    console.log(deleted)
+    
     if(localManager.getValue("deletedNotifications") !== null) {
       $http({
         method  : 'DELETE',
@@ -3934,6 +4797,9 @@ app.controller("radioTestControler",["$scope","$location","$http","templateServi
     $scope.refInfo.radiology.conclusion = $scope.lab.conclusion;
     $scope.refInfo.radiology.test_to_run = holdInitialTestToRun;
     $scope.refInfo.radiology.date = date;
+    $scope.refInfo.radiology.filesUrl = templateService.holdScanImageList;
+
+    
     $http({
       method  : 'PUT',
       url     : "/radiology/test-result/session-update",
@@ -3955,6 +4821,13 @@ app.controller("radioTestControler",["$scope","$location","$http","templateServi
 
     //console.log($scope.refInfo.laboratory.test_to_run)
     //alert("result sent to " + "Dr " + $scope.refInfo.referral_firstname + " " + $scope.refInfo.referral_lastname)
+  }
+
+  $scope.radio = {}
+  $scope.upload = function(){
+    var arr = $scope.radio.scanImage;
+    $scope.radio.ImageId = $scope.refInfo.ref_id;
+    multiData.sendPic("/radiology/upload-scan",arr);
   }
 
   function combineTest(testArray) {
@@ -4108,6 +4981,24 @@ app.controller("radiologySelectedRadioController",["$scope","$http","localManage
 
 }]);
 
+app.directive('myIframe', function(){
+  var linkFn = function(scope, element, attrs) {
+      element.find('iframe').bind('load', function (event) {
+        event.target.contentWindow.scrollTo(0,400);
+      });
+  };
+  return {
+    restrict: 'EA',
+    scope: {
+      src:'@src',
+      height: '@height',
+      width: '@width',
+      scrolling: '@scrolling'
+    },
+    template: '<iframe class="frame" height="{{height}}" width="{{width}}" frameborder="0" border="0" marginwidth="0" marginheight="0" scrolling="{{scrolling}}" src="{{src}}"></iframe>',
+    link : linkFn
+  };
+});
 
 
 

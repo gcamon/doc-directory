@@ -216,12 +216,13 @@
                           <div class="row">
                             <div class="col-sm-12 col-md-12 col-lg-12">
                               <ul>
-                                <li><strong>Complaint :</strong> {{}}</li>
-                                <li><strong>History of complain : </strong>{{}}</li>
-                                <li><strong>Past medical records :</strong>{{}}</li>
-                                <li><strong>Family History : </strong>{{}}</li>
-                                <li><strong>Social history : </strong>{{}}</li>
-                                <li><strong>Provisional Diagnosis : </strong>{{}}</li>                                
+                                <li><strong>Complaint :</strong> <input type="text" style="display:inline" ng-model="sessionData.diagnosis.presenting_complain" placeholder="{{sessionData.diagnosis.presenting_complain}}"></li>
+                                <li><strong>History of complain : </strong><input type="text" placeholder="{{sessionData.diagnosis.history_of_presenting_complain}}" ng-model="sessionData.diagnosis.history_of_presenting_complain"></li>
+                                <li><strong>Past medical history :</strong><input type="text" placeholder="{{sessionData.diagnosis.past_medical_history}}" ng-model="sessionData.diagnosis.past_medical_history"></li>
+                                <li><strong>Family History : </strong><input type="text" placeholder="{{sessionData.diagnosis.family_history}}" ng-model="sessionData.diagnosis.family_history"></li>
+                                <li><strong>Social history : </strong><input type="text" style="display:inline" placeholder="{{sessionData.diagnosis.social_history}}" ng-model="sessionData.diagnosis.social_history"></li>
+                                <li><strong>Summary : </strong><input type="text" style="display:inline" placeholder="{{sessionData.diagnosis.summary}}"ng-model="sessionData.diagnosis.summary"></li>
+                                <li><strong>Provisional Diagnosis : </strong><input type="text" placeholder="{{sessionData.diagnosis.provisional_diagnosis}}" ng-model="sessionData.diagnosis.provisional_diagnosis"></li>                                 
                               </ul>
                             </div>
                           </div>
@@ -231,13 +232,16 @@
                             <div class="col-sm-12 col-md-12 col-lg-12">
                               <h3>Physical Examination</h3>
                               <ul>
-                                <li><strong>General Examination : </strong> <textarea placeholder="Write report..."></textarea></li>
-                                <li><strong>Systemic Examination : </strong> <textarea placeholder="Write report..."></textarea></li>
-                                <li><strong>Diagnosis : </strong> <textarea placeholder="Write report..."></textarea></li>
+                                <li><strong>General Examination : </strong> <textarea placeholder="{{sessionData.diagnosis.general_examination}}" ng-model="sessionData.diagnosis.general_examination"></textarea></li>
+                                <li><strong>Systemic Examination : </strong> <textarea placeholder="{{sessionData.diagnosis.systemic_examination}}" ng-model="sessionData.diagnosis.systemic_examination"></textarea></li>
+                                <li><strong>Final diagnosis : </strong> <textarea placeholder="{{sessionData.diagnosis.final_diagnosis}}" ng-model="sessionData.diagnosis.final_diagnosis"></textarea></li>
                               </ul>
                             </div>
                           <div>
                         </section>
+                        <div style="text-align: right; margin-top: 20px">
+                            <button ng-click="saveChanges()" ng-if="isChanges">Save Changes</button>
+                        </div>
                         <section id="investigations">
                           <div class="row">
                             <div class="col-sm-12 col-md-12 col-lg-12">
@@ -320,13 +324,90 @@
                             <div class="col-sm-12 col-md-12 col-lg-12">
                               <h3>Treatment</h3>
                               <ul>
-                                <li><button>Pharmaceutical</button></li>
-                                <li><button>Surgery</button></li>
-                                <li><button>Physiotherapy</button></li>
-                                <li><button>Others</button></li>
+                                <li><button ng-click="pharmacy()">Pharmaceutical</button></li>
+                                <li><button ng-click="surgery()">Surgery</button></li>
+                                <li><button ng-click="physiotherapy()">Physiotherapy</button></li>
+                                <li><button ng-click="other()">Others</button></li>
                               </ul>
                             </div>
-                          <div>
+                          <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12">
+                                <div ng-if="isPharmacy">
+                                    <h3 style="text-align: center; border-bottom: 1px solid green">Treatment by pharmaceutical</h3>
+                                    <diV style="text-align: center">
+                                        <button ng-click="viewOld()">View Previous prescriptions</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                                        <button ng-click="writeNew()">Write new prescrptions</button>
+                                    </div> 
+                                    <div ng-if="isNewPrescription">
+                                                    
+                                        <table>
+                                            <tr>
+                                                <thead>
+                                                    <th><strong>S/N</strong></th>
+                                                    <th><strong>Drug name</strong></th>
+                                                    <th><strong>Dosage</strong></th>
+                                                    <th><strong>Frequency</strong></th>
+                                                    <th><strong>Duration</strong></th>
+                                                </thead>
+                                            </tr>
+                                            <tr>
+                                                <tbody ng-repeat="prescription in drugList">                                
+                                                    <td>{{prescription.sn}}</td>
+                                                    <td><textarea ng-model="prescription.drug_name" style="max-width: 200px;max-height: 80px"></textarea></td>
+                                                    <td><input type="text" ng-model="prescription.dosage"></td>
+                                                    <td><input type="text" ng-model="prescription.frequency"></td>
+                                                    <td><input type="text" ng-model="prescription.duration"></td>
+                                                </tbody>
+                                            </tr>                       
+                                        </table>
+                                        <div style="text-align: right">
+                                                <i class="fa fa-plus" style="font-size:16px;color:green;padding: 10px; cursor:pointer; margin-right: 5px" title="Add field" ng-click="addDrug()"></i>
+                                                    <i class="fa fa-minus" style="font-size:16px;color:green;padding: 10px; cursor:pointer; margin-right: 5px" title="Remove last field" ng-click="removeDrug()"></i>
+                                            </div>
+                                        <div> 
+                                            <button ng-click="toPatient()">Forward prescription to patient</button>
+                                            <button ng-click="toPharmacy()">Forward prescription to a Phamarcy</button>
+                                        </div>                          
+                                    </div>
+                                    <div ng-if="isOldPrescription">
+                                        <h3>List of previous prescriptions<h3>
+                                        <table ng-repeat="prescription in wroteByThisDoctor" style="font-size: 14px">
+                                            <caption style="border-bottom: 1px dashed rgba(0,0,0,0.3)"></caption>
+                                            <caption><strong>Date</strong>| {{prescription.date | date: "mediumDate"}}</caption>
+                                            <caption><strong>Time</strong>| {{prescription.date| date: "mediumTime"}}</caption>
+                                            <tr>
+                                                <thead>
+                                                    <th><strong>S/N</strong></th>
+                                                    <th><strong>Drug name</strong></th>
+                                                    <th><strong>Dosage</strong></th>
+                                                    <th><strong>Frequency</strong></th>
+                                                    <th><strong>Duration</strong></th>
+                                                </thead>
+                                            </tr>
+                                            <tr>
+                                                <tbody ng-repeat= "drug in prescription.prescription_body">                             
+                                                    <td>{{drug.sn}}</td>
+                                                    <td>{{drug.drug_name}}</td>
+                                                    <td>{{drug.dosage}}</td>
+                                                    <td>{{drug.frequency}}</td>
+                                                    <td>{{drug.duration}}</td>
+                                                </tbody>
+                                            </tr>
+                                                                    
+                                        </table>                    
+                                    </div>
+                                </div>
+                                <div ng-if="isSurgery">
+                                    <h1>Surgery</h1>
+                                </div>
+                                <div ng-if="isPhysiotherapy">
+                                    <h1>physio</h1>
+                                </div>
+                                <div ng-if="isOther">
+                                    <h1>Other</h1>
+                                </div>
+                            </div>
+                          </div>                          
                         </section>
                     </div>
                 </div>

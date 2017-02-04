@@ -227,6 +227,24 @@
 						</div>
                         <div class="col-xs-8 col-md-4">                            
                             <ul class="notify">
+                              <li class="noti chat notify-icon">                                  
+                                  <i class="icon-Pills" style="font-size:24px;color:rgba(0,180,0,0.8);position:relative"><span style="display:inline-block;width:24px;height:24px;background-color:#fff;left: 15px; top:-23px; border-radius: 15px;
+                                        position:absolute;text-align:center;color:#000;" ng-if="isNew">{{len}}
+                                      </span></i>
+
+                                  <ul class="all-notify" style="left: -100px; top: 45px">
+                                      <li><h5 style="text-align:center">Prescription Request</h5></li>
+                                      <li ng-if="noRequest">{{noRequest}}</li>
+                                      <li ng-repeat="request in allRequest" ng-click="viewPatient(request.sender_id)" style="cursor:pointer;border-bottom: 1px solid #000">
+                                        <img ng-src="{{request.sender_profile_pic_url}}" style="width:32px;height:32px">
+                                        <span>{{request.sender_firstname}}</span>
+                                        <span>{{request.sender_lastname}}</span>
+                                        <span><small>{{request.date_sent | date : "mediumDate"}}</small></span>
+                                        <span><small>{{request.date_sent | date : "mediumTime"}}</small></span>
+                                      </li>
+                                      
+                                  </ul>
+                                </li>
                                 <li class="noti note notify-icon">
                                     <i class="fa fa-bell-o" style="font-size:24px;color:rgba(0,180,0,0.8);position:relative"><span style="display:inline-block;width:24px;height:24px;background-color:#fff;left: 15px; top:-23px; border-radius: 15px;
                                         position:absolute;text-align:center;color:#000;" ng-if="<%= person.doctor_notification.length %> > 0 "><%= person.doctor_notification.length %></span></i>
@@ -234,7 +252,8 @@
                                         <li> <h6 style="text-align: center">Notification(s)</h6> </li>
                                         <% for(var i = person.doctor_notification.length -1; i >= 0; i--) { %>
                                             <li class="note-field" ng-click="viewNote('<%= person.doctor_notification[i].doctor_id %>')">                                                
-                                                <img src="<%= person.doctor_notification[i].doctor_profile_pic_url %>" style="width: 50px; height: 50px">
+                                                <img src="<%= person.doctor_notification[i].doctor_profile_pic_url %>" style="width: 50px; 
+                                                height: 50px">
                                                 <div>{{getData("<%= person.doctor_notification[i].doctor_firstname%>","<%= person.doctor_notification[i].doctor_lastname %>","<%= person.doctor_notification[i].date %>","<%= person.doctor_notification[i].doctor_profile_pic_url %>","<%= person.doctor_notification[i].consultation_fee %>","<%= person.firstname %>","<%= person.ewallet.available_amount %>","<%= person.doctor_notification[i].doctor_id %>","<%= person.doctor_notification[i].service_access %>","<%= person.doctor_notification[i].doctor_specialty %>")}}</div>
                                                 <span>{{convertDate('<%= person.doctor_notification[i].date %>')}}</span>    
 
@@ -244,17 +263,7 @@
                                         <% } %>
 
                                     </ul>
-                                </li>
-                                <li class="noti chat notify-icon">
-                                    <i class="fa fa-commenting-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
-                                    <ul class="all-notify">
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                    </ul>
-                                </li>
+                                </li>                                
                                 <li class="noti video notify-icon">
                                     <i class="fa fa-phone" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
                                     <ul class="all-notify">
@@ -300,7 +309,10 @@
 								</div>
 								<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 tg-expectwidth">
 								<div class="row">									
-                                <aside id="tg-sidebar">                            
+                                <aside id="tg-sidebar">
+                                <div style="padding: 10px; background-color: grey">
+                                    <span style="color:#fff"><i class="fa fa-user-plus" style="font-size: 22px"> Add new patient</i></span>
+                                </div>                            
                                 <div class="tg-widget tg-tab-widget" ng-controller="checkingOutDoctorController">
                                 <h3>My Patients</h3>
                                 <div>
@@ -345,6 +357,7 @@
 							</div>
 							</div>
 							<div class="tg-graph tg-haslayout">
+
 								<div class="tg-profilehits">
 									<div class="tg-heading-border tg-small">
 										<h3>Profile Hits</h3>
@@ -375,6 +388,7 @@
 									</div>
 								</div>
 								<div class="col-lg-8 col-md-6 col-sm-12 col-xs-12">
+                                    <span><i class="fa fa-user-plus" style="font-size: 22px; color:green"> Add patient</i></span>
 									<!--<div class="tg-costumerreview">
 										<div class="tg-heading-border tg-small">
 											<h3>Customer Reviews</h3>
@@ -786,12 +800,104 @@
 						</fieldset>
 					</form>
 				</div>
+
 			</div>
 		</div>
 	</div>
 	<!--************************************
 		Sign In Sign Up Light Box End
 	*************************************-->
+        <script type="text/ng-template" id="quickFillComplaint.html" ng-controller="fromModalSessionController">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>                                     
+              </div>
+              
+              <div class="modal-body">                                                   
+                    <form class="tg-form-modal tg-form-signin">                        
+                        <fieldset>
+                            <h6 style="text-align: center">Complete the fields below</h6>
+                            <div>
+                                <label>Complaint: </label>
+                                <textarea  placeholder="write.." ng-model="patient.complain" ></textarea>
+                            </div>
+                            <div>
+                                <label>History of the complain: </label>
+                                <textarea placeholder="write.." ng-model="patient.historyOfComplain"></textarea>
+                            </div>
+                            <div>
+                                <label>Past medical history: </label>
+                                <textarea placeholder="write.." ng-model="patient.pastMedicalHistory"></textarea>
+                            </div>
+                            <div>
+                                <label>Social history: </label>
+                                <textarea placeholder="write.." ng-model="patient.socialHistory"></textarea>
+                            </div>
+                            <div>
+                                <label>Family history: </label>
+                                <textarea placeholder="write.." ng-model="patient.familyHistory"></textarea>
+                            </div>
+                            <div>
+                                <label>Drug history: </label>
+                                <textarea placeholder="write.." ng-model="patient.drugHistory"></textarea>
+                            </div>
+                            <div>
+                                <label>Summary: </label>
+                                <textarea placeholder="write.." ng-model="patient.summary"></textarea>
+                            </div>
+                            <div>
+                                <label>Provisional Diagnosis: </label>
+                                <textarea placeholder="write.." ng-model="patient.provisionalDiagnosis"></textarea>
+                            </div>
+                        </fieldset>
+                    </form>
+                    <div style="text-align:right">
+                      <button style="color:#fff;padding:10px 20px;background-color:green" ng-click="createSession()">Proceed to treatment</button>
+                    </div>                        
+              </div>
+              
+            </div>
+          </div>
+        </div>
+     </script>
+    
+     <script type="text/ng-template" id="X-ray-view.html" ng-controller="viewXRayFilesController">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true" style="color:red;font-size: 32px">&times;</button>
+                </div>                                     
+              </div>
+              
+              <div class="modal-body" style="text-align:center">
+                    <div>
+                      <h6>Report</h6>
+                      <ul style="margin-bottom: 30px;">
+                        <ol ng-repeat="detail in report"><strong>{{detail.name}}:</strong> {{detail.data}}</ol>
+                      </ul>
+                    </div>                                               
+                    <div>                      
+                      <img ng-src="{{image}}" alt="x-ray image">
+                    </div>
+                    <div style="margin-top: 30px">
+                      <i class="fa fa-arrow-left" aria-hidden="true" style="color:#fff;padding:10px 20px;background-color:green;cursor:pointer" ng-click="previous()" title="Previous" ng-if="finishPre"></i>
+                      &nbsp;&nbsp;
+                      <i class="fa fa-arrow-right" aria-hidden="true" style="color:#fff;padding:10px 20px;background-color:green;cursor:pointer" ng-click="next()" title="Next" ng-if="finishNex"></i>
+                    </div>                        
+              </div>
+              
+            </div>
+          </div>
+        </div>
+     </script>
 		
         <script src="/assets/js/vendor/jquery-library.js"></script>
         <script src="/assets/js/vendor/bootstrap.min.js"></script>

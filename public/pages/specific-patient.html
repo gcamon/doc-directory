@@ -25,7 +25,7 @@
 				<div>
 					<span style="font-size: 24px; font-weight: 100">Contact Through: </span>
 					<i class="fa fa-phone" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px" title="Make an audio call to this patient"></i>				
-					<i class="fa fa-desktop" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px" title="Video chat with this patient" ng-click="makeVideoCall()"></i>	
+					<i class="fa fa-video-camera" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px" title="Video chat with this patient" ng-click="makeVideoCall()"></i>	
 					<i class="fa fa-comments" style="font-size:32px;color:green;padding: 20px; cursor:pointer" title="Chat with this patient"></i>			
 				</div>			
 			</div>
@@ -33,24 +33,39 @@
 	</div>
 	<div class="row">
 		<div class="col-sm-12 col-md-2 col-lg-2 pull-right" style="border-left: 1px solid rgba(0,0,0,0.2)">
+			
+			<div>
+				<span ng-click="viewSession()" style="cursor:pointer"><i class="fa fa-folder-open" style="font-size:32px;color:rgba(0,150,0,0.9); cursor:pointer;margin-bottom:10px" title="View sessions held with this patient"></i></span>
+			</div>
 			<div>
 				<span ng-click="writePrescription()" style="cursor:pointer"><i class="icon-Pills icon-style" title="Write prescription for this patient"></i></span>
 			</div>
 			<div style="margin-top: 10px">
 				<span ng-click="viewMedicalHistory()" style="cursor:pointer"><i class="icon-FirstAidKit icon-style" title="View patient's medical record"></i></span>				
 			</div>
-			<div style="margin-top: 10px">
-				<span ng-click="viewMedical()" style="cursor:pointer"><i class="fa fa-flask" title="View patient's medical record"
-					style="font-size:32px;color:rgba(0,150,0,0.9); cursor:pointer"></i></span>	
+			<div style="margin-top: 20px">
+				<i class="fa fa-flask" title="Patient recent laboratory test for your prescription"
+					style="font-size:32px;color:rgba(0,150,0,0.9); cursor:pointer;position:relative" ng-click="viewLabPrescriptionRequest()">
+					<span style="display:inline-block;width:18px;height:18px;background-color:red;left: 15px; top:-15px; border-radius: 15px;
+                    position:absolute;text-align:center;color:#fff;font-size:16px" ng-if="labPrescriptionReq.length > 0">{{labLen}}
+                  </span>
+				</i>	
 
+			</div>
+			<div style="margin-top: 20px">
+			<i class="fa fa-flask" title="Patient recent laboratory test for your prescription"
+					style="font-size:32px;color:rgba(0,150,0,0.9); cursor:pointer;position:relative" ng-click="viewRadioPrescriptionRequest()">
+					<span style="display:inline-block;width:18px;height:18px;background-color:red;left: 15px; top:-15px; border-radius: 15px;
+                    position:absolute;text-align:center;color:#fff;font-size:16px" ng-if="radioPrescriptionReq.length > 0">{{radioLen}}
+                  </span>
+				</i>
 			</div>
 			
 		</div>
 		<div class="col-sm-12 col-md-10 col-lg-10">
 			<div class="prescriptionArea" ng-if="isToPrescribe" style="border-top: 1px solid rgba(0,0,0,0.4)">
 				<h6 style="cursor:pointer;text-decoration:underline" ng-click="writeNew()">Write new prescription</h6>
-				<div ng-if="isNewPrescription">
-					
+				<div ng-if="isNewPrescription">					
 					<table>
 						<tr>
 							<thead>
@@ -110,6 +125,62 @@
 			</div>
 			<div class="medical-record-Area" ng-if="isToSeeRecord" style="border-top: 1px solid rgba(0,0,0,0.4)">
 				<h3>Hey iam record</h3>
+			</div>
+			<div class="medical-record-Area" ng-if="isToViewSession" style="border-top: 1px solid rgba(0,0,0,0.4)">
+				<h3 style="text-align: center">Treatment sessions</h3>
+				<aside style="text-align: right">
+					<button ng-click="createNewSession()" style="box-shadow:1px 2px 3px grey">
+						Create new
+					</button>
+				</aside>
+				<h5>Most recent</h5>
+				<article ng-click="viewTreatmentSession(recentSession)" style='padding: 10px; cursor:pointer;margin-bottom: 10px;box-shadow: 1px 5px 5px rgba(0,0,0,0.5);color:green'>
+					<span>{{recentSession.date | date : "mediumDate" }}</span> <span style="padding-left: 20px">{{recentSession.diagnosis.presenting_complain}}</span>
+				</article>
+				<h5>others</h5>
+				<article ng-repeat = "session in sessionData" ng-click="viewTreatmentSession(session)" style='padding: 10px; cursor:pointer;margin-bottom: 10px;box-shadow: 1px 5px 5px rgba(0,0,0,0.5);color:green'>
+					<span>{{session.date | date : "mediumDate" }}</span> <span style="padding-left: 20px">{{session.diagnosis.presenting_complain}}</span>
+				</article>
+			</div>
+			<div class="medical-record-Area" ng-if="isToViewLabPrescriptionReq" style="border-top: 1px solid rgba(0,0,0,0.4)">	
+				<section ng-repeat="test in labPrescriptionReq" style="border-bottom: 1px solid #000; margin-bottom: 10px">
+					<h5 style="text-align:center">{{test.center_name}} 
+					<span style="display:block;color:#000;font-size:12px">{{test.center_address}} {{test.cente_city}} {{test.center_country}}</span></h5>
+					<div style="text-align:right">
+						<small>Date sent: {{test.date_sent | date: "mediumDate"}} | Time: {{test.date_sent | date: "mediumTime"}}</small>
+					</div>
+
+					<h6>Test Result</h6>					
+					<ul>						
+						<li ng-repeat="report in test.test_result"><strong>{{report.name}} :</strong>  {{report.data}}</li>
+					</ul>
+					<article><strong>Conclusion :</strong> {{test.conclusion}}</article>
+					<div style="text-align: right">
+						<i class="fa fa-file-image-o" title="View X-Ray files associated with this test result" ng-if="test.files.length > 0"
+						style="font-size:24px;color:rgba(0,150,0,0.9); cursor:pointer;margin:20px 10px" ng-click="viewFile()"></i>
+						<i class="icon-Pills icon-style" title="Write prescription based on this test result" style="cursor:pointer" ng-click="prescribe(test)"></i>
+					</div>
+				</section>
+			</div>
+			<div class="medical-record-Area" ng-if="isToViewRadPrescriptionReq" style="border-top: 1px solid rgba(0,0,0,0.4)">
+				<section ng-repeat="test in radioPrescriptionReq" style="border-bottom: 1px solid #000; margin-bottom: 10px">
+					<h5 style="text-align:center">{{test.center_name}} 
+					<span style="display:block;color:#000;font-size:12px">{{test.center_address}} {{test.cente_city}} {{test.center_country}}</span></h5>
+					<div style="text-align:right">
+						<small>Date sent: {{test.date_sent | date: "mediumDate"}} | Time: {{test.date_sent | date: "mediumTime"}}</small>
+					</div>
+
+					<h6>Test Result</h6>					
+					<ul>						
+						<li ng-repeat="report in test.test_result"><strong>{{report.name}} :</strong>  {{report.data}}</li>
+					</ul>
+					<article><strong>Conclusion :</strong> {{test.conclusion}}</article>
+					<div style="text-align: right">
+						<i class="fa fa-file-image-o" title="View files associated with this test result" ng-if="test.files.length > 0"
+						style="font-size:24px;color:rgba(0,150,0,0.9); cursor:pointer;margin:20px 10px" ng-click="viewFile(test.files,test.test_result)"></i>
+						<i class="icon-Pills icon-style" title="Write prescription based on this test result" style="cursor:pointer" ng-click="prescribe(test)"></i>
+					</div>
+				</section>
 			</div>
 		</div>
 	</div>

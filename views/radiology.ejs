@@ -288,7 +288,7 @@
                                 </form>
                                 <div>
                                     <ul style="height: 600px; overflow-x: auto">
-                                        <li ng-repeat="person in pendingList | filter : lab.list" style="list-style: none; margin-bottom: 10px; border-bottom: 1px dashed rgba(0,0,0,0.3);padding-bottom: 5px; cursor:pointer" ng-click="viewLabTest(person.ref)">
+                                        <li ng-repeat="person in pendingList | filter : lab.list" style="list-style: none; margin-bottom: 10px; border-bottom: 1px dashed rgba(0,0,0,0.3);padding-bottom: 5px; cursor:pointer" ng-click="viewRadioTest(person.ref)">
                                             <img ng-src="{{person.profile_pic_url}}" style="width:32px; height:32px"/>
                                             <span>{{person.firstname}}  {{person.lastname}}<span style="display:block;font-size: 12px">{{person.date | date: "mediumDate" }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{person.date | date: "mediumTime"}}</span></span>                                            
                                         </li>

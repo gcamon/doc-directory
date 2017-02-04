@@ -220,6 +220,15 @@
                         </div>
                         <div class="col-xs-8 col-md-4">                            
                             <ul class="notify">
+                                
+                                <li class="noti chat notify-icon">
+                                    <!--<i class="fa fa-commenting-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>-->
+                                    <strong class="signal" ng-if="isLabP" ng-click="viewLabPending()" style="cursor:pointer" title=" {{labLenPending}} Awaiting lab test result">{{labLenPending}}&nbsp;PLab</strong>
+                                </li>
+                                <li class="noti video notify-icon">
+                                    <!--<i class="fa fa-phone" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>-->
+                                    <strong class="signal" ng-if="isScanP" ng-click="viewRadioPending()" style="cursor:pointer" title=" {{scanLenPending}} Awaiting scan test result">{{scanLenPending}} &nbsp;PScan</strong>
+                                </li>                               
                                 <li class="noti note notify-icon">
                                     <i class="fa fa-bell-o" style="font-size:24px;color:rgba(0,180,0,0.8);position:relative"><span style="display:inline-block;width:24px;height:24px;background-color:#fff;left: 15px; top:-23px; border-radius: 15px;
                                         position:absolute;text-align:center;color:#000;" ng-if="<%= userInfo.patient_notification.length %> > 0 "><%= userInfo.patient_notification.length %></span></i>
@@ -241,27 +250,7 @@
 
                                     </ul>
                                 </li>
-                                <li class="noti chat notify-icon">
-                                    <i class="fa fa-commenting-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
-                                    <ul class="all-notify">
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                    </ul>
-                                </li>
-                                <li class="noti video notify-icon">
-                                    <i class="fa fa-phone" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
-                                    <ul class="all-notify">
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                        <li>hello</li>
-                                    </ul>
-                                </li>
-                                <li class="noti chat">
+                                 <li class="noti chat">
                                     <img src="<%= userInfo.profile_pic_url %>" style= "width:35px;height:35px;border-radius: 20px">
                                     <p style="color:rgba(255,255,255,0.8);
                                     padding-left: 20px"><%= userInfo.firstname %> <%=userInfo.lastname %></p>
@@ -289,12 +278,13 @@
                 <div class="row">
                     <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12 pull-right" ng-controller="inPatientDashboardController">
                         <div class="row">
-                            <div class="col-sm-12 col-md-9 col-lg-9">
+                            <div class="col-sm-12 col-md-9 col-lg-9">                                
                                 <div class="view-animate-container row" >  
                                     <div class="view-animate" ng-view >
                                     </div>
                                 </div>
                             </div>
+                            <!--<my-iframe ng-src="{{link}}" height= "800" width="800">-->
                             <div class="col-sm-12 col-md-3 col-lg-3" style="padding: 0px 3px">
                                 <aside id="tg-sidebar">
                             <!--<div class="tg-heading-border tg-small">
@@ -589,8 +579,11 @@
                                 <ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                     <li class="panel panel-default">
                                         <span ng-click="dashboardhome()"><i class="fa fa-home" style="font-size: 32px; color: rgba(0,100,0,0.7);margin-right: 10px" title="Back to dashboard home"></i></span>
-                                        <span ng-click="viewPrescription()" style="cursor:pointer"><i class="icon-Pills icon-style" title="View all prescriptions"></i></span>
-                                        <span ng-click="viewTreatment()" style="cursor:pointer"><i class="icon-FirstAidKit icon-style" title="View all treatments"></i></i></span>
+                                        <span ng-click="viewPrescription()" style="cursor:pointer" class="indica"><i class="icon-Pills icon-style" title="View all prescriptions"></i><strong class="signal" ng-if="isNew">new</strong></span>
+                                         <span ng-click="viewLabTest()" style="cursor:pointer" class="indica"><strong class="signal">Lab</strong></span>
+                                          <span ng-click="viewScanTest()" style="cursor:pointer" class="indica"><strong class="signal">Scan</strong></span>
+                                         
+                                        <span ng-click="viewTreatment()" style="cursor:pointer"><i class="icon-FirstAidKit icon-style" title="View all treatments"></i></span>
                                     </li>                                 
                                     <li class="panel panel-default active">
                                         <div class="tg-panel-heading" role="tab" id="headingOne">
@@ -602,8 +595,7 @@
                                             <div class="panel-body">
                                                 <ol style="color:rgba(0,110,0,0.8)">
                                                     <% for(var k = 0; k < 1; k++) { %>
-                                                    <li ng-click="viewTreatment()" style="padding: 5px 2px; cursor: pointer">
-                                                                               
+                                                    <li ng-click="viewTreatment()" style="padding: 5px 2px; cursor: pointer">                                                                               
                                                     </li>
                                                     <% } %>                                                     
                                                 </ol>
@@ -620,13 +612,14 @@
                                         </div>
                                         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                                             <div class="panel-body">
-                                                <ol>                                            
-                                                
-                                                    <li ng-click="viewPrescription(prescription.doctor_id)" style="padding: 5px 2px; cursor: pointer" ng-repeat="prescription in filteredPrescriptions">Dr. {{prescription.doctor_firstname}} {{prescription.doctor_lastname}} ({{prescription.count || 0}}) </li>                                              
+                                                <ol>                                           
+                                                    <li ng-click="viewPrescription(prescription.doctor_id)" style="padding: 5px 2px; cursor: pointer" ng-repeat="prescription in filteredPrescriptions">Dr. {{prescription.doctor_firstname}} {{prescription.doctor_lastname}} ({{prescription.count || 0}}) </li>                  
                                                 </ol>
                                             </div>
                                         </div>
                                     </li>
+
+                                    <!-- change all to angularjs -->
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingSix">
                                              <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
