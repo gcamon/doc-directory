@@ -42,9 +42,9 @@ var configuration = function (app,model) {
 	});
 
 	passport.deserializeUser(function(id, done) {
-	model.user.findById(id, function(err, user) {
-		done(err, user);
-	});
+		model.user.findById(id, function(err, user) {
+			done(err, user);
+		});
 	});
 
 }

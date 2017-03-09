@@ -22,6 +22,7 @@
 	<link rel="stylesheet" href="/assets/css/transitions.css">
 	<link rel="stylesheet" href="/assets/css/color.css">
 	<link rel="stylesheet" href="/assets/css/responsive.css">
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/less.js/1.7.5/less.min.js"></script>
 	<script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
 </head>
 <body ng-app = "myApp">
@@ -310,25 +311,24 @@
 								<div class="col-lg-3 col-md-4 col-sm-12 col-xs-12 tg-expectwidth">
 								<div class="row">									
                                 <aside id="tg-sidebar">
-                                <div style="padding: 10px; background-color: grey">
+                                <div style="padding: 10px; background-color: grey; cursor:pointer" ng-click="newPatient()">
                                     <span style="color:#fff"><i class="fa fa-user-plus" style="font-size: 22px"> Add new patient</i></span>
                                 </div>                            
                                 <div class="tg-widget tg-tab-widget" ng-controller="checkingOutDoctorController">
                                 <h3>My Patients</h3>
                                 <div>
                                     <ul style="height: 600px; overflow-x: auto">
-                                        <% if(person.doctor_patients_list.length > 0) { %> 
-                                            <% for(var k =  person.doctor_patients_list.length - 1; k >= 0; k--) { %>
-                                            <li style="list-style-type: none; padding: 10px;border-bottom: 1px dashed rgba(0,0,0,0.2);border-radius: 20px;cursor: pointer" class="clearfix">
-                                                <div style="cursor: pointer;" ng-click="userPatient('<%= person.doctor_patients_list[k].patient_id %>')">                                           
-                                                    <img src="<%= person.doctor_patients_list[k].patient_profile_pic_url %>" style="width:32px;height:32px" alt="image description">
-                                                    <span style="font-size: 12px; padding-left: 10px"> <%= person.doctor_patients_list[k].patient_firstname %> <%= person.doctor_patients_list[k].patient_lastname %> </span>                                                  
+                                        <li><input type="text" placeholder="Filter list by patient name" ng-model="patient.firstname"></li>
+                                        
+                                            <li ng-repeat="patient in patientList | filter : patient.firstname || patient.lastname" style="list-style-type: none; padding: 10px;border-bottom: 1px dashed rgba(0,0,0,0.2);border-radius: 20px;cursor: pointer" class="clearfix">
+                                                <div style="cursor: pointer;" ng-click="userPatient(patient.patient_id)">                                           
+                                                    <img ng-src="{{patient.patient_profile_pic_url }}" style="width:32px;height:32px" alt="image description">
+                                                    <span style="font-size: 12px; padding-left: 10px"> {{patient.patient_firstname}} {{patient.patient_lastname}}</span>                                                  
                                                 </div>
                                                 <div>
                                                 </div>
                                             </li>
-                                            <% } %>
-                                        <% } %>
+                                          
                                     </ul>
                                 </div>
                                 <div class="tg-support">
@@ -532,13 +532,13 @@
                                             </h3>
                                         </div>
                                         <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
-                                            <div class="panel-body">
+                                            <div class="panel-body appointment">
                                                 <ol>
                                                 <% for(var k = 0; k < person.appointment.length; k++) { %>
-                                                <li ng-click="viewAppointment(<%= person.appointment[k].session_id %>)" style="padding: 5px 2px; cursor: pointer"> 
-                                                    <p>{{getDateTime("<%=person.appointment[k].date %>","<%= person.appointment[k].time %>")}}</p>                                                   
+                                                <li ng-click="viewAppointment(<%= person.appointment[k].session_id %>)" style="padding: 5px 2px; cursor: pointer">
+                                                                                                       
                                                     <%= person.appointment[k].firstname %> <%= person.appointment[k].lastname %><br> 
-                                                    <span style="padding-right: 20px">{{date | date : "mediumDate"}}</span> <span>{{ time | date: "mediumTime" }}</span> 
+                                                    <span style="padding-right: 20px">{{"<%=person.appointment[k].date %>" | date : "mediumDate"}}</span> <span>{{ "<%= person.appointment[k].time %>" | date: "mediumTime" }}</span> 
                                                 </li>
                                                 <% } %>
                                                 </ol>
@@ -557,7 +557,7 @@
                                             </div>
                                         </div>
                                     </li>
-                                    <li class="panel panel-default">
+                                    <!--<li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingTwo">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
                                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseFive" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Chat History</a>
@@ -572,7 +572,7 @@
                                                 </ol>                                                   
                                             </div>
                                         </div>
-                                    </li>                                                  
+                                    </li> -->                                                 
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingFour">
                                              <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
@@ -598,6 +598,7 @@
 				</div>
 			</div>
 		</main>
+
 		<!--************************************
 				Main End
 		*************************************-->
@@ -714,10 +715,13 @@
 				</div>
 			</div>
 		</footer>
+        
 		<!--************************************
 				Footer End
 		*************************************-->
 	</div>
+    
+    
 	<!--************************************
 			Wrapper End
 	*************************************-->
@@ -803,11 +807,11 @@
 
 			</div>
 		</div>
-	</div>
+	</div>    
 	<!--************************************
 		Sign In Sign Up Light Box End
 	*************************************-->
-        <script type="text/ng-template" id="quickFillComplaint.html" ng-controller="fromModalSessionController">
+        <script type="text/ng-template" id="quickFillComplaint.html">
          <div class="modal fade">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -866,7 +870,7 @@
         </div>
      </script>
     
-     <script type="text/ng-template" id="X-ray-view.html" ng-controller="viewXRayFilesController">
+     <script type="text/ng-template" id="X-ray-view.html">
          <div class="modal fade">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -898,6 +902,229 @@
           </div>
         </div>
      </script>
+
+     <script type="text/ng-template" id="write-prescription-modal.html">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true" style="color:red;font-size: 32px">&times;</button>
+                </div>                                     
+              </div>
+              
+              <div class="modal-body" style="text-align:center">
+                    <div ng-if="isToPrescribe">
+                      <h5>Test Result</h5>
+                      <ul>
+                        <li ng-repeat="test in testObj.test_result"><strong>{{test.name}} :</strong> {{test.data}}</li>
+                      </ul>
+                      <p><strong>Conclusion :</strong> {{testObj.conclusion}}</p>
+                      <div>
+                        <label>Write provisional diagnosis</label>
+                        <input type="text" placeholder="What is wrong with this patient?" ng-model="patient.provisional_diagnosis">
+                      </div> 
+                      <div>
+                      {{drugList}}
+                        <table>
+                          <tr>
+                            <thead>
+                              <th><strong>S/N</strong></th>
+                              <th><strong>Drug name</strong></th>
+                              <th><strong>Dosage</strong></th>
+                              <th><strong>Frequency</strong></th>
+                              <th><strong>Duration</strong></th>
+                            </thead>
+                          </tr>
+                          <tr>
+                            <tbody ng-repeat="prescription in drugList">                
+                              <td>{{prescription.sn}}</td>
+                              <td><input name="states" id="states" type="text" placeholder="Enter drug name" ng-model="drug.name" uib-typeahead="drug.name for drug in drugs | filter:$viewValue | limitTo:15" class="form-control" style="width: 95%">
+                                {{getDrug(drug.name)}} </td>
+                              <td><input type="text" ng-model="prescription.dosage"></td>
+                              <td><input type="text" ng-model="prescription.frequency"></td>
+                              <td><input type="text" ng-model="prescription.duration"></td>
+                            </tbody>
+                          </tr>           
+                        </table>
+                      </div>
+                      <div style="text-align: right">
+                        <i class="fa fa-plus" style="font-size:16px;color:green;padding: 10px; cursor:pointer; margin-right: 5px" title="Add field" ng-click="addDrug()"></i>
+                          <i class="fa fa-minus" style="font-size:16px;color:green;padding: 10px; cursor:pointer; margin-right: 5px" title="Remove last field" ng-click="removeDrug()"></i>
+                      </div>
+                    <div> 
+                      <button ng-click="toPatient()">Forward prescription to patient</button>
+                      <button ng-click="toPharmacy()" data-dismiss="modal" aria-hidden="true">Forward prescription to a Pharmacy<button>
+                    </div>
+
+                  </div>
+
+                  <div ng-if="isFindPharmacy" style="height: 900px;overflow-y: auto">
+                    <aside style="text-align:left"><button ng-click="back('find')">Back</button></aside>
+                    <h3>Find Pharmacy</h3>
+                    <p><strong>Tips: </strong> You can filter the result by "name"  <br>or complete the text box and click "find" to search based on the entered criteria.</p>
+                    <form>
+                      <input type="text" placeholder="City/Town" ng-model = "pharmacy.city" style="width: 30%; border: 1px solid rgba(0,0,0,0.2);margin-right: 10px"/>
+                      <input type="text" placeholder="Name" ng-model = "pharmacy.name" style="width: 30%; border: 1px solid rgba(0,0,0,0.2);margin-right: 10px"/>   
+                      <input type="button" value="FIND" ng-click = "findPharmacy()" style="width: 10%; padding: 10px 10px; background-color: green; color:#fff"/>
+                    </form>
+                    <div class= "row look-up-phamarcy" ng-repeat = "result in pharmacyData | filter: pharmacy.name || pharmacy.city | orderBy: 'name'" style="cursor:pointer; margin-top: 10px; width: 90%; margin-left: 2px" ng-click="forwardPrescriptionTo(result.user_id)"> 
+                      <div class="col-sm-12 col-md-4 col-lg-4">
+                        <img ng-src="{{result.profile_pic_url}}" alt="profile pic"/>
+                      </div>
+                      <div class="col-sm-12 col-md-12 col-lg-12" >
+                        <h3>{{result.name}}</h3>
+                        <address>{{result.address}} <span>{{result.city}}, <strong>{{result.country}}</strong></span></address>     
+                      </div>
+                    </div>
+                  </div>
+                  <div ng-if="isCenter">                  
+                            
+                            <div class="row" ng-if="placeHolder">
+                            <aside style="text-align:left"><button ng-click="back('center')">Back</button></aside>
+                              <h4>Forwarding Prescription</h3>
+                              <h5 style="text-align: center; color: red">{{message}}</h5> 
+                              <div class="col-sm-12 col-md-12 col-lg-12" style="padding:30px">
+                                <h4 style="text-align:center; border-bottom: 1px solid rgba(0,0,0,0.3)">{{centerInfo.name}} <span style="display:block; color:black;font-size: 12px">{{centerInfo.type}}</span></h4>
+                                <div class="col-sm-12 col-md-3 col-lg-3 pull-right">
+                                  <img ng-src="{{centerInfo.profile_pic_url}}" alt="profile pic"/>
+                                </div>
+                                <div class="col-sm-12 col-md-9 col-lg-9">     
+                                  <address><strong>Address: </strong>{{centerInfo.address}}</address>
+                                  <address><strong>City: </strong>{{centerInfo.city}}</address>
+                                  <address><strong>Country: </strong>{{centerInfo.country}}</address>
+                                </div>
+                              </div> 
+                              <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <p style="padding: 15px">Do you wish to contact <strong>{{centerInfo.name}}</strong> for inquires before sending prescription? <span style="cursor:pointer; color: green" ng-click="isEnquiry()"> &nbsp;YES</span></p>
+                                  <div ng-if="isContactFirst" style="margin: 20px auto; width: 60%">
+                                    <span style="font-size: 24px; font-weight: 100">Contact Through: </span>
+                                    <i class="fa fa-phone" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px"></i>
+                                    <i class="fa fa-commenting-o" style="font-size:32px;color:green;padding: 20px; cursor:pointer"></i>       
+                                  </div>      
+                                </div>    
+                              </div>
+                              <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div style="margin: 20px auto; width: 80%; border-bottom: 1px solid rgba(0,0,0,0.3);box-shadow: 0px 2px 5px rgba(0,0,0,0.4)">
+                                    <p style="background-color: rgba(0,180,0,0.8); color: #fff; padding: 15px; cursor:pointer;border:radius: 2px;box-shadow: 0px 2px 4px rgba(0,10,0,0.4);text-align: center;font-size: 18px;" ng-click="sendReferral(centerInfo.user_id,centerInfo.type)">I have confirmed, send prescription</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div ng-if="success">
+                              <div style="width: 80%; margin: 150px auto">
+                                <h5 style="text-align: center">{{message.info}} <span style="display:block; text-align:center;font-size: 12;color:#000">To</span><span style="display:block; text-align:center;color:#000">{{centerInfo.name}}</span></h5>
+                                <address style="text-align:center">{{centerInfo.address}}, <span style="display:block">{{centerInfo.city}}, {{centerInfo.country}}<span></address>
+                                <p> Ref No: {{message.ref}}</p>
+                                <p><strong>Make note of the <em style="font-weight: normal">Address</em> and <em style="font-weight: normal">reference number</em> above for easy location and identification respectively.</strong></p>
+                              </div>
+                            </div>
+                    
+                  </div>            
+                </div>
+              
+            </div>
+          </div>
+        </div>
+     </script>
+     <script type="text/ng-template" id="patient-emergency-form.html">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true" style="color:red;font-size: 32px">&times;</button>
+                </div>                                     
+              </div>
+              
+              <div class="modal-body" style="text-align:center">
+                    
+                    <form ng-if="isForm">
+                        <h6 style="text-align: center; color: red">{{error}}</h6>
+                        <h5>Fill this form for the new Patient</h5>
+                        <div>
+                            <input type="text" placeholder="Firstname *" ng-model="patient.firstname" required/>
+                        </div>
+                        <div>
+                            <input type="text" placeholder="Lastname *" ng-model="patient.lastname" required/>
+                        </div>
+                        <div>
+                            <input type="number" placeholder="Phone number *" ng-model="patient.phone" required/>
+                        </div>
+                        <div>
+                            <input type="text" placeholder="Email" ng-model="patient.email" required/>
+                        </div>
+                        
+                        <div>
+                            <input type="button"  value="Submit" class="btn btn-primary" ng-click="sendForm()"/>
+                        </div>
+                    </form>
+                    <div ng-if="isCreated" style="width: 95%; margin auto auto">
+                        <h4>Patient emergency profile created successfully!</h4>
+                    </div>
+
+              </div>
+              
+            </div>
+          </div>
+        </div>
+     </script>
+     
+      <script type="text/ng-template" id="calender-template.html">
+        <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true" style="color:red;font-size: 32px">&times;</button>
+                </div>                                     
+              </div>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="modal-body">
+                        <h5>Book an appointment with patient</h5>                        
+                        <div class="calender-header">
+                            <i class="fa fa-angle-left" ng-click="previous()"></i>
+                            <span>{{month.format("MMMM, YYYY")}}</span>
+                            <i class="fa fa-angle-right" ng-click="next()"></i>
+                        </div>
+                        <div class="week">
+                            <span class="day">Sun</span>
+                            <span class="day">Mon</span>
+                            <span class="day">Tue</span>
+                            <span class="day">Wed</span>
+                            <span class="day">Thu</span>
+                            <span class="day">Fri</span>
+                            <span class="day">Sat</span>
+                        </div>
+                        
+                        <div ng-repeat="week in weeks" class="indays">
+                            <span class="dates" ng-class="{ today: day.isToday, 'different-month': !day.isCurrentMonth, selected: day.date.isSame(selected) }" ng-click="select(day)" style="cursor:pointer" ng-repeat="day in week.days">{{day.number}}</span>
+                        </div>                        
+                        <p><strong>{{dd.format('dddd, MMMM Do YYYY')}} {{treatment.appointment.time | date: "mediumTime"}}</strong></p><address><strong>{{treatment.appointment.address}}</strong></address>                        
+                        <div style="text-align:center">
+
+                        <h6>Time of appointment: <br><input type="time" placeholder="Enter time" ng-model="treatment.appointment.time"/></h6>
+                        <h6>Vanue <small>(If none,defaults to the address in your profile)</small>: <br><input class="addr" type="address" placeholder="Enter address" ng-model="treatment.appointment.address"></h6>
+                            <button ng-click="book()" class="btn btn-primary" style="background-color:#7dbb00">Book</button>
+                        </div>
+                        
+                    </div> 
+                </div>
+              </div>          
+            </div>
+          </div>
+        </div>
+     </script>
+
+                        
+                    
+                    
 		
         <script src="/assets/js/vendor/jquery-library.js"></script>
         <script src="/assets/js/vendor/bootstrap.min.js"></script>
@@ -920,7 +1147,13 @@
         <script src="/assets/js/modalService.js"></script>
         <script src="/assets/js/main.js"></script>
         <script src="/assets/js/angular-touch.min.js"></script>
-        <script src="/assets/js/angular-carousel.js"></script>     
+        <script src="/assets/js/angular-carousel.js"></script>
+        <script src="/assets/js/moment.min.js"></script>
+        <script src="/assets/js/angular-moment.min.js"></script>
+        <script src="/assets/js/angucomplete-alt.min.js"></script> 
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>
+        <script src="/assets/js/angular-clipboard.js"></script>       
+             
         
 
 	  

@@ -26,8 +26,10 @@
 					<span style="font-size: 24px; font-weight: 100">Contact Through: </span>
 					<i class="fa fa-phone" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px" title="Make an audio call to this patient"></i>				
 					<i class="fa fa-video-camera" style="font-size:32px;color:green;padding: 20px; cursor:pointer; margin-right: 10px" title="Video chat with this patient" ng-click="makeVideoCall()"></i>	
-					<i class="fa fa-comments" style="font-size:32px;color:green;padding: 20px; cursor:pointer" title="Chat with this patient"></i>			
-				</div>			
+					<i class="fa fa-comments" style="font-size:32px;color:green;padding: 20px; cursor:pointer" title="Chat with this patient"></i>
+					<i class="fa fa-calendar" style="font-size:32px;color:green;padding: 20px; cursor:pointer" title="Book appointment with this patient" aria-hidden="true" ng-click="appointment(patientInfo)"></i>		
+				</div>
+
 			</div>
 		</div>
 	</div>
@@ -65,7 +67,7 @@
 		<div class="col-sm-12 col-md-10 col-lg-10">
 			<div class="prescriptionArea" ng-if="isToPrescribe" style="border-top: 1px solid rgba(0,0,0,0.4)">
 				<h6 style="cursor:pointer;text-decoration:underline" ng-click="writeNew()">Write new prescription</h6>
-				<div ng-if="isNewPrescription">					
+				<div ng-if="isNewPrescription">				
 					<table>
 						<tr>
 							<thead>
@@ -79,7 +81,9 @@
 						<tr>
 							<tbody ng-repeat="prescription in drugList">								
 								<td>{{prescription.sn}}</td>
-								<td><textarea ng-model="prescription.drug_name" style="max-width: 200px;max-height: 80px"></textarea></td>
+								<!--<td><textarea ng-model="prescription.drug_name" style="max-width: 200px;max-height: 80px"></textarea></td>-->
+								<td><input name="states" id="states" type="text" placeholder="Enter drug name" ng-model="drug.name" uib-typeahead="drug.name for drug in drugs | filter:$viewValue | limitTo:15" class="form-control" style="width: 95%">
+								{{getDrug(drug.name)}} </td>
 								<td><input type="text" ng-model="prescription.dosage"></td>
 								<td><input type="text" ng-model="prescription.frequency"></td>
 								<td><input type="text" ng-model="prescription.duration"></td>
@@ -125,6 +129,7 @@
 			</div>
 			<div class="medical-record-Area" ng-if="isToSeeRecord" style="border-top: 1px solid rgba(0,0,0,0.4)">
 				<h3>Hey iam record</h3>
+								
 			</div>
 			<div class="medical-record-Area" ng-if="isToViewSession" style="border-top: 1px solid rgba(0,0,0,0.4)">
 				<h3 style="text-align: center">Treatment sessions</h3>
@@ -144,6 +149,12 @@
 			</div>
 			<div class="medical-record-Area" ng-if="isToViewLabPrescriptionReq" style="border-top: 1px solid rgba(0,0,0,0.4)">	
 				<section ng-repeat="test in labPrescriptionReq" style="border-bottom: 1px solid #000; margin-bottom: 10px">
+					<span ng-if="test.attended || theAttended.length > 0"  class="sentto">
+						Sent to ?
+						<ul style="color: green">							
+							<li ng-repeat="i in test.attended || theAttended"><small>{{i.name}} {{i.address}} {{i.city}} {{i.country}} &nbsp; {{i.date_sent| date: "mediumDate"}}</small></li>
+						</ul>
+					</span>
 					<h5 style="text-align:center">{{test.center_name}} 
 					<span style="display:block;color:#000;font-size:12px">{{test.center_address}} {{test.cente_city}} {{test.center_country}}</span></h5>
 					<div style="text-align:right">
@@ -159,11 +170,18 @@
 						<i class="fa fa-file-image-o" title="View X-Ray files associated with this test result" ng-if="test.files.length > 0"
 						style="font-size:24px;color:rgba(0,150,0,0.9); cursor:pointer;margin:20px 10px" ng-click="viewFile()"></i>
 						<i class="icon-Pills icon-style" title="Write prescription based on this test result" style="cursor:pointer" ng-click="prescribe(test)"></i>
+						<i class="fa fa-times" title="Delete this request" style="cursor:pointer" ng-click="delete(test)"></i>
 					</div>
 				</section>
 			</div>
 			<div class="medical-record-Area" ng-if="isToViewRadPrescriptionReq" style="border-top: 1px solid rgba(0,0,0,0.4)">
 				<section ng-repeat="test in radioPrescriptionReq" style="border-bottom: 1px solid #000; margin-bottom: 10px">
+					<span ng-if="test.attended"  class="sentto">
+						Sent to ?
+						<ul style="color: green">
+							<li ng-repeat="i in test.attended || theAttended"><small>{{i.name}} {{i.address}} {{i.city}} {{i.country}} {{i.patient}}&nbsp; {{i.date_sent| date: "mediumDate"}}</small></li>
+						</ul>
+					</span>
 					<h5 style="text-align:center">{{test.center_name}} 
 					<span style="display:block;color:#000;font-size:12px">{{test.center_address}} {{test.cente_city}} {{test.center_country}}</span></h5>
 					<div style="text-align:right">
@@ -179,6 +197,7 @@
 						<i class="fa fa-file-image-o" title="View files associated with this test result" ng-if="test.files.length > 0"
 						style="font-size:24px;color:rgba(0,150,0,0.9); cursor:pointer;margin:20px 10px" ng-click="viewFile(test.files,test.test_result)"></i>
 						<i class="icon-Pills icon-style" title="Write prescription based on this test result" style="cursor:pointer" ng-click="prescribe(test)"></i>
+						<i class="fa fa-times" title="Delete this request" style="cursor:pointer" ng-click="delete(test)"></i>
 					</div>
 				</section>
 			</div>

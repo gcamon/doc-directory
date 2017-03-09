@@ -22,7 +22,12 @@
     <link rel="stylesheet" href="/assets/css/transitions.css">
     <link rel="stylesheet" href="/assets/css/color.css">
     <link rel="stylesheet" href="/assets/css/responsive.css">
-    <link rel="stylesheet" href="/assets/css/angular-carousel.css">   
+    <link rel="stylesheet" href="/assets/css/angular-carousel.css">
+
+
+
+
+    
 
 
     <!--<script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>-->
@@ -118,7 +123,7 @@
                                     
                                 </div>
                             </div>-->
-                            <div class="col-md-5 col-sm-5 col-xs-12">
+                            <!--<div class="col-md-5 col-sm-5 col-xs-12">
                                 <div class="form-group">
                                     <input type="text" placeholder="Enter city name" class="form-control" ng-model="user.city">
                                 </div>
@@ -202,10 +207,25 @@
                                         </select>
                                     </span>
                                 </div>
+                            </div>-->
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-specialist" class="tg-btn tg-btn-lg">Find A Doctor</a>
+                                </div>
                             </div>
                             <div class="col-md-2 col-sm-2 col-xs-4">
                                 <div class="form-group">
-                                    <button id="search_banner" class="tg-btn tg-btn-lg" ng-click = "search()">Search</button>
+                                    <a id="search_banner" href="/user/find-drug" class="tg-btn tg-btn-lg">Find A Drug</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-lab-test" class="tg-btn tg-btn-lg">Find A Lab Test</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-scan-test" class="tg-btn tg-btn-lg">Find A Scan Test</a>
                                 </div>
                             </div>
                         </form>
@@ -588,7 +608,7 @@
                                     <li class="panel panel-default active">
                                         <div class="tg-panel-heading" role="tab" id="headingOne">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
-                                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Treatment(s)</a>
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseOne" aria-expanded="false" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Treatment(s)</a>
                                             </h3>
                                         </div>                                        
                                         <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
@@ -613,7 +633,7 @@
                                         <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
                                             <div class="panel-body">
                                                 <ol>                                           
-                                                    <li ng-click="viewPrescription(prescription.doctor_id)" style="padding: 5px 2px; cursor: pointer" ng-repeat="prescription in filteredPrescriptions">Dr. {{prescription.doctor_firstname}} {{prescription.doctor_lastname}} ({{prescription.count || 0}}) </li>                  
+                                                    <li ng-click="viewPrescription(prescription.doctor_id)" style="padding: 5px 2px; cursor: pointer" ng-repeat="prescription in filteredPrescriptions">{{prescription.title}} {{prescription.doctor_firstname}} {{prescription.doctor_lastname}} ({{prescription.count || 0}}) </li>                  
                                                 </ol>
                                             </div>
                                         </div>
@@ -627,10 +647,13 @@
                                             </h3>
                                         </div>
                                         <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
-                                            <div class="panel-body">
+                                            <div class="panel-body appointment">
                                                 <ol>
                                                 <% for(var k = 0; k < userInfo.appointment.length; k++) { %>
-                                                <li ng-click="viewPrescription(<%= userInfo.appointment[k].doctor_id %>)" style="padding: 5px 2px; cursor: pointer"> </li>
+                                                <li ng-click="viewAppointment(<%= userInfo.appointment[k].session_id %>)" style="padding: 5px 2px; cursor: pointer">                                                                                                      
+                                                    <%= userInfo.appointment[k].title %> <%= userInfo.appointment[k].firstname %> <%= userInfo.appointment[k].lastname %><br> 
+                                                    <span style="padding-right: 20px">{{ "<%= userInfo.appointment[k].date %>" | date : "mediumDate"}}</span> <span>{{ "<%= userInfo.appointment[k].time %>" | date: "mediumTime" }}</span> 
+                                                </li>
                                                 <% } %>
                                                 </ol>
                                             </div>
@@ -648,7 +671,7 @@
                                             </div>
                                         </div>
                                     </li>
-                                    <li class="panel panel-default">
+                                    <!--<li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingTwo">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
                                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseFive" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Chat History</a>
@@ -663,7 +686,7 @@
                                                 </ol>                                                   
                                             </div>
                                         </div>
-                                    </li>                                                  
+                                    </li>-->                                                  
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingFour">
                                              <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
@@ -679,9 +702,9 @@
                                             </div>
                                         </div>
                                     </li>
-                                    <li class="panel panel-default">
+                                    <!--<li class="panel panel-default">
                                         <h3 class="panel-title"><a href="/user/logout">Signout</a></h3>
-                                    </li>
+                                    </li>-->
                                 </ul>
                             </div>
                         </aside>
@@ -968,7 +991,7 @@
                     </div>
                 </div>
                 </h6>               
-              </div>
+              </div>a
               <div class="modal-body">                                                   
                     <form class="tg-form-modal tg-form-signin">                        
                             <fieldset>
@@ -1073,6 +1096,11 @@
         <script src="/assets/js/main.js"></script>
         <script src="/assets/js/angular-touch.min.js"></script>
         <script src="/assets/js/angular-carousel.js"></script>
+        <script src="/assets/js/moment.min.js"></script>
+        <script src="/assets/js/angular-moment.min.js"></script>
+       <script src="/assets/js/ui-bootstrap-tpls.js"></script>
+       <script src="/assets/js/angular-clipboard.js"></script> 
+          
         
         
 

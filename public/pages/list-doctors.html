@@ -1,13 +1,14 @@
 
     <div ng-controller = "listController"  class="tg-view tg-list-view" >
         <div class="row">
-            <article class="tg-doctor-profile" ng-repeat="i in searchResult">
+            <input type="text" placeholder="Filter by hostipal name or doctor's name" ng-model="list.work_place" class="form-control" style="width: 80%;margin-left:20px">
+            <article class="tg-doctor-profile" ng-repeat="i in searchResult | filter: list.work_place || list.firstname || list.specialty">
                 <div class="tg-box" style="padding: 50px; box-shadow: 5px 5px 10px rgba(0,0,0,0.8)">
                     <a href="{{i.profile_url}}"><span class="tg-show"><a href="{{i.profile_url}}"><em class="icon-add"></em></span></a>
                     <figure class="tg-docprofile-img">
                         <span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
                         <a href="{{i.profile_url}}"><img ng-src="{{i.profile_pic_url}}" class="pp" alt="image description"></a>
-                        <img src="/assets/images/icons/online-icon.png" class="presence"><span class="on">Online</span>
+                        <!--<img src="/assets/images/icons/online-icon.png" class="presence"><span class="on">Online</span>-->
                         <!--<img src="/assets/images/icons/offline-red-icon.png" class="presence"><span class="on"></span>-->
                     </figure>												
                     <div class="tg-docprofile-content">

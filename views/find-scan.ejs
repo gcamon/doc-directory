@@ -31,7 +31,7 @@
 	<!--************************************
 			Wrapper Start
 	*************************************-->
-	<div id="wrapper" class="tg-haslayout">
+	<div id="wrapper" class="tg-haslayout" ng-controller ="findRadioTestController">
 		<!--************************************
 				Header Start
 		*************************************-->
@@ -104,102 +104,33 @@
 		<!--************************************
 				Home Slider Start
 		*************************************-->
-		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="searchController">
+		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" >
 			<div class="tg-searcharea tg-haslayout">
 				<div class="container">
 					<div class="row">
 						<form class="tg-searchform">
-							<div class="col-md-5 col-sm-5 col-xs-12">
-								<div class="form-group">
-									<input type="text" placeholder="City" class="form-control" ng-model="user.city">
-								</div>
-							</div>
-							<div class="col-md-5 col-sm-5 col-xs-8">
-								<div class="form-group">								
-									<span class="select">
-										<select id="group1" class="group" placeholder="Specialty" ng-model="user.specialty">
-											<option>Acupunture</option>
-                                            <option>Addiction Medicine</option>
-                                            <option>Adolescent Medicine</option>
-                                            <option>Aerospace Medicine</option>
-                                            <option>Allergy</option>
-                                            <option>Allergy/Immunology</option>
-                                            <option>Anesthesiology</option>
-                                            <option>Audiologist</option>
-                                            <option>Bariatrician</option>
-                                            <option>Cardiac Electrophysiology</option>
-                                            <option>Cardiology</option>
-                                            <option>Chiropractic</option>
-                                            <option>Clinical Laboratory Immunology</option>
-                                            <option>Clinical Pathology</option>
-                                            <option>Colon/Rectal Surgery</option>
-                                            <option>Critical Care</option>
-                                            <option>Cythopathology</option>
-                                            <option>Dermatology</option>
-                                            <option>Dermatopathology</option>
-                                            <option>Diabetes</option>
-                                            <option>Diagnostic</option>
-                                            <option>Emergency Medical Tech</option>
-                                            <option>Emergency Medicine</option>
-                                            <option>Endocrinology</option>
-                                            <option>Endovascular Surgical Neuroradiology</option>
-                                            <option>Family Practice</option>
-                                            <option>Gastroenterology</option>
-                                            <option>General Practice</option>
-                                            <option>General Surgery</option>
-                                            <option>Genetics</option>
-                                            <option>Geriatrics</option>
-                                            <option>Gynecology</option>
-                                            <option>Gynecology Oncology</option>
-                                            <option>Hand Surgery</option>
-                                            <option>Hand and Neck Surgery</option>
-                                            <option>Hematology</option>
-                                            <option>Hematology/Oncology</option>
-                                            <option>Hepatology</option>
-                                            <option>Holistic Medicine</option>
-                                            <option>Hospitalist</option>
-                                            <option>Immunology</option>
-                                            <option>Infectious Disease</option>
-                                            <option>Internal Medicine</option>
-                                            <option>Interventional Cardiology</option>
-                                            <option>Legal Medicine</option>
-                                            <option>Medical Oncology</option>
-                                            <option>Medical Toxicology</option>
-                                            <option>Neonatology</option>
-                                            <option>Nephrology</option>
-                                            <option>Neurology</option>
-                                            <option>Neuroradiology</option>
-                                            <option>Nuclear Cardiology</option>
-                                            <option>Nuclear Medicine</option>
-                                            <option>Nutrition</option>
-                                            <option>Obstetrics/Gynecology</option>
-                                            <option>Occupational Medicine</option>
-                                            <option>Oncology</option>
-                                            <option>Opthalmology</option>
-                                            <option>Optometry</option>
-                                            <option>Orthopedic Foot & Ankle</option>
-                                            <option>Orthopedic Reconstructive Surgery</option>
-                                            <option>Orthopedic Spine Surgery</option>
-                                            <option>Orthopedic Surgery</option>
-                                            <option>Osteopathy</option>
-                                            <option>Otorhinolaryngology</option>
-                                            <option>Pain Management</option>
-                                            <option>Pathology</option>
-                                            <option>PPediatric Allergy</option>
-                                            <option>Pediatric Cardiology</option>
-                                            <option>Pediatric Critical Care</option>
-                                            <option>Padiatric Emergency Medicine</option>
-                                            <option>Other</option>	
-										</select>
-									</span>
-								</div>
-							</div>
 							<div class="col-md-2 col-sm-2 col-xs-4">
-								<div class="form-group">
-									<button id="search_banner" class="tg-btn tg-btn-lg" ng-click = "search()">Search</button>
-								</div>
-							</div>
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-specialist" class="tg-btn tg-btn-lg">Find A Doctor</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-drug" class="tg-btn tg-btn-lg" class="active">Find A Drug</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-lab-test" class="tg-btn tg-btn-lg">Find A Lab Test</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-scan-test" class="tg-btn tg-btn-lg">Find A Scan Test</a>
+                                </div>
+                            </div>
 						</form>
+						<span style="cursor: pointer" ng-click="backTo('<%= userInfo.type %>')">Back to dashboard</span>
 					</div>
 				</div>
 			</div>
@@ -207,10 +138,10 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-xs-12">
-							<h1>Success!</h1>
+							<h1>Scan test search</h1>
 							<ol class="tg-breadcrumb">
 								<li><a href="#">Home</a></li>
-								<li class="active">Account Created</li>
+								<li class="active">Find scan</li>
 							</ol>
 						</div>
 					</div>
@@ -223,25 +154,21 @@
 		<!--************************************
 				Main Start
 		*************************************-->
-		<main id="main" class="tg-main-section tg-haslayout" ng-controller = "loginController">
+		<main id="main" class="tg-main-section tg-haslayout">
 			<div class="container">
 				<div class="row">
 					<div class="tg-404 tg-haslayout">
-						<div class="col-md-12 col-sm-12">
-							
-							<h3 style="text-align: center; margin:10px 0px 60px">Account created Successfully!!</h4>
-                            <h5 style="text-align: center;color:rgba(0,0,0,0.6)">Login</h5>
-                            <div style="width: 400px; height: 400px; margin:0 auto">
-                            <span  style="color: red;display:block;text-align: center; font-size:16px;padding:10px 10px" ng-cloak>{{error}}</span>							
-							<form>
-								<input type="text" placeholder="Email" ng-model = "login.email" style="border: 1px solid rgba(0,255,0,0.8)">
-								<input type="password" placeholder="Password" ng-model = "login.password" style="border: 1px solid rgba(0,255,0,0.8);margin: 10px 0px">
-								<p style="text-align: center">
-								<button class="btn btn-login" ng-click="send()">Send</button>
-								</p>
-							</form>
-							</div>
-						</div>						
+						<div class="col-sm-12 col-md-8 col-lg-8">
+							<div class="view-animate-container row" >  
+                                <div class="view-animate" ng-view >
+                                </div>
+                        	</div>									
+						</div>
+						<div class = "col-sm-12 col-md-4 col-lg-4">
+							<aside class="side-services">										
+								<a href="#/help">Need help?</a>
+							</aside>
+						</div>			
 				</div>
 			</div>
 		</main>
@@ -477,8 +404,9 @@
         <script src="/assets/js/angular-carousel.js"></script>
         <script src="/assets/js/moment.min.js"></script>
         <script src="/assets/js/angular-moment.min.js"></script>
-        <script src="/assets/js/ui-bootstrap-tpls.js"></script>     
-        <script src="/assets/js/angular-clipboard.js"></script>
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>
+        <script src="/assets/js/angular-clipboard.js"></script>     
+
     
 </body>
 </html>

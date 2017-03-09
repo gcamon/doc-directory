@@ -587,19 +587,28 @@ var basicRoute = function (model) {
 
     //route for qusetions and requsts from patients to a doctor through the modal
     router.put("/patient/doctor/connection",function(req,res){
-        if(req.user){
+        if(req.user){ 
+        console.log(req.body)   
+        req.body.sender_firstname = req.user.firstname;
+        req.body.sender_lastname = req.user.lastname;
+        req.body.sender_profile_pic_url = req.user.profile_pic_url;
+        req.body.sender_id = req.user.user_id;
         var requestData = {};
         for(var item in req.body){
             if(req.body.hasOwnProperty(item) && item !== "receiverId") {
                 requestData[item] = req.body[item];
             }
         }
+
+        console.log(requestData)
         
         model.user.update(
         { _id: req.body.receiverId},
         { "$push": { doctor_notification: requestData} },
-        function(err,info) {          
-           res.send("notified");
+        function(err,info) {
+          if(err) throw err;
+          console.log(requestData)         
+          res.send("notified");
         }
         );
         } else {
@@ -619,7 +628,7 @@ var basicRoute = function (model) {
         }
     });
 
-     router.get("/doctor/get-patient-prescription-request",function(req,res){
+     router.get("/doctor/get-patient-prescription-request",function(req,res){        
          if(req.user){
          model.user.findOne({email:req.user.email},{doctor_prescriptionRequest:1,_id:0},function(err,data){                
             res.send(data);
@@ -800,7 +809,7 @@ var basicRoute = function (model) {
                         }
                       )
                       .exec(function(err,data){
-                        data.doctor_patients_list.push({
+                        data.doctor_patients_list.unshift({
                           patient_firstname: req.user.firstname,
                           patient_lastname: req.user.lastname,
                           patient_id: req.user.user_id,
@@ -868,8 +877,10 @@ var basicRoute = function (model) {
     //where all his prescriptions has been send sent to.
     router.get("/patient/get-prescription/track-record",function(req,res){
       if(req.user){
-        console.log(req.user.prescription_tracking);
-        res.send(req.user.prescription_tracking);
+        model.user.findOne({email:req.user.email},{prescription_tracking:1,_id:0},function(err,data){
+          console.log(data.prescription_tracking);
+          res.send(data.prescription_tracking);
+        })
       } else {
         res.end("Unauthorized access");
       }
@@ -956,7 +967,12 @@ var basicRoute = function (model) {
 
           }).exec(function(err,pharmacy){
             var date = new Date();
-            var ref_id = Math.floor(Math.random() * 9999999);
+            var ref_id;
+            if(req.body.ref_id) {
+              ref_id = req.body.ref_id;
+            } else {
+              ref_id = Math.floor(Math.random() * 9999999);
+            }
             var title = (req.user.type === "Doctor") ? 'Dr.': "";            
             var refObj = {
               ref_id: ref_id,
@@ -992,7 +1008,6 @@ var basicRoute = function (model) {
               patient.prescription_tracking.unshift(track_record);
               patient.save(function(err,info){
                 if(err) throw err;
-                console.log(info);
               });
             });
 
@@ -1001,7 +1016,6 @@ var basicRoute = function (model) {
 
             pharmacy.save(function(err,info){
               if(err) throw err;
-              console.log(info);
             });
 
            res.send({success:true,ref_id: ref_id}); 
@@ -1063,7 +1077,6 @@ var basicRoute = function (model) {
               patient.prescription_tracking.unshift(track_record);
               patient.save(function(err,info){
                 if(err) throw err;
-                console.log("track record save " + "----" + info)
               })
             })
 
@@ -1086,7 +1099,8 @@ var basicRoute = function (model) {
       //if prescription is forwarded by a doctor to a pharmacy it talks different form. ie doctor can send prescription
       //straight to a pharmacy. later the patient will be notified. 
       //this block represents doctor action by forwarding prescription to a pharmacy.
-      //any data sent to a diagnostic center other than to the patient himself is seens a a referral by this application.      
+      //any data sent to a diagnostic center other than to the patient himself is seens a a referral by this application.
+       
       if(req.user){        
          model.user.findOne(
           {
@@ -1100,19 +1114,25 @@ var basicRoute = function (model) {
             city:1,
             country:1
 
-          }).exec(function(err,pharmacy){ 
-          console.log(pharmacy)           
+          }).exec(function(err,pharmacy){           
             if(err) throw err;            
             var date = new Date();
-            var ref_id = Math.floor(Math.random() * 9999999);
+            var ref_id;
+            if(req.body.ref_id) {
+              ref_id = req.body.ref_id;
+            } else {
+              ref_id = Math.floor(Math.random() * 9999999);
+            }
+            
 
             var preObj = {              
-              allergy: req.body.allergy,
+              provisional_diagnosis: req.body.provisional_diagnosis,
               date: date,
               prescriptionId: req.body.prescriptionId,
               doctor_firstname: req.user.firstname,
               doctor_lastname: req.user.lastname,
-              doctor_address: req.user.address,   
+              doctor_address: req.user.address,
+              doctor_verified: req.user.verified,   
               doctor_id: req.user.user_id,
               doctor_work_place: req.user.work_place,
               doctor_city: req.user.city,
@@ -1129,10 +1149,15 @@ var basicRoute = function (model) {
               patient_age: req.body.age,
               patient_city: req.body.city,
               patient_country: req.body.country,
-              prescription_body: req.body.prescriptionBody
+              prescription_body: req.body.prescriptionBody,
+              ref_id: ref_id,
+              eligible: true
             }
 
-            var title = (req.user.type === "Doctor") ? 'Dr.': "";                        
+            var title = (req.user.type === "Doctor") ? 'Dr.': ""; 
+            var verifyId;
+            
+
             var refObj = {
               ref_id: ref_id,
               referral_firstname: req.user.firstname,
@@ -1161,7 +1186,7 @@ var basicRoute = function (model) {
               {user_id: req.body.patient_id},{patient_notification:1,firstname:1,lastname:1,prescription_tracking:1,medications:1}
               ).exec(function(err,data){
               if(err) throw err;
-              console.log(data);
+              
                var date = new Date();
                var msg = "your prescription has been forwarded to " + pharmacy.name + " @ " + pharmacy.address +
                 " by Dr. " + req.user.firstname + req.user.lastname +
@@ -1201,16 +1226,37 @@ var basicRoute = function (model) {
               console.log("prescription saved");                           
             });
 
-            res.send({success:true,ref_id: ref_id}); 
+            res.json({success:true,ref_id: ref_id,name:pharmacy.name,address:pharmacy.address,city:pharmacy.city,country:pharmacy.country}); 
         });        
      
       } else {
         res.end("Unauthorized Access");
       }   
-    });    
+    });
+
+    router.delete("/doctor/delete-prescriptionReq-test",function(req,res){
+      console.log(req.body)
+      if(req.user){
+        model.user.findOne({email: req.user.email},{doctor_prescriptionRequest:1}).exec(function(err,data){
+          if(err) throw err;
+          var elementPos = data.doctor_prescriptionRequest.map(function(x){return x.ref_id}).indexOf(req.body.ref_id)
+          var objFound = data.doctor_prescriptionRequest.splice(elementPos,1);          
+          
+          data.save(function(err,info){
+            if(err) throw err;            
+          })
+          res.send("deleted");
+        });
+
+      } else {
+        res.end("Unauthorized access!")
+      }
+      
+    })    
 
     //prescription foewarded by the doctor to a patient inbox
-    router.put("/patient/forwarded-prescription",function(req,res){     
+    router.put("/patient/forwarded-prescription",function(req,res){
+      console.log(req.body)     
       if(req.user){         
         model.user.findOne(
           {
@@ -1222,7 +1268,7 @@ var basicRoute = function (model) {
             if(err) throw err;            
             var date = new Date();                
             var preObj = {              
-              allergy: req.body.allergy,
+              provisional_diagnosis: req.body.provisional_diagnosis,
               date: date,
               prescriptionId: req.body.prescriptionId,
               doctor_firstname: req.user.firstname,
@@ -1244,7 +1290,7 @@ var basicRoute = function (model) {
               patient_age: req.body.age,
               patient_city: req.body.city,
               patient_country: req.body.country,
-              prescription_body: req.body.prescriptionBody
+              prescription_body: req.body.prescriptionBody,
             }           
             result.medications.push(preObj);
             result.save(function(err,info){             
@@ -1268,7 +1314,14 @@ var basicRoute = function (model) {
 
           data.save(function(err,info){
             if(err) throw err;            
-            res.send("success! prescription forwarded to " + data.firstname + " " + data.lastname);                 
+            res.send(
+              {
+                message: "success! prescription forwarded to " + data.firstname + " " + data.lastname,
+                firstname: data.firstname,
+                lastname: data.lastname,
+                ref_id: req.body.ref_id
+              }
+            );                 
           });
         });
                      
@@ -1284,6 +1337,18 @@ var basicRoute = function (model) {
         });
       } else {
         res.end("Unauthorized access!!!");
+      }
+    });
+
+    //this route get all the doctor's patients
+    router.get("/doctor/my-patients",function(req,res){
+      if(req.user){
+        model.user.findOne({email:req.user.email},{doctor_patients_list:1,_id:0},function(err,data){
+          if(err) throw err;
+          res.send(data);
+        });
+      } else {
+        res.end("Unauthorized access!!")
       }
     });
 
@@ -1626,15 +1691,20 @@ var basicRoute = function (model) {
           provisional_diagnosis: req.body.provisionalDiagnosis,
         }
 
+        /****************Note text messages or email will be sent to notify patients of the appointment ***********/
+
+        // if there is appointment save appointment to the data base
         if(req.body.appointment){
           var getNames = {
             firstname : req.body.appointment.firstname,
             lastname: req.body.appointment.lastname,
             patient_id: req.body.patient_id
           }
+
+          var createAddress = req.user.address + "," + req.user.city + "," + req.user.country; 
           req.body.appointment.firstname = req.user.firstname;
           req.body.appointment.lastname = req.user.lastname;
-          req.body.appointment.address = req.body.appointment.address || req.user.address;
+          req.body.appointment.address = req.body.appointment.address || createAddress;
           req.body.appointment.title = "Dr";
           req.body.appointment.profilePic = req.user.profile_pic_url;   
           model.user.findOne({user_id:req.body.patient_id},{appointment:1}).exec(function(err,result){            
@@ -1648,25 +1718,26 @@ var basicRoute = function (model) {
           });
         }
 
-        var tellDoctor = function(names){          
+        var tellDoctor = function(names){ 
+           
+          req.body.appointment.session_id = session_id;                          
           req.body.appointment.last_meeting = req.body.date;
           req.body.appointment.firstname = names.firstname;
-          req.body.appointment.lastname = names.lastname;
-          req.body.appointment.session_id = session_id;
+          req.body.appointment.lastname = names.lastname;         
           req.body.appointment.typeOfSession = req.body.typeOfSession,
           req.body.appointment.profilePic = req.body.appointment.profilePic;        
           model.user.findOne({user_id: req.user.user_id},{appointment:1}).exec(function(err,result){
             result.appointment.unshift(req.body.appointment);
             result.save(function(err,info){
-              if(err) throw err;
-              console.log(info);              
+              if(err) throw err;                       
             });
           });
         }
 
+        //save the newly created session to he database.
         model.user.findOne({email:req.user.email},{doctor_patient_session:1}).exec(function(err,result){
           if(err) throw err;          
-          req.body.session_id = session_id;
+          req.body.session_id = session_id;       
           result.doctor_patient_session.unshift(req.body);
           result.doctor_patient_session[0].diagnosis = connectObj;
           result.save(function(err,info){
@@ -1683,9 +1754,24 @@ var basicRoute = function (model) {
       }
     });
 
+
+    //note both patients and doctors are using this roiute to view their appointment.
     router.put("/doctor/appointment/view",function(req,res){
       if(req.user){
         model.user.findOne({"appointment.session_id": req.body.id},{appointment:1,_id:0},function(err,data){     
+          if(err) throw err;
+          var elementPos = data.appointment.map(function(x) {return x.session_id; }).indexOf(req.body.id);
+          var objectFound = data.appointment[elementPos];          
+          res.send(objectFound);         
+        });
+      } else {
+        res.end("Unauthorized access")
+      }
+    });
+
+    router.put("/patient/appointment/view",function(req,res){
+      if(req.user){
+        model.user.findOne({user_id: req.user.user_id},{appointment:1,_id:0},function(err,data){     
           if(err) throw err;
           var elementPos = data.appointment.map(function(x) {return x.session_id; }).indexOf(req.body.id);
           var objectFound = data.appointment[elementPos];          
@@ -1748,6 +1834,8 @@ var basicRoute = function (model) {
     //doctor updates changes doctor made when consulting the patient. based on the patient presenting complain and others
     router.put("/doctor/session-update/save-changes",function(req,res){
       if(req.user){
+
+        //save changes in the treatment session to the database
         model.user.findOne({"doctor_patient_session.session_id": req.body.session_id},{doctor_patient_session:1}).exec(function(err,data){
           if(err) throw err;
           var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(req.body.session_id);
@@ -1776,10 +1864,68 @@ var basicRoute = function (model) {
             if(err) {
               res.send({error:"failed"})
             } else {
-              res.send({success:"success"})
+              if(!req.body.appointment){
+                res.send({success:"success"})
+              } else {
+                saveAppointment();
+              }
             }
           });
         });
+        
+
+        //check to see if there is an appointment. doc and patient appointment list will be populated
+
+        /****************Note text messages or email will be sent to notify patients of the appointment ***********/
+        
+        // if there is an accompanied appointment object, save and notify both the patient and doctor
+        function saveAppointment() {
+          var getNames = {
+            firstname : req.body.appointment.firstname,
+            lastname: req.body.appointment.lastname,
+            patient_id: req.body.patient_id
+          }
+
+          req.body.appointment.session_id = req.body.session_id;
+          req.body.appointment.firstname = req.user.firstname;
+          req.body.appointment.lastname = req.user.lastname;
+          req.body.appointment.address = req.body.appointment.address || req.user.address;
+          req.body.appointment.title = "Dr";
+          req.body.appointment.profilePic = req.user.profile_pic_url;   
+          model.user.findOne({user_id:req.body.patient_id},{appointment:1}).exec(function(err,result){            
+            if(err) throw err;
+            var elementPos = result.appointment.map(function(x){return x.session_id}).indexOf(req.body.session_id)
+            var foundObj = result.appointment.splice(elementPos,1);
+            result.appointment.unshift(req.body.appointment);
+            result.save(function(err,info){
+              if(err) throw err;
+              if(info)
+                tellDoctor(getNames);
+            });
+          });   
+
+          var tellDoctor = function(names){         
+            req.body.appointment.last_meeting = req.body.date;
+            req.body.appointment.firstname = names.firstname;
+            req.body.appointment.lastname = names.lastname;         
+            req.body.appointment.typeOfSession = req.body.typeOfSession,
+            req.body.appointment.profilePic = req.body.appointment.profilePic;        
+            model.user.findOne({user_id: req.user.user_id},{appointment:1}).exec(function(err,result){
+              if(err) throw err;
+              var elementPos = result.appointment.map(function(x){return x.session_id}).indexOf(req.body.session_id)
+              var foundObj = result.appointment.splice(elementPos,1);
+              result.appointment.unshift(req.body.appointment);
+              result.save(function(err,info){
+                if(err) throw err;
+                if(req.body.typeOfSession === "In-person meeting") {
+                  res.json({success: "success",session_id:req.body.session_id})
+                } else {
+                  res.send("success");
+                }                                   
+              });
+            });
+          }
+        }
 
       } else {
         res.end("Unauthorized access!!!")
@@ -1842,7 +1988,6 @@ var basicRoute = function (model) {
     //doctors finds the patient's scan if any
     router.put("/doctor/get-scan-result",function(req,res){/////////////////////////////
         if(req.user){
-          console.log("radio test result ran broooooooooooooooo")
           model.user.findOne({email: req.user.email},{doctor_patient_session:1}).exec(function(err,data){
             if(err) throw err;
             var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(req.body.id);
@@ -1935,9 +2080,8 @@ var basicRoute = function (model) {
         var random = Math.floor(Math.random() * 9999999);
         var testId = Math.floor(Math.random() * 9999999999999999);       
         model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1})        
-        .exec(function(err,result){
-          if(err) throw err;        
-
+        .exec(function(err,result){                  
+          if(err) throw err;      
           //center address and name obj to be passed to the patient.
           var centerObj = {
             name: result.name,
@@ -2472,12 +2616,1092 @@ var basicRoute = function (model) {
       }
     });
 
+    /****** Utilities **************/
 
-
-    router.get("/user/logout",function(req,res){
-        req.logout();
-        res.redirect('/');
+    router.get("/user/find-drug",function(req,res){      
+      if(req.user) {
+        var userObj = {
+          firstname: req.user.firstname,
+          lastname: req.user.lastname,
+          user_id: req.user.user_id,
+          phone: req.user.phone,
+          email: req.user.email,
+          address: req.user.address,
+          city: req.user.city,
+          country: req.user.country,
+          type: req.user.type,
+        }
+        res.render("find-drug",{userInfo: userObj})
+      } else {
+        res.end("Unauthorized access!!")
+      }
+      
     });
+
+    router.put("/user/search-drug",function(req,res){
+
+    });
+
+    //searching for a particular test
+
+    router.get("/user/find-lab-test",function(req,res){
+      if(req.user) {
+        var userObj = {
+          firstname: req.user.firstname,
+          lastname: req.user.lastname,
+          user_id: req.user.user_id,
+          phone: req.user.phone,
+          email: req.user.email,
+          address: req.user.address,
+          city: req.user.city,
+          country: req.user.country,
+          type: req.user.type,
+        }
+        res.render("find-test",{userInfo: userObj})
+      } else {
+        res.end("Unauthorized access!!!")
+      }
+    });
+
+    router.get("/user/find-scan-test",function(req,res){
+      if(req.user) {
+        var userObj = {
+          firstname: req.user.firstname,
+          lastname: req.user.lastname,
+          user_id: req.user.user_id,
+          phone: req.user.phone,
+          email: req.user.email,
+          address: req.user.address,
+          city: req.user.city,
+          country: req.user.country,
+          type: req.user.type,
+        }
+        res.render("find-scan",{userInfo: userObj})
+      } else {
+        res.end("Unauthorized access!!!")
+      }
+    });
+
+
+    /*centers update the store and services**/
+
+    router.post("/laboratory/create-services",function(req,res){
+      console.log(req.body)
+      model.services.findOne({user_id:req.user.user_id}).exec(function(err,user){
+        console.log(user)
+        console.log("did it ran")
+        if(err) throw err;
+        if(!user){
+          createUser()
+        } else {
+          updateUser(user)
+        }
+      })
+
+      function createUser() {
+        var user = new model.services({
+          center_name : req.user.name,
+          center_address : req.user.address,
+          center_city:  req.user.city,
+          center_country: req.user.country,
+          user_id : req.user.user_id,
+          unavailable_services : req.body,
+          type: "Laboratory"
+        })
+
+        user.save(function(err,info){
+          if(err) throw err;
+          console.log("service created")
+        })
+      }
+
+      function updateUser(user) {
+        var serviceList = user.unavailable_services;
+        for(var i = 0; i < req.body.length; i++){
+          var test = req.body[i];
+          var elementPos = serviceList.map(function(x){return x.id}).indexOf(test.id);
+          if(elementPos === -1) {
+            serviceList.push(test)
+          } else {
+            serviceList[elementPos] = test;
+          }
+
+        }
+        user.save(function(err,info){
+          if(err) throw err;
+          console.log("service updated")
+        })
+      }
+
+      res.send({message: "Saved!"})
+
+    });
+
+     router.get("/laboratory/not-ran-services",function(req,res){
+      model.services.findOne({user_id: req.user.user_id},{unavailable_services:1,_id:0},function(err,data){
+        if(err) throw err;
+        res.send(data.unavailable_services);
+      })
+    });
+
+    router.put("/laboratory/update-services",function(req,res){
+      
+      model.services.findOne({user_id:req.user.user_id},{unavailable_services:1}).exec(function(err,data){
+        if(err) throw err;
+        res.send({message: "success"});
+        var testsIdList = req.body;
+        var testList = data.unavailable_services;
+        testsIdList.forEach(function(id){
+          var elementPos = testList.map(function(x){return x.id}).indexOf(id);
+          var del = testList.splice(elementPos,1);
+          console.log(testList)
+        })
+        data.save(function(err,info){
+          console.log("deleted")
+        })       
+      })
+    });
+
+    //radiology
+    router.post("/radiology/create-services",function(req,res){
+      console.log(req.body)
+      model.services.findOne({user_id:req.user.user_id}).exec(function(err,user){
+        console.log(user)
+        console.log("did it ran in radio")
+        if(err) throw err;
+        if(!user){
+          createUser()
+        } else {
+          updateUser(user)
+        }
+      })
+
+      function createUser() {
+        var user = new model.services({
+          center_name : req.user.name,
+          center_address : req.user.address,
+          center_city:  req.user.city,
+          center_country: req.user.country,
+          user_id : req.user.user_id,
+          unavailable_services : req.body,
+          type: "Radiology"
+        })
+
+        user.save(function(err,info){
+          if(err) throw err;
+          console.log("service created")
+        })
+      }
+
+      function updateUser(user) {
+        var serviceList = user.unavailable_services;
+        for(var i = 0; i < req.body.length; i++){
+          var test = req.body[i];
+          var elementPos = serviceList.map(function(x){return x.id}).indexOf(test.id);
+          if(elementPos === -1) {
+            serviceList.push(test)
+          } else {
+            serviceList[elementPos] = test;
+          }
+
+        }
+        user.save(function(err,info){
+          if(err) throw err;
+          console.log("service updated")
+        })
+      }
+
+      res.send({message: "Saved!"})
+
+    });
+
+     router.get("/radiology/not-ran-services",function(req,res){
+      model.services.findOne({user_id: req.user.user_id},{unavailable_services:1,_id:0},function(err,data){
+        if(err) throw err;
+        res.send(data.unavailable_services);
+      })
+    });
+
+     router.put("/radiology/update-services",function(req,res){      
+      model.services.findOne({user_id:req.user.user_id},{unavailable_services:1}).exec(function(err,data){
+        if(err) throw err;
+        res.send({message: "success"});
+        var testsIdList = req.body;
+        var testList = data.unavailable_services;
+        testsIdList.forEach(function(id){
+          var elementPos = testList.map(function(x){return x.id}).indexOf(id);
+          var del = testList.splice(elementPos,1);
+          console.log(testList)
+        })
+        data.save(function(err,info){
+          console.log("deleted")
+        })       
+      })
+    });
+//for pharmacy
+     router.post("/pharmacy/create-services",function(req,res){
+        model.services.findOne({user_id:req.user.user_id}).exec(function(err,user){
+        if(err) throw err;
+        if(!user){
+          createUser()
+        } else {
+          updateUser(user)
+        }
+      })
+
+      function createUser() {
+        var user = new model.services({
+          center_name : req.user.name,
+          center_address : req.user.address,
+          center_city:  req.user.city,
+          center_country: req.user.country,
+          user_id : req.user.user_id,
+          unavailable_services : req.body,
+          type: "Pharmacy"
+        })
+
+        user.save(function(err,info){
+          if(err) throw err;
+          console.log("service created")
+        })
+      }
+
+      function updateUser(user) {
+        var serviceList = user.unavailable_services;
+        for(var i = 0; i < req.body.length; i++){
+          var test = req.body[i];
+          var elementPos = serviceList.map(function(x){return x.id}).indexOf(test.id);
+          if(elementPos === -1) {
+            serviceList.push(test)
+          } else {
+            serviceList[elementPos] = test;
+          }
+
+        }
+        user.save(function(err,info){
+          if(err) throw err;
+          console.log("service updated")
+        })
+      }
+
+      res.send({message: "Saved!"})
+     });
+
+    
+    router.get("/pharmacy/not-ran-services",function(req,res){
+      model.services.findOne({user_id: req.user.user_id},{unavailable_services:1,_id:0},function(err,data){
+        if(err) throw err;
+        res.send(data.unavailable_services);
+      })
+    });
+
+     router.put("/pharmacy/update-services",function(req,res){    
+      model.services.findOne({user_id:req.user.user_id},{unavailable_services:1}).exec(function(err,data){
+        if(err) throw err;
+        res.send({message: "success"});
+        var drugIdList = req.body;
+        var drugList = data.unavailable_services;
+        drugIdList.forEach(function(id){
+          var elementPos = drugList.map(function(x){return x.id}).indexOf(id);
+          var del = drugList.splice(elementPos,1);
+        })
+        data.save(function(err,info){
+          console.log("drug saved")
+        })       
+      })
+    });
+
+    router.put("/pharmacy/search/find-drugs",function(req,res){
+      if(req.user && req.body.city === undefined)
+        req.body.city = req.user.city;
+      model.services.find({type:"Pharmacy",center_city:req.body.city},
+        {center_name:1,center_city:1,center_address:1,center_country:1,user_id:1,unavailable_services:1,_id:0},function(err,data){
+        if(err) throw err;
+        var newListToSend = [];        
+        var sendObj = {};
+        var listOfDrugs = req.body.drugList;        
+        for(var i = 0; i < listOfDrugs.length; i++){
+          var elements = data.map(function(x){return x.unavailable_services});
+          var count = 0;
+          var foundDrug = [];          
+          while(count < elements.length){
+            var centerInfo = {}                      
+            var elementPos = elements[count].map(function(x){ return x.id}).indexOf(listOfDrugs[i].id);            
+            centerInfo.notFound = listOfDrugs[i].name;
+            if(elementPos === -1){              
+              centerInfo.center_name = data[count].center_name;
+              centerInfo.center_city = data[count].center_city;
+              centerInfo.center_country = data[count].center_country;
+              centerInfo.center_city = data[count].center_city;
+              centerInfo.center_id = data[count].user_id;
+              centerInfo.center_address = data[count].center_address;
+              centerInfo.drugFound = listOfDrugs[i].name;              
+              foundDrug.push(centerInfo)               
+              sendObj[listOfDrugs[i].name] = foundDrug;
+              newListToSend.push(sendObj)  
+            } 
+            count++;
+          }
+        }
+
+        var filter = {};
+        
+        for(var i in sendObj){
+          for(var j = 0; j < sendObj[i].length; j++){
+            if(!filter.hasOwnProperty(sendObj[i][j].center_id)){                             
+              filter[sendObj[i][j].center_id] = {};
+              filter[sendObj[i][j].center_id].count = 1;
+              filter[sendObj[i][j].center_id].name = sendObj[i][j].center_name;
+              filter[sendObj[i][j].center_id].address = sendObj[i][j].center_address;
+              filter[sendObj[i][j].center_id].city = sendObj[i][j].center_city;
+              filter[sendObj[i][j].center_id].country = sendObj[i][j].center_country
+              filter[sendObj[i][j].center_id].id = sendObj[i][j].center_id
+              filter[sendObj[i][j].center_id].str = sendObj[i][j].drugFound;
+            } else {
+              filter[sendObj[i][j].center_id].str += "," + sendObj[i][j].drugFound;
+              filter[sendObj[i][j].center_id].count++;
+            }
+          }
+        }
+        
+        Array.prototype.diff = function(arr2) {
+            var ret = [];
+            this.sort();
+            arr2.sort();
+            for(var i = 0; i < this.length; i += 1) {
+                if(arr2.indexOf( this[i].name ) === -1){
+                    ret.push( this[i] );
+                }
+            }
+            return ret;
+        };
+
+        var sub = {};
+         sub['full'] = []
+         sub['less'] = [];
+        for(var k in filter){
+          if(filter[k].count === req.body.drugList.length) {           
+            sub['full'].push(filter[k])
+          } else {
+            var arr1 = req.body.drugList;
+            var newFilterArr = filter[k].str.split(",")            
+            var notFoundArr = arr1.diff(newFilterArr)
+            filter[k].notFound = notFoundArr;          
+            sub['less'].push(filter[k])
+          }
+        }
+
+        res.send(sub)
+      })
+
+    });
+
+  router.put("/drug-search/pharmacy/referral",function(req,res){
+   if(req.user){
+    var person = (req.body.phone && req.body.phone !== "") ? {phone: req.body.phone} : {user_id: req.user.user_id};
+    model.user.findOne(person,{firstname:1,lastname:1,title:1,profile_pic_url:1,city:1,country:1,name:1,age:1,prescription_tracking:1,medications:1})
+    .exec(function(err,user){     
+      if(err) throw err;
+      if(!user && req.body.phone !== undefined) {
+        res.send({error: "User not found. Please ensure this person was registered with this "  + req.body.phone + " or register the person."});
+        user.save(function(err,info){
+          if(err) throw err;
+        })
+      } else {
+        model.user.findOne({user_id: req.body.user_id},{referral:1,diagnostic_center_notification:1,city:1,name:1,country:1,address:1})
+        .exec(function(err,pharmacy){         
+          if(err) throw err;
+
+           var ref_id;
+
+          if(req.body.ref_id){            
+            ref_id = req.body.ref_id;
+          }  else {        
+            ref_id = Math.floor(Math.random() * 9999999);
+          }
+         
+          req.body.patient_profile_pic_url = user.profile_pic_url;
+          req.body.age = user.age;
+          var firstname =  user.firstname || user.name;
+          req.body.patient_firstname = firstname;
+          req.body.patient_lastname = user.lastname;
+          req.body.patient_city = user.city;
+          req.body.patient_country = user.country;
+          req.body.patient_address = user.address;
+          
+
+          var refObj = {
+            ref_id: ref_id,
+            referral_firstname: firstname,
+            referral_lastname: user.lastname,
+            referral_title: user.title,
+            referral_id: user.user_id,    
+            date: req.body.sent_date,
+            pharmacy: req.body
+          };
+
+
+
+          var pharmacyNotification = {
+            sender_firstname: firstname,
+            sender_lastname: user.lastname,
+            sender_title : user.title,
+            sent_date: req.body.sent_date,
+            ref_id: ref_id,
+            note_id: ref_id,
+            sender_profile_pic_url: user.profile_pic_url,
+            message: 'Hi, I need your services'
+          };
+
+          
+          var preObj = {              
+            provisional_diagnosis: req.body.provisional_diagnosis,
+            date: req.body.sent_date,
+            prescriptionId: req.body.prescriptionId,
+            doctor_firstname: firstname,
+            doctor_lastname: req.user.lastname,
+            doctor_address: req.user.address,   
+            doctor_id: req.user.user_id,
+            doctor_work_place: req.user.work_place,
+            doctor_city: req.user.city,
+            doctor_country: req.user.country,
+            lab_analysis: req.body.lab_analysis,
+            scan_analysis: req.body.scan_analysis,
+            Doctor_profile_pic_url: req.user.profile_pic_url,
+            patient_id : req.body.patient_id,
+            patient_profile_pic_url: req.body.patient_profile_pic_url,
+            patient_firstname: req.body.firstname,
+            patient_lastname: req.body.lastname,
+            patient_address: req.body.address,
+            patient_gender: req.body.gender,
+            patient_age: req.body.age,
+            patient_city: req.body.city,
+            patient_country: req.body.country,
+            prescription_body: req.body.prescription_body,
+            ref_id: ref_id
+          }
+          
+          var track_record = {
+            date: req.body.sent_date,
+            center_name: pharmacy.name,
+            address: pharmacy.address,
+            ref_id: ref_id,
+            city: pharmacy.city,
+            country: pharmacy.country,
+            prescriptionId: req.body.prescriptionId
+          };
+
+          if(!req.body.ref_id){
+            user.medications.push(preObj);
+          }
+          
+
+          user.prescription_tracking.unshift(track_record); 
+
+          pharmacy.referral.push(refObj);
+          pharmacy.diagnostic_center_notification.push(pharmacyNotification);
+
+          pharmacy.save(function(err,info){
+            if(err) throw err;
+          });
+
+          user.save(function(err,info){
+            if(err) throw err;
+            console.log("patient saved")
+          });
+
+          res.send({success:true,ref_id: ref_id}); 
+        });
+           
+      }
+
+    });
+
+   } else {
+    res.end("Unauthorized access!")
+   }
+  });
+
+
+//for lab test search
+router.put("/laboratory/search/find-tests",function(req,res){
+  console.log(req.body)
+  if(req.user && req.body.city === undefined)
+    req.body.city = req.user.city;
+  model.services.find({type:"Laboratory",center_city:req.body.city},
+    {center_name:1,center_city:1,center_address:1,center_country:1,user_id:1,unavailable_services:1,_id:0},function(err,data){
+    if(err) throw err;
+    var newListToSend = [];        
+    var sendObj = {};
+    var listOfTests = req.body.testList;        
+    for(var i = 0; i < listOfTests.length; i++){
+      var elements = data.map(function(x){return x.unavailable_services});
+      console.log(elements)
+      var count = 0;
+      var foundTest = [];          
+      while(count < elements.length){
+        var centerInfo = {}                      
+        var elementPos = elements[count].map(function(x){ return x.id}).indexOf(listOfTests[i].id);            
+        centerInfo.notFound = listOfTests[i].name;
+        if(elementPos === -1){              
+          centerInfo.center_name = data[count].center_name;
+          centerInfo.center_city = data[count].center_city;
+          centerInfo.center_country = data[count].center_country;
+          centerInfo.center_city = data[count].center_city;
+          centerInfo.center_id = data[count].user_id;
+          centerInfo.center_address = data[count].center_address;
+          centerInfo.testFound = listOfTests[i].name;              
+          foundTest.push(centerInfo)               
+          sendObj[listOfTests[i].name] = foundTest;
+          newListToSend.push(sendObj)  
+        } 
+        count++;
+      }
+    }
+   
+    var filter = {};
+        
+    for(var i in sendObj){
+      for(var j = 0; j < sendObj[i].length; j++){
+        if(!filter.hasOwnProperty(sendObj[i][j].center_id)){                             
+          filter[sendObj[i][j].center_id] = {};
+          filter[sendObj[i][j].center_id].count = 1;
+          filter[sendObj[i][j].center_id].name = sendObj[i][j].center_name;
+          filter[sendObj[i][j].center_id].address = sendObj[i][j].center_address;
+          filter[sendObj[i][j].center_id].city = sendObj[i][j].center_city;
+          filter[sendObj[i][j].center_id].country = sendObj[i][j].center_country
+          filter[sendObj[i][j].center_id].id = sendObj[i][j].center_id
+          filter[sendObj[i][j].center_id].str = sendObj[i][j].testFound;
+        } else {
+          filter[sendObj[i][j].center_id].str += "," + sendObj[i][j].testFound;
+          filter[sendObj[i][j].center_id].count++;
+        }
+      }
+    }
+   
+
+    Array.prototype.diff = function(arr2) {
+      var ret = [];
+      this.sort();
+      arr2.sort();
+      for(var i = 0; i < this.length; i += 1) {
+          if(arr2.indexOf( this[i].name ) === -1){
+              ret.push( this[i] );
+          }
+      }
+      return ret;
+    };
+
+    var sub = {};
+    sub['full'] = []
+    sub['less'] = [];
+    for(var k in filter){
+      if(filter[k].count === req.body.testList.length) {           
+        sub['full'].push(filter[k])
+      } else {
+        var arr1 = req.body.testList;
+        var newFilterArr = filter[k].str.split(",")            
+        var notFoundArr = arr1.diff(newFilterArr)
+        console.log(notFoundArr)
+        filter[k].notFound = notFoundArr;          
+        sub['less'].push(filter[k])
+      }
+    }
+    console.log(sub)
+    res.send(sub)
+
+  });
+
+});
+
+router.put("/test-search/laboratory/referral",function(req,res){
+    if(req.user){
+    var person = (req.body.phone && req.body.phone !== "") ? {phone: req.body.phone} : {user_id: req.user.user_id};
+    model.user.findOne(person,{firstname:1,lastname:1,title:1,profile_pic_url:1,city:1,country:1,name:1,age:1,user_id:1})
+    .exec(function(err,user){
+      if(err) throw err;
+        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1})
+        .exec(function(err,result){
+        var firstname = user.firstname || user.name;
+        try{
+        var refData = {
+          firstname: firstname,
+          lastname: user.lastname,
+          title: user.title,
+          address: user.address,
+          city: user.city,
+          country: user.country,
+          phone: result.phone,
+          id: user.user_id
+        }
+
+        var refObj = {
+          ref_id: req.body.ref_id,
+          referral_firstname: firstname,
+          referral_lastname: user.lastname,
+          referral_title: user.title,
+          referral_id: user.user_id,    
+          date: req.body.sent_date,            
+          laboratory: {
+            test_to_run : req.body.test_to_run,
+            patient_firstname: user.firstname,
+            patient_lastname: user.lastname,
+            patient_profile_pic_url: user.profile_pic_url,
+            patient_title: user.title,
+            patient_phone: user.phone,
+            session_id: req.body.session_id,
+            patient_id: user.user_id,
+            attended: false
+          }             
+        }
+
+        var refNotification = {
+          sender_firstname: firstname,
+          sender_lastname: user.lastname,
+          sender_title : user.title,
+          sent_date: req.body.sent_date,
+          ref_id: req.body.ref_id,
+          note_id: req.body.ref_id,
+          sender_profile_pic_url: user.profile_pic_url,
+          message: "Please run the test for me"
+        }
+
+        
+        var refPos = result.referral.map(function(x){return x.ref_id}).indexOf(req.body.ref_id);
+
+        if(refPos === -1){
+          result.referral.push(refObj);
+          //remember sms will be sent to the patient
+          //this populates the patient medical record
+          model.user.findOne({user_id: user.user_id},{medical_records: 1,user_id:1}).exec(function(err,record){
+            if(err) throw err;     
+            var recordObj = {
+              test_to_run: req.body.test_to_run,
+              center_address: req.body.address,
+              center_city: req.body.city,
+              center_country: req.body.country,
+              center_name: req.body.name,
+              center_phone: result.phone,
+              center_id: req.body.id,
+              patient_id: record.user_id,
+              ref_id: req.body.ref_id,
+              referral_firstname: firstname,
+              referral_lastname: user.lastname,
+              referral_title: user.title,
+              sent_date: req.body.sent_date,
+              session_id: req.body.session_id,
+              report: "Pending",
+              conclusion: "Pending"
+            }
+            record.medical_records.laboratory_test.unshift(recordObj);
+            record.save(function(err,info){
+              if(err) {
+                throw err;
+                res.end('500: Internal server error')
+              }
+              res.json({success:true,ref_id:req.body.ref_id});
+              console.log("send all went well")
+            });
+
+            result.diagnostic_center_notification.push(refNotification);
+            result.save(function(err,info){
+              if(err) throw err;
+              console.log("i saved !!!!")            
+            });
+          });        
+          
+        } else {
+           res.json({success:true,ref_id:req.body.ref_id});
+        }  
+        
+    
+        user.save(function(err,info){
+          if(err) throw err;
+          console.log("saved")
+        })
+
+       } catch(e){
+          console.log(e.message)
+        }
+
+      })
+   
+      
+    });
+
+  } else {
+    res.end("Unauthorized access")
+  }
+});
+
+//for scan test search
+router.put("/radiology/search/find-tests",function(req,res){
+  console.log(req.body)
+  if(req.user && req.body.city === undefined)
+    req.body.city = req.user.city;
+  model.services.find({type:"Radiology",center_city:req.body.city},
+    {center_name:1,center_city:1,center_address:1,center_country:1,user_id:1,unavailable_services:1,_id:0},function(err,data){
+    if(err) throw err;
+    var newListToSend = [];        
+    var sendObj = {};
+    var listOfTests = req.body.testList;        
+    for(var i = 0; i < listOfTests.length; i++){
+      var elements = data.map(function(x){return x.unavailable_services});
+      var count = 0;
+      var foundTest = [];          
+      while(count < elements.length){
+        var centerInfo = {}                      
+        var elementPos = elements[count].map(function(x){ return x.id}).indexOf(listOfTests[i].id);            
+        centerInfo.notFound = listOfTests[i].name;
+        if(elementPos === -1){              
+          centerInfo.center_name = data[count].center_name;
+          centerInfo.center_city = data[count].center_city;
+          centerInfo.center_country = data[count].center_country;
+          centerInfo.center_city = data[count].center_city;
+          centerInfo.center_id = data[count].user_id;
+          centerInfo.center_address = data[count].center_address;
+          centerInfo.testFound = listOfTests[i].name;              
+          foundTest.push(centerInfo)               
+          sendObj[listOfTests[i].name] = foundTest;
+          newListToSend.push(sendObj)  
+        } 
+        count++;
+      }
+    }
+   
+    var filter = {};
+        
+    for(var i in sendObj){
+      for(var j = 0; j < sendObj[i].length; j++){
+        if(!filter.hasOwnProperty(sendObj[i][j].center_id)){                             
+          filter[sendObj[i][j].center_id] = {};
+          filter[sendObj[i][j].center_id].count = 1;
+          filter[sendObj[i][j].center_id].name = sendObj[i][j].center_name;
+          filter[sendObj[i][j].center_id].address = sendObj[i][j].center_address;
+          filter[sendObj[i][j].center_id].city = sendObj[i][j].center_city;
+          filter[sendObj[i][j].center_id].country = sendObj[i][j].center_country
+          filter[sendObj[i][j].center_id].id = sendObj[i][j].center_id
+          filter[sendObj[i][j].center_id].str = sendObj[i][j].testFound;
+        } else {
+          filter[sendObj[i][j].center_id].str += "," + sendObj[i][j].testFound;
+          filter[sendObj[i][j].center_id].count++;
+        }
+      }
+    }
+   
+
+    Array.prototype.diff = function(arr2) {
+      var ret = [];
+      this.sort();
+      arr2.sort();
+      for(var i = 0; i < this.length; i += 1) {
+          if(arr2.indexOf( this[i].name ) === -1){
+              ret.push( this[i] );
+          }
+      }
+      return ret;
+    };
+
+    var sub = {};
+    sub['full'] = []
+    sub['less'] = [];
+    for(var k in filter){
+      if(filter[k].count === req.body.testList.length) {           
+        sub['full'].push(filter[k])
+      } else {
+        var arr1 = req.body.testList;
+        var newFilterArr = filter[k].str.split(",")            
+        var notFoundArr = arr1.diff(newFilterArr)
+        console.log(notFoundArr)
+        filter[k].notFound = notFoundArr;          
+        sub['less'].push(filter[k])
+      }
+    }
+    console.log(sub)
+    res.send(sub)
+
+  });
+
+});
+
+router.put("/scan-search/radiology/referral",function(req,res){
+    if(req.user){
+    var person = (req.body.phone && req.body.phone !== "") ? {phone: req.body.phone} : {user_id: req.user.user_id};
+    model.user.findOne(person,{firstname:1,lastname:1,title:1,profile_pic_url:1,city:1,country:1,name:1,age:1,user_id:1})
+    .exec(function(err,user){
+      if(err) throw err;
+        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1})
+        .exec(function(err,result){         
+        var firstname = user.firstname || user.name;
+        var refData = {
+          firstname: firstname,
+          lastname: user.lastname,
+          title: user.title,
+          address: user.address,
+          city: user.city,
+          country: user.country,
+          phone: result.phone,
+          id: user.user_id
+        }
+
+        var refObj = {
+          ref_id: req.body.ref_id,
+          referral_firstname: firstname,
+          referral_lastname: user.lastname,
+          referral_title: user.title,
+          referral_id: user.user_id,    
+          date: req.body.sent_date,            
+          radiology: {
+            test_to_run : req.body.test_to_run,
+            patient_firstname: user.firstname,
+            patient_lastname: user.lastname,
+            patient_profile_pic_url: user.profile_pic_url,
+            patient_title: user.title,
+            patient_phone: user.phone,
+            session_id: req.body.session_id,
+            patient_id: user.user_id,
+            attended: false
+          }             
+        }
+
+        var refNotification = {
+          sender_firstname: firstname,
+          sender_lastname: user.lastname,
+          sender_title : user.title,
+          sent_date: req.body.sent_date,
+          ref_id: req.body.ref_id,
+          note_id: req.body.ref_id,
+          sender_profile_pic_url: user.profile_pic_url,
+          message: "Please run the test for me"
+        }
+
+        
+        var refPos = result.referral.map(function(x){return x.ref_id}).indexOf(req.body.ref_id);
+
+        if(refPos === -1){
+          result.referral.push(refObj);
+          //remember sms will be sent to the patient
+          //this populates the patient medical record
+          model.user.findOne({user_id: user.user_id},{medical_records: 1,user_id:1}).exec(function(err,record){
+            if(err) throw err;     
+            var recordObj = {
+              test_to_run: req.body.test_to_run,
+              center_address: req.body.address,
+              center_city: req.body.city,
+              center_country: req.body.country,
+              center_name: req.body.name,
+              center_phone: result.phone,
+              center_id: req.body.id,
+              patient_id: record.user_id,
+              ref_id: req.body.ref_id,
+              referral_firstname: firstname,
+              referral_lastname: user.lastname,
+              referral_title: user.title,
+              sent_date: req.body.sent_date,
+              session_id: req.body.session_id,
+              report: "Pending",
+              conclusion: "Pending"
+            }
+            record.medical_records.radiology_test.unshift(recordObj);
+            record.save(function(err,info){
+              if(err) {
+                throw err;
+                res.end('500: Internal server error')
+              }
+              res.json({success:true,ref_id:req.body.ref_id});
+              console.log("send all went well")
+            });
+
+            result.diagnostic_center_notification.push(refNotification);
+            result.save(function(err,info){
+              if(err) throw err;
+              console.log("i saved !!!!")            
+            });
+          });        
+          
+        } else {
+           res.json({success:true,ref_id:req.body.ref_id});
+        }        
+    
+        user.save(function(err,info){
+          if(err) throw err;
+          console.log("saved")
+        })
+
+      })
+   
+      
+    });
+
+  } else {
+    res.end("Unauthorized access")
+  }
+});
+
+/**
+//center address and name obj to be passed to the patient.
+    var centerObj = {
+      name: result.name,
+      address: result.address,
+      city: result.city,
+      country: result.country,
+      phone: result.phone,
+      id: result.user_id
+    }
+
+    var refObj = {
+      ref_id: req.body.ref_id,
+      referral_firstname: req.user.firstname,
+      referral_lastname: req.user.lastname,
+      referral_title: req.user.title,
+      referral_id: req.user.user_id,    
+      date: req.body.date,            
+      laboratory: {
+        test_to_run : req.body.laboratory.test_to_run,
+        patient_firstname: req.body.laboratory.patient_firstname,
+        patient_lastname: req.body.laboratory.patient_lastname,
+        patient_profile_pic_url: req.body.laboratory.patient_profilePic,
+        patient_title: req.body.laboratory.patient_title,
+        patient_phone: req.body.laboratory.phone,
+        session_id: req.body.laboratory.session_id,
+        patient_id: req.body.laboratory.patient_id,
+        attended: false
+      }             
+    }
+
+    //this is notification for the center.
+    var refNotification = {
+      sender_firstname: req.user.firstname,
+      sender_lastname: req.user.lastname,
+      sender_title : req.user.title,
+      sent_date: req.body.date,
+      ref_id: req.body.ref_id,
+      note_id: req.body.ref_id,
+      sender_profile_pic_url: req.user.profile_pic_url,
+      message: "Please run the test for my patient"
+    }
+
+    result.referral.push(refObj);
+    result.diagnostic_center_notification.push(refNotification);
+
+    result.save(function(err,info){
+      if(err) throw err;            
+    });
+    tellPatient(centerObj);
+  });
+
+  var tellPatient = function(centerInfo){
+    //remember sms will be sent to the patient
+    model.user.findOne({user_id: req.body.laboratory.patient_id},{medical_records: 1,user_id}).exec(function(err,record){
+      if(err) throw err;     
+      var recordObj = {
+        test_to_run: req.body.laboratory.test_to_run,
+        center_address: centerInfo.address,
+        center_city: centerInfo.city,
+        center_country: centerInfo.country,
+        center_name: centerInfo.name,
+        center_phone: centerInfo.phone,
+        center_id: centerInfo.id,
+        patient_id: record.user_id,
+        ref_id: req.body.ref_id,
+        referral_firstname: req.user.firstname,
+        referral_lastname: req.user.lastname,
+        referral_title: req.user.title,
+        sent_date: req.body.date,
+        session_id: req.body.session_id,
+        report: "Pending",
+        conclusion: "Pending"
+      }
+      record.medical_records.laboratory_test.unshift(recordObj);
+      record.save(function(err,info){
+        if(err) {
+          throw err;
+          res.end('500: Internal server error')
+        }
+        res.json({success:true,ref_no:req.body.ref_id});
+      });
+
+    });
+**/
+
+router.post("/user/help",function(req,res){
+  model.help.findOne({user_id: req.user.user_id}).exec(function(err,user){
+    var complain = {
+      helpType: req.body.helpType,
+      description: req.body.description,
+      sent_date: req.body.date,
+    }
+
+    if(!user){
+      var newHelp = new model.help({       
+        isLoggedIn: req.body.isLoggedIn,
+        typeOfUser: req.body.typeOfUser,
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        title: req.body.title,
+        phone: req.body.phone,
+        email: req.body.email,
+        user_id: req.body.user_id,
+      });
+
+      newHelp.complaint.unshift(complain)
+
+      newHelp.save(function(err,info){
+        if(err) throw err;
+        res.send({status:true})
+      })
+    } else {
+      user.complaint.unshift(complain);
+      res.send({status:true})
+    }
+
+    user.save(function(err,info){
+      if(err) throw err;
+      console.log(info)
+    })
+  });
+  
+});
+
+router.post("/user/courier",function(req,res){
+  res.send({status:true})
+});
+
+  
+
+//log out route
+router.get("/user/logout",function(req,res){
+    req.logout();
+    res.redirect('/');
+});
+
+/***************For emergency profile *************/
+
+router.get("/patient/EM/profile/:id",function(req,res){
+  console.log(req.params);
+  model.user.findOne({user_id: req.params.id},{_id:0},function(err,result){
+    if(err) throw err;     
+    res.render("emergency-profile",{userInfo:result})
+  })
+  
+});
+
+router.put("/patient-panel/get-medical-record/em",function(req,res){      
+  model.user.findOne({user_id: req.body.patient_id},{medical_records: 1,medications:1},function(err,data){
+    res.json({medical_records: data.medical_records,prescriptions: data.medications})
+    //Note from model, medications holds all prescriptions while medical_records holds all laboratory and radiology tests
+    // though there is prescription property on medical_record obj but not used yet.
+  });   
+
+});
+
+router.put("/patient/get-prescription/track-record/em",function(req,res){
+  model.user.findOne({user_id:req.body.patient_id},{prescription_tracking:1,_id:0},function(err,data){
+    console.log(data.prescription_tracking);
+    res.send(data.prescription_tracking);
+  });
+});
+
 }
 
 module.exports = basicRoute;

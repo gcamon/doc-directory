@@ -333,7 +333,8 @@
                                         </div>
                                         <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                                             <div class="panel-body">
-                                                <p><a href="#/phamarcy-edit-profile">Edit your profile</a></p>                                                
+                                                <p><a href="#/pharmacy-edit-profile">Edit your profile</a></p>
+                                                <p><a href="#/pharmacy/drug-service/update">Update drug stock</a></p>                       
                                             </div>
                                         </div>
                                     </li>
@@ -579,7 +580,7 @@
             </div>
         </div>
     </div>
-    <script type="text/ng-template" id="question.html" ng-controller="connectController">
+    <script type="text/ng-template" id="question.html">
          <div class="modal fade">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -616,7 +617,7 @@
           </div>
         </div>
      </script>
-     <script type="text/ng-template" id="request.html" ng-controller="connectController">
+     <script type="text/ng-template" id="request.html">
          <div class="modal fade">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -647,7 +648,7 @@
           </div>
         </div>
      </script>
-     <script type="text/ng-template" id="insuficient-fund.html" ng-controller="insuficientFundController">
+     <script type="text/ng-template" id="insuficient-fund.html">
          <div class="modal fade">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -672,6 +673,31 @@
           </div>
         </div>
      </script>
+
+     <script type="text/ng-template" id='selected-drug-not-have.html'>
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              </div>              
+              <div class="modal-body"> 
+                  <article > 
+                    Based on your selection, the drugs(s) below are not 
+                    available in your center
+                  </article>
+                  <ol>
+                    <li ng-repeat="drug in selectedDrugs">{{drug.name}}</li>
+                  </ol>          
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="goBack()" class="btn btn-primary" data-dismiss="modal">No,go back</button>
+                <button type="button" ng-click="save()" class="btn btn-primary" data-dismiss="modal">Yes,save</button>              
+              </div>
+            </div>
+          </div>
+        </div>
+     </script>
+
     <!--************************************
         Sign In Sign Up Light Box End
     *************************************-->
@@ -698,6 +724,10 @@
         <script src="/assets/js/main.js"></script>
         <script src="/assets/js/angular-touch.min.js"></script>
         <script src="/assets/js/angular-carousel.js"></script>
+        <script src="/assets/js/moment.min.js"></script>
+        <script src="/assets/js/angular-moment.min.js"></script>
+        <script src="/assets/js/angucomplete-alt.min.js"></script>
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>       
         
 
 

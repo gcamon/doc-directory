@@ -31,7 +31,7 @@
 	<!--************************************
 			Wrapper Start
 	*************************************-->
-	<div id="wrapper" class="tg-haslayout">
+	<div id="wrapper" class="tg-haslayout" ng-controller = "drugSearchController">
 		<!--************************************
 				Header Start
 		*************************************-->
@@ -104,102 +104,33 @@
 		<!--************************************
 				Home Slider Start
 		*************************************-->
-		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="searchController">
+		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" >
 			<div class="tg-searcharea tg-haslayout">
 				<div class="container">
 					<div class="row">
 						<form class="tg-searchform">
-							<div class="col-md-5 col-sm-5 col-xs-12">
-								<div class="form-group">
-									<input type="text" placeholder="City" class="form-control" ng-model="user.city">
-								</div>
-							</div>
-							<div class="col-md-5 col-sm-5 col-xs-8">
-								<div class="form-group">								
-									<span class="select">
-										<select id="group1" class="group" placeholder="Specialty" ng-model="user.specialty">
-											<option>Acupunture</option>
-                                            <option>Addiction Medicine</option>
-                                            <option>Adolescent Medicine</option>
-                                            <option>Aerospace Medicine</option>
-                                            <option>Allergy</option>
-                                            <option>Allergy/Immunology</option>
-                                            <option>Anesthesiology</option>
-                                            <option>Audiologist</option>
-                                            <option>Bariatrician</option>
-                                            <option>Cardiac Electrophysiology</option>
-                                            <option>Cardiology</option>
-                                            <option>Chiropractic</option>
-                                            <option>Clinical Laboratory Immunology</option>
-                                            <option>Clinical Pathology</option>
-                                            <option>Colon/Rectal Surgery</option>
-                                            <option>Critical Care</option>
-                                            <option>Cythopathology</option>
-                                            <option>Dermatology</option>
-                                            <option>Dermatopathology</option>
-                                            <option>Diabetes</option>
-                                            <option>Diagnostic</option>
-                                            <option>Emergency Medical Tech</option>
-                                            <option>Emergency Medicine</option>
-                                            <option>Endocrinology</option>
-                                            <option>Endovascular Surgical Neuroradiology</option>
-                                            <option>Family Practice</option>
-                                            <option>Gastroenterology</option>
-                                            <option>General Practice</option>
-                                            <option>General Surgery</option>
-                                            <option>Genetics</option>
-                                            <option>Geriatrics</option>
-                                            <option>Gynecology</option>
-                                            <option>Gynecology Oncology</option>
-                                            <option>Hand Surgery</option>
-                                            <option>Hand and Neck Surgery</option>
-                                            <option>Hematology</option>
-                                            <option>Hematology/Oncology</option>
-                                            <option>Hepatology</option>
-                                            <option>Holistic Medicine</option>
-                                            <option>Hospitalist</option>
-                                            <option>Immunology</option>
-                                            <option>Infectious Disease</option>
-                                            <option>Internal Medicine</option>
-                                            <option>Interventional Cardiology</option>
-                                            <option>Legal Medicine</option>
-                                            <option>Medical Oncology</option>
-                                            <option>Medical Toxicology</option>
-                                            <option>Neonatology</option>
-                                            <option>Nephrology</option>
-                                            <option>Neurology</option>
-                                            <option>Neuroradiology</option>
-                                            <option>Nuclear Cardiology</option>
-                                            <option>Nuclear Medicine</option>
-                                            <option>Nutrition</option>
-                                            <option>Obstetrics/Gynecology</option>
-                                            <option>Occupational Medicine</option>
-                                            <option>Oncology</option>
-                                            <option>Opthalmology</option>
-                                            <option>Optometry</option>
-                                            <option>Orthopedic Foot & Ankle</option>
-                                            <option>Orthopedic Reconstructive Surgery</option>
-                                            <option>Orthopedic Spine Surgery</option>
-                                            <option>Orthopedic Surgery</option>
-                                            <option>Osteopathy</option>
-                                            <option>Otorhinolaryngology</option>
-                                            <option>Pain Management</option>
-                                            <option>Pathology</option>
-                                            <option>PPediatric Allergy</option>
-                                            <option>Pediatric Cardiology</option>
-                                            <option>Pediatric Critical Care</option>
-                                            <option>Padiatric Emergency Medicine</option>
-                                            <option>Other</option>	
-										</select>
-									</span>
-								</div>
-							</div>
 							<div class="col-md-2 col-sm-2 col-xs-4">
-								<div class="form-group">
-									<button id="search_banner" class="tg-btn tg-btn-lg" ng-click = "search()">Search</button>
-								</div>
-							</div>
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-specialist" class="tg-btn tg-btn-lg">Find A Doctor</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-drug" class="tg-btn tg-btn-lg" style="background-color:#7dbb00;color:#fff">Find A Drug</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-lab-test" class="tg-btn tg-btn-lg">Find A Lab Test</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-scan-test" class="tg-btn tg-btn-lg">Find A Scan Test</a>
+                                </div>
+                            </div>
 						</form>
+						<span style="cursor: pointer" ng-click="backTo('<%= userInfo.type %>')">Back to dashboard</span>
 					</div>
 				</div>
 			</div>
@@ -207,10 +138,10 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-xs-12">
-							<h1>Success!</h1>
+							<h1>Drug search</h1>
 							<ol class="tg-breadcrumb">
 								<li><a href="#">Home</a></li>
-								<li class="active">Account Created</li>
+								<li class="active">Find drug</li>
 							</ol>
 						</div>
 					</div>
@@ -223,24 +154,28 @@
 		<!--************************************
 				Main Start
 		*************************************-->
-		<main id="main" class="tg-main-section tg-haslayout" ng-controller = "loginController">
+		<main id="main" class="tg-main-section tg-haslayout">
 			<div class="container">
 				<div class="row">
 					<div class="tg-404 tg-haslayout">
 						<div class="col-md-12 col-sm-12">
+							<div class="row">
+								<div class="col-sm-12 col-md-8 col-lg-8">
+									<div class="view-animate-container row" >  
+	                                    <div class="view-animate" ng-view >
+	                                    </div>
+                                	</div>									
+								</div>
+								<div class = "col-sm-12 col-md-4 col-lg-4">
+									<aside class="side-services">																				
+										<a href="#/help">Need help?</a>
+										<!--<a href="#/courier">Our Courier?</a>-->
+									</aside>
+								</div>
+								<div>
+				
+							</div>							
 							
-							<h3 style="text-align: center; margin:10px 0px 60px">Account created Successfully!!</h4>
-                            <h5 style="text-align: center;color:rgba(0,0,0,0.6)">Login</h5>
-                            <div style="width: 400px; height: 400px; margin:0 auto">
-                            <span  style="color: red;display:block;text-align: center; font-size:16px;padding:10px 10px" ng-cloak>{{error}}</span>							
-							<form>
-								<input type="text" placeholder="Email" ng-model = "login.email" style="border: 1px solid rgba(0,255,0,0.8)">
-								<input type="password" placeholder="Password" ng-model = "login.password" style="border: 1px solid rgba(0,255,0,0.8);margin: 10px 0px">
-								<p style="text-align: center">
-								<button class="btn btn-login" ng-click="send()">Send</button>
-								</p>
-							</form>
-							</div>
 						</div>						
 				</div>
 			</div>
@@ -453,6 +388,151 @@
 	<!--************************************
 		Sign In Sign Up Light Box End
 	*************************************-->
+	
+    <script type="text/ng-template" id="qiuck-login.html" >
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true" style="font-size: 26px">&times;</button>
+                <h5 style="text-align: center">Oops! You need to log in before you can forward drugs to a pharmacy</h5>
+              </div>
+              <div class="modal-body" style="text-align:center">
+              <form class="tg-form-modal tg-form-signin">
+                <span style="color:red" ng-cloak>{{error}}</span>
+                    <fieldset>
+                        <div class="form-group">
+                            <input type="email" class="form-control" placeholder="Email Address" name="email" ng-model="login.email">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" placeholder="Password" name="password" ng-model="login.password">
+                        </div>                                
+                        <div class="form-group tg-checkbox" ng-controller="isNotloggedInModalController">
+                            <label>
+                                <strong>Not yet registered as a <b>patient?</b> </strong>
+                                <span style="font-size: 18px; text-decoration: underline;password:10px;cursor:pointer" ng-click="signUp()">Sign up</span>
+                            </label>
+                            <a class="tg-forgot-password" href="#">
+                                <i>Forgot Password</i>
+                                <i class="fa fa-question-circle"></i>
+                            </a>
+                        </div>
+                        <button class="tg-btn tg-btn-lg" ng-click="send()">LOGIN now</button>
+                    </fieldset>
+                </form>        
+              </div>
+              <div class="modal-footer">
+              </div>
+            </div>
+          </div>
+        </div>
+    </script>
+
+	<script type="text/ng-template" id="patient-signup.html">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true" style="font-size: 26px">&times;</button>
+                
+              </div>
+              <div class="modal-body">
+                <form class="tg-form-modal tg-form-signup">
+                            <span style="color:red" ng-cloak>{{error}}</span>
+                            <fieldset>
+                            <h5>Patient signup</h5>                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname">
+                                </div>                                
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="lastname" ng-model="user.lastname">
+                                </div>
+                                 <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" name="gender" placeholder="Gender" ng-model="user.gender">
+                                </div>
+                               
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Age*" id="work" ng-model="user.age">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="City/Town*" id="firstname" ng-model="user.city" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <input type="email" class="form-control placeholder-color" placeholder="Email*" id="firstname" ng-model="user.email" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" placeholder="Password" ng-model="user.password">
+                                </div>                                                   
+                               
+                                <div class="form-group tg-checkbox">
+                                    <label>
+                                        <input type="checkbox" class="form-control" ng-model="user.check">
+                                        I agree with the terms and conditions
+                                    </label>
+                                </div>                                
+                                <button class="tg-btn tg-btn-lg" ng-click="submit('Patient')">Create an Account</button>
+                            </fieldset>
+                        </form>               
+                    
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="close('No')" class="btn btn-default" data-dismiss="modal">No</button>
+                <button type="button" ng-click="close('Yes')" class="btn btn-primary" data-dismiss="modal">Yes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        </script>
+        <script type="text/ng-template" id="patient-emergency-form.html">
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true" style="color:red;font-size: 32px">&times;</button>
+                </div>                                     
+              </div>
+              
+              <div class="modal-body" style="text-align:center">
+                    
+                    <form ng-if="isForm">
+                        <h6 style="text-align: center; color: red">{{error}}</h6>
+                        <h5>Fill this form for the new Patient</h5>
+                        <div>
+                            <input type="text" placeholder="Firstname *" ng-model="patient.firstname" required/>
+                        </div>
+                        <div>
+                            <input type="text" placeholder="Lastname *" ng-model="patient.lastname" required/>
+                        </div>
+                        <div>
+                            <input type="number" placeholder="Phone number *" ng-model="patient.phone" required/>
+                        </div>
+                        <div>
+                            <input type="text" placeholder="Email" ng-model="patient.email" required/>
+                        </div>
+                        
+                        <div>
+                            <input type="button"  value="Submit" class="btn btn-primary" ng-click="sendForm()"/>
+                        </div>
+                    </form>
+                    <div ng-if="isCreated" style="width: 95%; margin auto auto">
+                        <h4>Patient emergency profile created successfully!</h4>
+                    </div>
+
+              </div>
+              
+            </div>
+          </div>
+        </div>
+     </script>
 	 	 <script src="/assets/js/vendor/jquery-library.js"></script>
         <script src="/assets/js/vendor/bootstrap.min.js"></script>
         <script type="text/javascript" src="/assets/js/source.js"></script>
@@ -477,8 +557,8 @@
         <script src="/assets/js/angular-carousel.js"></script>
         <script src="/assets/js/moment.min.js"></script>
         <script src="/assets/js/angular-moment.min.js"></script>
-        <script src="/assets/js/ui-bootstrap-tpls.js"></script>     
-        <script src="/assets/js/angular-clipboard.js"></script>
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>
+        <script src="/assets/js/angular-clipboard.js"></script> 
     
 </body>
 </html>

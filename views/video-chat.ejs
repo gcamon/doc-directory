@@ -240,7 +240,8 @@
                                             <tr>
                                                 <tbody ng-repeat="prescription in drugList">                                                                           
                                                     <td>{{prescription.sn}}</td>
-                                                    <td><textarea ng-model="prescription.drug_name" style="width: 180px;max-height: 80px;padding: 18px 2px"></textarea></td>
+                                                    <td><input name="states" id="states" type="text" placeholder="Enter drug name" ng-model="drug.name" uib-typeahead="drug.name for drug in drugs | filter:$viewValue | limitTo:15" class="form-control" style="width: 95%">
+                                                        {{getDrug(drug.name)}} </td>
                                                     <td><input type="text" ng-model="prescription.dosage" style="padding: 18px 2px"></td>
                                                     <td><input type="text" ng-model="prescription.frequency" style="padding: 18px 2px"></td>
                                                     <td><input type="text" ng-model="prescription.duration" style="padding: 18px 2px"></td>
@@ -550,6 +551,9 @@
         <script src="/assets/js/main.js"></script>
         <script src="/assets/js/angular-touch.min.js"></script>
         <script src="/assets/js/angular-carousel.js"></script>
+        <script src="/assets/js/moment.min.js"></script>
+        <script src="/assets/js/angular-moment.min.js"></script>         
+         <script src="/assets/js/ui-bootstrap-tpls.js"></script>    
         
         <script type="text/javascript"> 
     

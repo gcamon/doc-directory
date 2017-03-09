@@ -108,7 +108,7 @@
         <!--************************************
                 Home Slider Start
         *************************************-->
-        <div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="searchController">
+        <div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout">
             <div class="tg-searcharea tg-haslayout">
                 <div class="container">
                     <div class="row">
@@ -118,7 +118,7 @@
                                     
                                 </div>
                             </div>-->
-                            <div class="col-md-5 col-sm-5 col-xs-12">
+                            <!--<div class="col-md-5 col-sm-5 col-xs-12">
                                 <div class="form-group">
                                     <input type="text" placeholder="Enter city name" class="form-control" ng-model="user.city">
                                 </div>
@@ -202,66 +202,76 @@
                                         </select>
                                     </span>
                                 </div>
+                            </div>-->
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-specialist" class="tg-btn tg-btn-lg">Find A Doctor</a>
+                                </div>
                             </div>
                             <div class="col-md-2 col-sm-2 col-xs-4">
                                 <div class="form-group">
-                                    <button id="search_banner" class="tg-btn tg-btn-lg" ng-click = "search()">Search</button>
+                                    <a id="search_banner" href="/user/find-drug" class="tg-btn tg-btn-lg">Find A Drug</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-lab-test" class="tg-btn tg-btn-lg">Find A Lab Test</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-scan-test" class="tg-btn tg-btn-lg">Find A Scan Test</a>
                                 </div>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
-            <div class="tg-pagebar tg-haslayout" ng-controller = "pharmacyCenterNotificationController">
+            <div class="tg-pagebar tg-haslayout" ng-controller = "empatientNotificationController">
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-xs-4 col-md-8">
-                            <h1>Pharmacy dashboard</h1>
-                            <!--<ol class="tg-breadcrumb">
-                                <li><a href="#">Home</a></li>
-                                <li class="active">Patient dashboard</li>                                
-                            </ol>-->
+                            <h1>Patient dashboard</h1>                            
                         </div>
                         <div class="col-xs-8 col-md-4">                            
                             <ul class="notify">
-                                <li class="noti note notify-icon">
-                                    <i class="fa fa-bell-o" style="font-size:24px;color:rgba(0,180,0,0.8);position:relative"><span style="display:inline-block;width:24px;height:24px;background-color:#fff;left: 15px; top:-23px; border-radius: 15px;
-                                        position:absolute;text-align:center;color:#000" ng-if="<%= userInfo.diagnostic_center_notification.length %> > 0 "><%= userInfo.diagnostic_center_notification.length %></span></i>
-                                    <ul class="all-notify">                                        
-                                        <li> <h6 style="text-align: center">Notification(s)</h6> </li>
-                                        <li>
-                                            <p style="cursor: pointer; color:green;text-decoration: underline" ng-click="addAllNote()">Add all notifications to attendance list</p>
-                                        </li>                     
-                                        <% for(var i = userInfo.diagnostic_center_notification.length - 1; i >= 0; i--) { %>
-                                            <li class="pharmacy_notification" ng-click="viewNote(<%= userInfo.diagnostic_center_notification[i].ref_id  %>)">
-                                                <img src="<%= userInfo.diagnostic_center_notification[i].sender_profile_pic_url %>" style="width: 32px; height:32px">
-                                                <aside>
-                                                    <p><%= userInfo.diagnostic_center_notification[i].sender_firstname %> <%= userInfo.diagnostic_center_notification[i].sender_lastname %>
-                                                    <span><%= userInfo.diagnostic_center_notification[i].message %></span>
-                                                    <span><%= userInfo.diagnostic_center_notification[i].sent_date %></span></p>                                                 
-                                                </aside>                                                
-                                            </li>
-                                        <% } %> 
-                                    </ul>
-                                </li>
+                                <li>{{getName("<%= userInfo.firstname %>","<%=userInfo.lastname %>","<%= userInfo.user_id %>")}}</li>
+                                
                                 <li class="noti chat notify-icon">
-                                    <i class="fa fa-commenting-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
-                                    <ul class="all-notify">
-                                        <li>hello</li>                                        
-                                    </ul>
+                                    <!--<i class="fa fa-commenting-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>-->
+                                    <strong class="signal" ng-if="isLabP" ng-click="viewLabPending()" style="cursor:pointer" title=" {{labLenPending}} Awaiting lab test result">{{labLenPending}}&nbsp;PLab</strong>
                                 </li>
                                 <li class="noti video notify-icon">
-                                    <i class="fa fa-phone" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
+                                    <!--<i class="fa fa-phone" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>-->
+                                    <strong class="signal" ng-if="isScanP" ng-click="viewRadioPending()" style="cursor:pointer" title=" {{scanLenPending}} Awaiting scan test result">{{scanLenPending}} &nbsp;PScan</strong>
+                                </li>                               
+                                <li class="noti note notify-icon">
+                                    <i class="fa fa-bell-o" style="font-size:24px;color:rgba(0,180,0,0.8);position:relative"><span style="display:inline-block;width:24px;height:24px;background-color:#fff;left: 15px; top:-23px; border-radius: 15px;
+                                        position:absolute;text-align:center;color:#000;" ng-if="<%= userInfo.patient_notification.length %> > 0 "><%= userInfo.patient_notification.length %></span></i>
                                     <ul class="all-notify">
-                                        <li>hello</li>                                        
+                                        <li> <h6 style="text-align: center">Notification(s)</h6> </li>
+                                        {{getPatientId("<%= userInfo.user_id %>", "<%= userInfo.firstname %>", "<%= userInfo.lastname %>")}}
+                                        <% for(var i = userInfo.patient_notification.length -1; i >= 0; i--) { %>
+                                            <li class="note-field" ng-click="viewNote('<%= userInfo.patient_notification[i].doctor_id %>')">                                                
+                                                <img src="<%= userInfo.patient_notification[i].doctor_profile_pic_url %>" style="width: 50px; height: 50px">
+                                                <div>{{getData("<%= userInfo.patient_notification[i].doctor_firstname%>","<%= userInfo.patient_notification[i].doctor_lastname %>","<%= userInfo.patient_notification[i].date %>","<%= userInfo.patient_notification[i].doctor_profile_pic_url %>","<%= userInfo.patient_notification[i].consultation_fee %>","<%= userInfo.firstname %>","<%= userInfo.ewallet.available_amount %>","<%= userInfo.patient_notification[i].doctor_id %>","<%= userInfo.patient_notification[i].service_access %>","<%= userInfo.patient_notification[i].doctor_specialty %>","<%= userInfo.patient_notification[i].message %>")}}
+                                                </div>
+
+                                                <span>{{convertDate('<%= userInfo.patient_notification[i].date %>')}}</span>    
+
+                                                <span> From Dr. <%= userInfo.patient_notification[i].doctor_firstname %> <%= userInfo.patient_notification[i].doctor_lastname %></span>
+                                                <span style="display:block">{{realDate | date: "medium"}}</span>
+                                            </li>
+                                        <% } %>
+
                                     </ul>
                                 </li>
-                                <li class="noti chat">
+                                 <li class="noti chat">
                                     <img src="<%= userInfo.profile_pic_url %>" style= "width:35px;height:35px;border-radius: 20px">
                                     <p style="color:rgba(255,255,255,0.8);
-                                    padding-left: 20px"><%= userInfo.name%></p>
+                                    padding-left: 20px"><%= userInfo.firstname %> <%=userInfo.lastname %></p>
                                     <ul class="all-notify">
-                                        <li style="text-align:center; cursor:pointer" ng-click="logout()">SIGNOUT</a></li>                              
+                                        <li style="text-align:center; cursor:pointer" ng-click="logout()">SIGNOUT</a></li>                                       
                                     </ul>
                                 </li>
                             </ul>
@@ -282,62 +292,95 @@
         <main id="main" class="tg-main-section tg-haslayout">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-lg-9 col-md-9 col-sm-8 pull-right" ng-controller="pharmacyCenterDashboardController">
+                    <div class="col-lg-9 col-md-9 col-sm-8 col-xs-12 pull-right" ng-controller="eminPatientDashboardController">
                         <div class="row">
-                            <div class="col-sm-12 col-md-9 col-lg-9">
+                            <div class="col-sm-12 col-md-9 col-lg-9">                                
                                 <div class="view-animate-container row" >  
                                     <div class="view-animate" ng-view >
                                     </div>
                                 </div>
                             </div>
+                            <!--<my-iframe ng-src="{{link}}" height= "800" width="800">-->
                             <div class="col-sm-12 col-md-3 col-lg-3" style="padding: 0px 3px">
-                                <aside id="tg-sidebar">                                                           
-                                <div class="tg-widget tg-tab-widget" ng-controller="checkingOutPatientController">
-                                <h3>Attendance list</h3>
-                                <form>
-                                    <input type="text" placeholder="Look up a patient in this list"/>
-                                    <input type="button" value="Find"/>
-                                </form>
+                                <aside id="tg-sidebar">
+                            <div>
+                                <a href="/user/em/update" class="tg-btn tg-btn-lg">Update Your Profile</a>
+                            </div>
+                            <div class="tg-widget tg-tab-widget" ng-controller="emcheckingOutDoctorController">
+                                <h3>My doctor(s)</h3>                                
                                 <div>
                                     <ul style="height: 600px; overflow-x: auto">
-                                        <li ng-repeat="person in attendanceList" style="list-style: none; margin-bottom: 10px; border-bottom: 1px dashed rgba(0,0,0,0.3);padding-bottom: 5px; cursor:pointer" ng-click="patientPrescription(person.ref)">
-                                            <img ng-src="{{person.profile_pic_url}}" style="width:32px; height:32px"/>
-                                            <span>{{person.firstname}}  {{person.lastname}}</span>
-                                        </li>
+                                        <% if(userInfo.accepted_doctors.length > 0) { %> 
+                                            <% for(var k = 0; k < userInfo.accepted_doctors.length; k++) { %>
+                                            <li style="list-style-type: none; padding: 10px;border-bottom: 1px dashed rgba(0,0,0,0.2);border-radius: 20px;cursor: pointer" class="clearfix" ng-click="checkoutDoctor()">
+                                                <div style="cursor: pointer;" ng-click="userDoctor('<%= userInfo.accepted_doctors[k].doctor_id %>')">                                                
+                                                    <img src="<%= userInfo.accepted_doctors[k].doctor_profile_pic_url %>" style="width:32px;height:32px" alt="image description">
+                                                    <span style="font-size: 12px">Dr. <%= userInfo.accepted_doctors[k].doctor_firstname %> <%= userInfo.accepted_doctors[k].doctor_lastname %> </span>                                                    
+                                                </div>
+                                                <div>
+                                                </div>
+                                            </li>
+                                            <% } %>
+                                        <% } %>
                                     </ul>
                                 </div>
-                               </aside>
-                            </div>                 
+                               
+                            </div>
+                        </aside>
+                            </div>
+                           
+                           
                         </div>
                     </div>
-                    <div class="col-lg-3 col-md-3 col-sm-4">
-                        <aside id="tg-sidebar">                            
+                    
+                    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12" ng-controller="empatientPanelController">
+                        <aside id="tg-sidebar">
                             
                             <div class="tg-widget tg-widget-accordions">
                                 <h3>Dashboard</h3>
                                 <ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                                <li class="panel panel-default">
-                                        <span ng-click="dashboardhome()"><i class="fa fa-home" style="font-size: 32px; color: rgba(0,100,0,0.7);margin-right: 10px; cursor:pointer" title="Back to dashboard home"></i></span>                                        
-                                        
-                                    </li>                                                          
+                                    <li class="panel panel-default">
+                                        <span ng-click="dashboardhome()"><i class="fa fa-home" style="font-size: 32px; color: rgba(0,100,0,0.7);margin-right: 10px" title="Back to dashboard home"></i></span>
+                                        <span ng-click="viewPrescription()" style="cursor:pointer" class="indica"><i class="icon-Pills icon-style" title="View all prescriptions"></i><strong class="signal" ng-if="isNew">new</strong></span>
+                                         <!--<span ng-click="viewLabTest()" style="cursor:pointer" class="indica"><strong class="signal">Lab</strong></span>
+                                          <span ng-click="viewScanTest()" style="cursor:pointer" class="indica"><strong class="signal">Scan</strong></span>
+                                         
+                                        <span ng-click="viewTreatment()" style="cursor:pointer"><i class="icon-FirstAidKit icon-style" title="View all treatments"></i></span>-->
+                                    </li>                                 
                                     
+                                    <li class="panel panel-default">
+                                        <div class="tg-panel-heading" role="tab" id="headingThree">
+                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseThree" aria-expanded="false" aria-controls="collapseThree" style="color:rgba(0,180,0,0.6); font-size: 18px;">Prescription(<%= userInfo.medications.length %>)</a>
+                                            </h3>
+                                        </div>
+                                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+                                            <div class="panel-body">
+                                                <ol>                                           
+                                                    <li ng-click="viewPrescription(prescription.doctor_id)" style="padding: 5px 2px; cursor: pointer" ng-repeat="prescription in filteredPrescriptions">Dr. {{prescription.doctor_firstname}} {{prescription.doctor_lastname}} ({{prescription.count || 0}}) </li>                  
+                                                </ol>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                    <!-- change all to angularjs -->
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingSix">
                                              <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
-                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseSix" aria-expanded="false" aria-controls="collapseSix" style="color:rgba(0,180,0,0.6); font-size: 18px;">Appointments(0)</a>
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseSix" aria-expanded="false" aria-controls="collapseSix" style="color:rgba(0,180,0,0.6); font-size: 18px;">Appointments(<%= userInfo.appointment.length %>)</a>
                                             </h3>
                                         </div>
                                         <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
                                             <div class="panel-body">
                                                 <ol>
-                                                <% for(var k = 0; k < userInfo.medications.length; k++) { %>
-                                                <li ng-click="viewPrescription(<%= userInfo.appointments[k].doctor_id %>)" style="padding: 5px 2px; cursor: pointer"> </li>
+                                                <% for(var k = 0; k < userInfo.appointment.length; k++) { %>
+                                                <li ng-click="viewAppointment(<%= userInfo.appointment[k].doctor_id %>)" style="padding: 5px 2px; cursor: pointer"> </li>
                                                 <% } %>
                                                 </ol>
                                             </div>
                                         </div>
                                     </li>                                                                  
-                                    <li class="panel panel-default">
+                                    <!--<li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingTwo">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
                                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseTwo" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Account profile</a>
@@ -345,10 +388,10 @@
                                         </div>
                                         <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
                                             <div class="panel-body">
-                                                <p><a href="#/phamarcy-edit-profile">Edit your profile</a></p>                                                
+                                                <p><a href="#/edit-profile">Edit your profile</a></p>                                                
                                             </div>
                                         </div>
-                                    </li>
+                                    </li>-->
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingTwo">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
@@ -357,7 +400,11 @@
                                         </div>
                                         <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
                                             <div class="panel-body">
-                                                                                          
+                                                <ol>
+                                                <% for(var k = 0; k < userInfo.medications.length; k++) { %>
+                                                <li ng-click="viewPrescription(<%= userInfo.medications[k].doctor_id %>)" style="padding: 5px 2px; cursor: pointer"> </li>
+                                                <% } %>
+                                                </ol>                                                   
                                             </div>
                                         </div>
                                     </li>                                                  
@@ -376,15 +423,70 @@
                                             </div>
                                         </div>
                                     </li>
-                                    <li class="panel panel-default">
-                                        <h3 class="panel-title"><a href="/user/logout">Signout</a></h3>
-                                    </li>
+                                    
                                 </ul>
                             </div>
                         </aside>
                     </div>
                 </div>
-            </div>
+            </div><!-- main content -->
+            <!--<div class="container-fluid" ng-controller="appointmentController">
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12 col-md-12">
+                        <ul rn-carousel rn-carousel-index class="image">
+                         <li><img src="/assets/images/doctors/img-03.jpg"></li>
+                        </ul>
+                        
+                       
+                    </div>                       
+                    <div class="col-sm-12 col-lg-12 col-md-12">
+                         <div class="row">
+                            <div class="col-md-4 col-lg-4">
+                            <div style="width:89%;margin: -20px auto 0;">
+                            <p style="font-size: 22px; font-weight: 100; margin-top: 50px">Fund your wallet now!</p>                
+                            <ul>
+                                <li>Make payments to gain access to our all services</li>
+                                <li>Call your doctor at your free time.</li>
+                                <li>Request for in-person consultation</li>
+                                <li>Book a video chat appointment with you doctor</li>
+                                <li>Enter live chat with your doctor</li>
+                                <li>View your medical records at all times</li>
+                                <li>Download your prescriptions</li>
+                                <li>Share files with your doctor</li>                                
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-4">
+                            <div style="width:89%;margin: -20px auto 0;">
+                            <p style="font-size: 22px; font-weight: 100; margin-top: 50px">Find a phamarcy close to you!</p>                
+                            <ul>
+                                <li>Just few click you can locate a Phamarcy nearby to buy drug</li>
+                                <li>All are verified and certified by us</li>
+                                <li>You are sure to buy quality drugs</li>
+                                <li>You can purchase drugs and pay online with our easy services</li>
+                                <li>We can deliver at your door step if so desired</li>
+                            </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-4">
+                            <div style="width:89%;margin: -20px auto 0;">
+                            <p style="font-size: 22px; font-weight: 100; margin-top: 50px">Find a diagnostic center close to you!</p>                
+                            <ul>
+                                <li>Make payments to gain access to our all services</li>
+                                <li>Call your doctor at your free time.</li>
+                                <li>Request for in-person consultation</li>
+                                <li>Book a video chat appointment with you doctor</li>
+                                <li>Enter live chat with you doctor</li>
+                                <li>Reach out to all our diagnostic centers in one click</li>
+                                </ul>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>slider -->
         </main>
         <!--************************************
                 Main End
@@ -608,7 +710,7 @@
                     </div>
                 </div>
                 </h6>               
-              </div>
+              </div>a
               <div class="modal-body">                                                   
                     <form class="tg-form-modal tg-form-signin">                        
                             <fieldset>
@@ -628,37 +730,7 @@
           </div>
         </div>
      </script>
-     <script type="text/ng-template" id="request.html" ng-controller="connectController">
-         <div class="modal fade">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-              <div class="row">
-                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
-                 <h6 style="text-align: center; color: #000; font-size: 12px">{{message}}</h6>
-              </div>
-              <div class="modal-body">
-              <h6 style="text-align: center">You want to send Consultation request 
-                <span style="display:block;margin-top: 20px">To</span> 
-                </h6> 
-                                                                              
-                    <form class="tg-form-modal tg-form-signin" style="text-align: center">                        
-                            <fieldset>
-                            <img ng-src="{{docInfo.profile_pic_url}}" style="width:150px; height:150px;margin-bottom: 20px;margin-top:-10px"/>
-                            <h6>Dr. {{docInfo.firstname}} {{docInfo.lastname}}</h6>
-                            <span style="display:block;margin-top: -10px; margin-bottom:20px">{{docInfo.specialty}}</span>
-                            <p>Note: consultation fees will apply if your request is granted. </p>                                 
-                        <button class="tg-btn tg-btn-lg" ng-click="sendRequest('<%= userInfo.firstname %>','<%= userInfo.lastname %>','<%= userInfo.profile_pic_url %>',<%=userInfo.user_id %>)">Continue</button>
-                            </fieldset>
-                        </form>
-              </div>
-              <div class="modal-footer">
-                <button type="button" ng-click="close('No')" class="btn btn-default" data-dismiss="modal">No</button>
-              </div>
-            </div>
-          </div>
-        </div>
-     </script>
+     
      <script type="text/ng-template" id="insuficient-fund.html" ng-controller="insuficientFundController">
          <div class="modal fade">
           <div class="modal-dialog">
@@ -687,6 +759,9 @@
     <!--************************************
         Sign In Sign Up Light Box End
     *************************************-->
+        <!--<script src="https://media.twiliocdn.com/sdk/js/common/v0.1/twilio-common.min.js"></script>        
+        <script src="https://media.twiliocdn.com/sdk/js/video/releases/1.0.0-beta2/twilio-video.js"></script>
+        <script src="https://media.twiliocdn.com/sdk/rtc/js/ip-messaging/v0.10/twilio-ip-messaging.min.js"></script>-->
         
         <script src="/assets/js/vendor/jquery-library.js"></script>
         <script src="/assets/js/vendor/bootstrap.min.js"></script>
@@ -711,9 +786,11 @@
         <script src="/assets/js/angular-touch.min.js"></script>
         <script src="/assets/js/angular-carousel.js"></script>
         <script src="/assets/js/moment.min.js"></script>
-        <script src="/assets/js/angular-moment.min.js"></script>    
+        <script src="/assets/js/angular-moment.min.js"></script>
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>
+        <script src="/assets/js/angular-clipboard.js"></script>     
         
-
+        
 
 
    <!--<script src="http://angular-ui.github.com/bootstrap/ui-bootstrap-tpls-0.2.0.js"></script>-->

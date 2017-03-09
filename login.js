@@ -50,7 +50,16 @@ router.post('/user/login', passport.authenticate('login', {
 router.get('/login',function(req,res){
         if(req.user){
         console.log(req.user.type)      
-         res.json({isLoggedIn: true,typeOfUser: req.user.type});
+         res.json({
+                isLoggedIn: true,
+                typeOfUser: req.user.type,
+                firstname: req.user.firstname,
+                lastname:req.user.lastname,
+                phone: req.user.phone,
+                email: req.user.email,
+                title: req.user.title,
+                user_id: req.user.user_id
+            });
         } else {
         res.sendFile(path.join(__dirname + "/404.html"));
         }  

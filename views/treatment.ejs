@@ -22,7 +22,8 @@
     <link rel="stylesheet" href="/assets/css/transitions.css">
     <link rel="stylesheet" href="/assets/css/color.css">
     <link rel="stylesheet" href="/assets/css/responsive.css">
-    <link rel="stylesheet" href="/assets/css/angular-carousel.css">   
+    <link rel="stylesheet" href="/assets/css/angular-carousel.css">
+    
 
 
     <!--<script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>-->
@@ -201,6 +202,9 @@
             <div class="container">
                 <div class="row">                
                     <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div style="text-align: right">
+                            <button ng-click="bookAppointment()">Book Appointment</button>
+                        </div>
                         <section id="bio">
                             <div class="row">
                                 <div class="col-sm-12 col-md-3 col-lg-3 pull-right">
@@ -339,7 +343,7 @@
                                         <button ng-click="writeNew()">Write new prescrptions</button>
                                     </div> 
                                     <div ng-if="isNewPrescription">
-                                                    
+                                        {{drugList}}            
                                         <table>
                                             <tr>
                                                 <thead>
@@ -353,7 +357,9 @@
                                             <tr>
                                                 <tbody ng-repeat="prescription in drugList">                                
                                                     <td>{{prescription.sn}}</td>
-                                                    <td><textarea ng-model="prescription.drug_name" style="max-width: 200px;max-height: 80px"></textarea></td>
+                                                    <!--<td><textarea ng-model="prescription.drug_name" style="max-width: 200px;max-height: 80px"></textarea></td>-->
+                                                    <td><input name="states" id="states" type="text" placeholder="Enter drug name" ng-model="drug.name" uib-typeahead="drug.name for drug in drugs | filter:$viewValue | limitTo:15" class="form-control" style="width: 95%">
+                                                    {{getDrug(drug.name)}} </td>
                                                     <td><input type="text" ng-model="prescription.dosage"></td>
                                                     <td><input type="text" ng-model="prescription.frequency"></td>
                                                     <td><input type="text" ng-model="prescription.duration"></td>
@@ -618,6 +624,53 @@
             </div>
         </div>
     </div>
+    <script type="text/ng-template" id="calender-template.html">
+        <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true" style="color:red;font-size: 32px">&times;</button>
+                </div>                                     
+              </div>
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="modal-body">
+                        <h5>Book an appointment with patient</h5>                      
+                       
+                        <div class="calender-header">
+                            <i class="fa fa-angle-left" ng-click="previous()"></i>
+                            <span>{{month.format("MMMM, YYYY")}}</span>
+                            <i class="fa fa-angle-right" ng-click="next()"></i>
+                        </div>
+                        <div class="week">
+                            <span class="day">Sun</span>
+                            <span class="day">Mon</span>
+                            <span class="day">Tue</span>
+                            <span class="day">Wed</span>
+                            <span class="day">Thu</span>
+                            <span class="day">Fri</span>
+                            <span class="day">Sat</span>
+                        </div>
+                        
+                        <div ng-repeat="week in weeks" class="indays">
+                            <span class="dates" ng-class="{ today: day.isToday, 'different-month': !day.isCurrentMonth, selected: day.date.isSame(selected) }" ng-click="select(day)" style="cursor:pointer" ng-repeat="day in week.days">{{day.number}}</span>
+                        </div>
+                        <p><strong>{{dd.format('dddd, MMMM Do YYYY')}} {{treatment.appointment.time | date: "mediumTime"}}</strong></p><address><strong>{{treatment.appointment.address}}</strong></address>                        
+                        <div style="text-align:center">
+
+                        <h6>Time of appointment: <br><input type="time" placeholder="Enter time" ng-model="treatment.appointment.time"/></h6>
+                        <h6>Vanue <small>(If none,defaults to the address in your profile)</small>: <br><input class="addr" type="address" placeholder="Enter address" ng-model="treatment.appointment.address"></h6>
+                            <button ng-click="book()" class="btn btn-primary" style="background-color:#7dbb00">Book</button>
+                        </div>
+                    </div> 
+                </div>
+              </div>          
+            </div>
+          </div>
+        </div>
+     </script>
     
     <!--************************************
         Sign In Sign Up Light Box End
@@ -647,6 +700,11 @@
         <script src="/assets/js/main.js"></script>
         <script src="/assets/js/angular-touch.min.js"></script>
         <script src="/assets/js/angular-carousel.js"></script>
+        <script src="/assets/js/moment.min.js"></script>
+        <script src="/assets/js/angular-moment.min.js"></script>
+        <script src="/assets/js/angucomplete-alt.min.js"></script>
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>
+        <script src="/assets/js/angular-clipboard.js"></script>       
         
         
 

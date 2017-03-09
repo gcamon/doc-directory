@@ -12,6 +12,27 @@ var myModel = function () {
 		collections: "fileinfo"
 	});
 
+	var service_objSchema = Schema({
+		name: String,
+		val: Boolean,
+		id: Number,
+		price: Number
+	})
+
+	var serviceSchema = Schema({
+		center_name: String,
+		center_address: String,
+		center_city: String,
+		center_country: String,
+		user_id: String,
+		unavailable_services: [service_objSchema],
+		type: String
+
+	},{
+		collections: "centerservices"
+	});
+	
+
 	var AwardSchema = Schema({
 		id: Number,
 		type_of_Award: String,
@@ -49,13 +70,14 @@ var myModel = function () {
 
 	var prescriptionSchema = Schema({
 		prescriptionId: Number,
-		allergy: String,
+		provisional_diagnosis: String,
 		date: Date,
 		doctor_experience: Number,	
 		doctor_firstname: String,
 		doctor_lastname: String,
 		doctor_address: String,		
 		doctor_id: String,
+		doctor_verified:Boolean,
 		doctor_work_place: String,
 		doctor_city: String,
 		doctor_country: String,
@@ -73,6 +95,8 @@ var myModel = function () {
 		patient_city: String,
 		patient_country: String,
 		prescription_body: [prescriptionBodySchema],
+		ref_id: Number,
+		eligible:Boolean
 	});
 
 	var transactionSchema = Schema({
@@ -328,6 +352,7 @@ var myModel = function () {
 		medications: [prescriptionSchema],
 		date: Date,
 		profile_url: String,
+		verified: Boolean,
 		ewallet:{			
 			available_amount: Number,
 			firstname: String,
@@ -378,15 +403,39 @@ var myModel = function () {
 		appointment:[appointment_schema],
 		prescription_tracking: [statusSchema],
 		doctor_patient_session: [sessionSchema],
-		doctor_prescriptionRequest: [requestSchema]		
+		doctor_prescriptionRequest: [requestSchema],
+		emergency_ref_url: String		
 	},{
 		collections: "userinfos"
 	})
+	
+	var complainObj = Schema({
+		helpType: String,
+		description: String,
+		sent_date: String
+	})
+
+	var helpSchema = Schema({
+		isLoggedIn: Boolean,
+		typeOfUser: String,
+		firstname: String,
+		lastname: String,
+		phone: Number,
+		email: String,
+		user_id: String,		
+		title: String,
+		complaint: [complainObj]		
+	},{
+		collections: "helpinfos"
+	})
+
 	//models
 	var models = {};
 	models.user = mongoose.model('userinfos', userSchema);
 	models.files = mongoose.model('fileinfo', fileSchema);
-	models.patient = mongoose.model("patientinfo",patient_briefSchema)
+	models.patient = mongoose.model("patientinfo",patient_briefSchema);
+	models.services = mongoose.model("centerservices",serviceSchema);
+	models.help = mongoose.model("helpinfos",helpSchema);
 	/*models.award = mongoose.model('awardinfo', AwardSchema);
 	models.education = mongoose.model('educationinfo', EducationSchema);
 	models.prescribtion = mongoose.model("prescribtioninfo", prescribtionSchema);
@@ -397,6 +446,9 @@ var myModel = function () {
 }
 
 module.exports = myModel;
+
+
+
 
 
 

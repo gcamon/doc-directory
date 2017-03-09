@@ -37,6 +37,7 @@ body {
 	background: #fff;
 	position: relative;
 	font:400 14px/20px 'Open Sans', Arial, Helvetica, sans-serif;
+	font-weight: 100px
 }
 body h1,
 body h2,
@@ -163,7 +164,7 @@ input[type="color"],
 	border-radius: 0;
 	display: inline-block;
 	vertical-align: middle;
-	border: 1px solid #ddd;
+	/*border: 1px solid #ddd;*/
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
@@ -478,7 +479,7 @@ ul.dosage {
 
 /*in doctor html */
 .tg-haslayout button {
-	color: #fff;
+	color: #000;
 	background-color: rgba(0,120,0,0.6);
 	padding: 5px 15px;
 	margin-right: 20px;
@@ -529,7 +530,159 @@ ul.dosage {
 	left: 50px;	
 	visibility: visible;
 }
+/*calender*/
+.modal-body h5 {
+	text-align: center;
+}
 
+
+
+.modal-body input {
+	font-size: 16px;
+	margin-top: 10px;
+	padding: 3px 10px;
+	border: none;	
+	width: 100%;
+	color: #000;
+}
+.calender-header {
+	background-color:#7dbb00;
+	color: #fff;	
+	padding: 20px 5px;
+	text-align: center;
+}
+
+.calender-header i {
+	width: 20%;
+	cursor: pointer;
+}
+
+.calender-header i,.calender-header span {
+	font-size: 30px;
+	display: inline-block;
+}
+
+.calender-header > span {
+	width: 55%;
+}
+
+.week,.indays {
+	text-align: center;
+}
+
+span.day {	
+	display: inline-block;
+	padding: 5px;
+	width: 12.5%;
+	text-align: center;
+	font-size: 18px;
+	margin: 20px 0px 10px;
+}
+
+span.dates {
+	margin-right: 5px;
+	display: inline-block;
+	padding: 5px;
+	width: 13%;
+	text-align: center;
+	font-size: 18px;
+	margin: 20px 0px;
+	border-bottom: 1px solid grey;
+	box-shadow: 1px 2px 3px grey;
+	font-weight: bold;
+}
+
+.different-month {
+    color:#C0C0C0;
+    font-weight: normal!important;
+}
+
+.today {
+    background:#ccc;
+    color:#fff;
+}
+            
+.different-month {
+    color:#C0C0C0;
+}
+            
+.selected {
+    background:#7dbb00;
+    color:white;
+}
+
+/*listing of available tests style*/
+.all-test-check span {
+	padding: 10px 5px;
+	display: inline-block;
+	font-size: 16px;
+}
+
+.all-test-check input{
+	width: 18px;
+	height: 18px
+}
+
+.all-test-check h6 {
+	border-bottom: 1px solid grey
+}
+
+/* prescription id style */
+.pres-id {
+	background-color:#eee;
+	color:#000;
+	display:inline-block;
+	padding:3px;
+	border-radius:4px;
+	box-shadow: 1px 2px 2px #000;
+	cursor:pointer
+}
+
+
+
+/*on behalf style */
+.dismiss {
+	visibility: hidden;
+	-webkit-transition: 0.1s;
+}
+
+/* typeahead dropdown */
+.dropdown-menu>.active>a, 
+.dropdown-menu>.active>a:focus, 
+.dropdown-menu>.active>a:hover { 
+	background-color: #7dbb00;
+}
+
+.dropdown-menu>li>a { 
+	font-size: 16px;
+}
+
+.dropdown-menu {
+	max-height: 600px;
+	overflow-y: auto; 
+}
+/*sentto style**/
+.sentto {
+	color:red;
+	display:block;
+	position:relative;
+}
+
+.sentto ul {
+	visibility: hidden;
+	position: absolute;
+	left: 0;
+	top: 10px;
+}
+
+.sentto li {
+	list-style: none;
+}
+
+span.sentto:hover ul{
+	visibility: visible;
+}
+/*end*/
 li.note-field:hover {
 	cursor: pointer;
 	background-color: rgba(0,150,0,0.6);
@@ -539,6 +692,17 @@ li.note-field img, li.note-field div {
 	float: left;
 	margin-right: 10px
 }
+
+
+/*** drug search **/
+.side-services a {
+	font-weight: 100;
+    color: black;
+    font-size: 22px;
+    padding: 10px;
+    text-decoration: underline;
+}
+
 /* my ng animate style */
 .view-animate-container {
   position:relative;  
@@ -605,7 +769,7 @@ form p span i {
 option { padding: 5px 15px; }
 li {
 	line-height: 28px;
-	list-style: disc inside none;
+	/*list-style: disc inside none;*/
 }
 ul ul { margin-left: 20px; }
 ol {
@@ -690,7 +854,7 @@ address { font-style: italic; }
 .tg-btn{
 	border: 2px solid;
 	color: #5d5955;
-	padding: 0 35px;
+	cursor: pointer;
 	text-align:center;
 	display: inline-block;
 	vertical-align: middle;
@@ -2671,7 +2835,14 @@ body.tg-comming-soon #main{
 	width: 100%;
 	float: left;
 	padding: 15px 0 0;
+
 }
+
+.tg-widget ul li .appointment {
+	height: 400px;
+    overflow-y: auto;
+}
+
 .tg-widget.tg-widget-flickr ul{padding: 15px;}
 .tg-widget.tg-widget-flickr ul li{
 	border: 0;

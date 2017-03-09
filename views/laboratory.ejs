@@ -105,7 +105,7 @@
                                     
                                 </div>
                             </div>-->
-                            <div class="col-md-5 col-sm-5 col-xs-12">
+                            <!--<div class="col-md-5 col-sm-5 col-xs-12">
                                 <div class="form-group">
                                     <input type="text" placeholder="Enter city name" class="form-control" ng-model="user.city">
                                 </div>
@@ -194,6 +194,26 @@
                                 <div class="form-group">
                                     <button id="search_banner" class="tg-btn tg-btn-lg" ng-click = "search()">Search</button>
                                 </div>
+                            </div>-->
+                             <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-specialist" class="tg-btn tg-btn-lg">Find A Doctor</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-drug" class="tg-btn tg-btn-lg">Find A Drug</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-lab-test" class="tg-btn tg-btn-lg">Find A Lab Test</a>
+                                </div>
+                            </div>
+                            <div class="col-md-2 col-sm-2 col-xs-4">
+                                <div class="form-group">
+                                    <a id="search_banner" href="/user/find-scan-test" class="tg-btn tg-btn-lg">Find A Scan Test</a>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -279,7 +299,10 @@
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-3 col-lg-3" style="padding: 0px 3px">
-                                <aside id="tg-sidebar">                                                           
+                                <aside id="tg-sidebar">
+                                <div style="padding: 10px; background-color: grey; cursor:pointer" ng-click="newPatient()">
+                                    <span style="color:#fff"><i class="fa fa-user-plus" style="font-size: 22px"> Add new patient</i></span>
+                                </div>                                                                
                                 <div class="tg-widget tg-tab-widget" ng-controller="checkingOutPatientController">
                                 <h3>Pending Test</h3>
                                 <form>
@@ -328,16 +351,17 @@
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingTwo">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
-                                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseTwo" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Account profile</a>
+                                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseNine" aria-expanded="true" aria-controls="collapseNine" style="color:rgba(0,180,0,0.6); font-size: 18px;">Account profile</a>
                                             </h3>
                                         </div>
-                                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                        <div id="collapseNine" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingNine">
                                             <div class="panel-body">
-                                                <p><a href="#/phamarcy-edit-profile">Edit your profile</a></p>                                                
+                                                <p><a href="#/laboratory-edit-profile">Edit your profile</a></p>
+                                                <p><a href="#/lab/test-service/update">Update test services</a></p>                                                
                                             </div>
                                         </div>
                                     </li>
-                                    <li class="panel panel-default">
+                                    <!--<li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingTwo">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
                                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseFive" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Chat History</a>
@@ -348,14 +372,14 @@
                                                                                           
                                             </div>
                                         </div>
-                                    </li>                                                  
+                                    </li>-->                                                  
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingFour">
                                              <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
-                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseFour" aria-expanded="false" aria-controls="collapseThree" style="color:rgba(0,180,0,0.6); font-size: 18px;">Payment & Wallet</a>
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseTen" aria-expanded="false" aria-controls="collapseTen" style="color:rgba(0,180,0,0.6); font-size: 18px;">Payment & Wallet</a>
                                             </h3>
                                         </div>
-                                        <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
+                                        <div id="collapseTen" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTen">
                                             <div class="panel-body">
                                                 {{convertToDollar('<%= userInfo.ewallet.available_amount %>')}}
                                                 <p>Avalaible amount | <strong>{{amount | currency}}</strong></p>
@@ -363,10 +387,7 @@
                                                 <p><a href="#/wallet">View all Transactions</a></p>
                                             </div>
                                         </div>
-                                    </li>
-                                    <li class="panel panel-default">
-                                        <h3 class="panel-title"><a href="/user/logout">Signout</a></h3>
-                                    </li>
+                                    </li>                                    
                                 </ul>
                             </div>
                         </aside>
@@ -579,7 +600,7 @@
             </div>
         </div>
     </div>
-    <script type="text/ng-template" id="unsent.html" ng-controller="unRanTestModalController">
+    <script type="text/ng-template" id="unsent.html">
          <div class="modal fade">
           <div class="modal-dialog">
             <div class="modal-content">
@@ -600,6 +621,32 @@
           </div>
         </div>
      </script>
+
+     <script type="text/ng-template" id='selected-test-not-ran.html'>
+         <div class="modal fade">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+              </div>              
+              <div class="modal-body"> 
+                  <article > 
+                    Based on your selection, the test(s) below are not 
+                    available in your center
+                  </article>
+                  <ol>
+                    <li ng-repeat="test in selectedTest">{{test.name}}</li>
+                  </ol>          
+              </div>
+              <div class="modal-footer">
+                <button type="button" ng-click="goBack()" class="btn btn-primary" data-dismiss="modal">No,go back</button>
+                <button type="button" ng-click="save()" class="btn btn-primary" data-dismiss="modal">Yes,save</button>              
+              </div>
+            </div>
+          </div>
+        </div>
+     </script>
+
+     
      
     <!--************************************
         Sign In Sign Up Light Box End
@@ -627,7 +674,11 @@
         <script src="/assets/js/main.js"></script>
         <script src="/assets/js/angular-touch.min.js"></script>
         <script src="/assets/js/angular-carousel.js"></script>
-        
+        <script src="/assets/js/moment.min.js"></script>
+        <script src="/assets/js/angular-moment.min.js"></script>
+        <script src="/assets/js/angucomplete-alt.min.js"></script>
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>
+        <script src="/assets/js/angular-clipboard.js"></script>       
 
 
 

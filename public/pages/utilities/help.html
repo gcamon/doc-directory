@@ -1,0 +1,26 @@
+<a href="#/drug" style="font-size: 22px; font-weight: 100; color: #000"><i class="fa fa-arrow-left"> &nbsp;Find Drug</i></a>
+<div>
+	<p style="font-size: 18px">Welcome {{user.firstname}}, How may we help you?</p>
+	<span>Please fiil the form we'll contact you soon.</span>
+	<form>
+		<div>
+			<label>Type of help * <label>
+			<select ng-model="user.helpType" required>
+				<option>Pharmaceutical</option>
+				<option>Laboratory</option>
+				<option>Radiology</option>
+				<option>Special centers</option>
+				<option>Need a Doctor</option>
+				<option>Others</option>
+			</select>
+		</div>
+		
+		<div>
+			<label>Briefly describe what you need *<small>(e.g I am looking for a center for dialysis.Please I need your help.)</small></label>
+			<textarea placeholder="Write..." ng-model="user.description" style="height: 200px"></textarea>
+		</div>
+		<div>		
+			<input type="button" value="submit" class="btn btn-primary" ng-click="sendHelp()">
+		</div>
+	</form>
+</div>
