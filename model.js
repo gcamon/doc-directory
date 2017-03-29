@@ -31,7 +31,28 @@ var myModel = function () {
 	},{
 		collections: "centerservices"
 	});
-	
+
+	var mailSchema = Schema({
+		doctor_firstname: String,
+		title: String,
+		doctor_lastname: String,
+		specialty: String,
+		doctor_id: String,
+		date: String,
+		consultation_fee: Number,
+    service_access: String,
+    doctor_profile_pic_url: String,
+		message: String,
+		category: String,//note categories are admin, decline, redirect.
+		reason: String,
+		redirect: {
+			title: String,
+			firstname: String,
+			lastname: String,
+			specialty: String,
+			user_id: String
+		}
+	});
 
 	var AwardSchema = Schema({
 		id: Number,
@@ -218,6 +239,8 @@ var myModel = function () {
 		patient_lastname: String,
 		patient_profile_pic_url: String,
 		patient_title: String,
+		patient_gender: String,
+		patient_age: Number,
 		session_id: Number,
 		patient_id: String,
 		test_id: Number,
@@ -341,7 +364,7 @@ var myModel = function () {
 		lastname: String,
 		user_id: String,
 		password: String,
-		age: Number,
+		age: String,
 		email: String,
 		gender: String,
 		address: String,
@@ -404,7 +427,8 @@ var myModel = function () {
 		prescription_tracking: [statusSchema],
 		doctor_patient_session: [sessionSchema],
 		doctor_prescriptionRequest: [requestSchema],
-		emergency_ref_url: String		
+		emergency_ref_url: String,
+		patient_mail: [mailSchema]		
 	},{
 		collections: "userinfos"
 	})
@@ -412,7 +436,8 @@ var myModel = function () {
 	var complainObj = Schema({
 		helpType: String,
 		description: String,
-		sent_date: String
+		sent_date: String,
+		symptoms: Array
 	})
 
 	var helpSchema = Schema({

@@ -35,31 +35,46 @@
 		<!--************************************
 				Header Start
 		*************************************-->
-		<header id="header" class="tg-haslayout tg-inner-header">
-			<div class="container">
-				<div class="row">
-					<div class="col-xs-12">
-						<div class="tg-navigationarea tg-haslayout">
-							<strong class="logo">
-								<a href="/"><img src="/assets/images/logo.png" alt="image description"></a>
-							</strong>
-							<nav id="tg-nav" class="tg-nav">
-								<div class="navbar-header">
-									<button type="button" class="navbar-toggle collapsed" userInfo-toggle="collapse" userInfo-target="#tg-navigation" aria-expanded="false">
-										<span class="sr-only">Toggle navigation</span>
-										<span class="icon-bar"></span>
-										<span class="icon-bar"></span>
-										<span class="icon-bar"></span>
-									</button>
-								</div>
-								<div class="collapse navbar-collapse" id="tg-navigation">
-								<ul>
-									<li>
-										<a href="/">Home</a>										
-									</li>
-									<li>
-										<a href="#">doctors</a>
-										<ul> 
+		<header id="header" class="tg-haslayout top-header"  ng-controller="topHeaderController">
+                <div  class="navbar-header top-navbar">
+                    <div style="width: 70%; padding-right: 30px;display:inline-block">
+                        <span data-toggle="modal" data-target=".tg-user-modal" title="login/signup" ng-if="!checkLogIn">Log in / Sign up</span>
+                        <span class="fa fa-sign-out" aria-hidden="true" ng-if="checkLogIn" ng-click="logout()"> Log out</span>
+                        <i class="fa fa-ellipsis-v" aria-hidden="true" style="color:#fff;font-size:23px;font-weight:100; cursor:pointer" title="Menu" ng-click="isClicked()"></i>
+                    </div>
+                    <ul ng-if="drop === true" class="drp-list">
+                        <li><a href="/user/find-specialist">Find A Doctor</a></li>
+                        <li><a href="/user/find-drug">Find Drug</a></li>
+                        <li><a href="/user/find-scan-test">Find Scan</a></li>
+                        <li><a href="/user/find-lab-test">Find Test</a></li>
+                        <li><a href="#/help">Get help</a></li>                        
+                    </ul>
+
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <strong class="logo">
+                                <a href="/"><img src="/assets/images/logo.png" alt="image description"></a>
+                            </strong>
+                            <nav id="tg-nav" class="tg-nav">
+                                <div class="navbar-header">
+                                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#tg-navigation" aria-expanded="false">
+                                        <span class="sr-only">Toggle navigation</span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </button>
+                                </div>
+                                <div class="collapse navbar-collapse top-nav" id="tg-navigation">
+                                    <ul>
+                                        <li>
+                                            <a href="/">Home</a>                                           
+                                        </li>
+                                        <li><a href="/how-it-works">How it works</a></li>
+                                        <li>
+                                            <a href="#">Top Ranking</a>
+                                            <ul> 
                                                 <li><a href="/topview/doctors">Doctors</a></li>                                                     
                                                 <li><a href="/topview/hospitals">Hospitals</a></li>
                                                 <li><a href="/topview/clinics">Clinics</a></li>
@@ -69,38 +84,35 @@
                                                 <li><a href="/topview/fitness">fitness Centers</a></li>                                                                           
                                                 <!--<li><a href="doctor-detail2.html">Doctor Detail 2</a></li>-->
                                             </ul>
-									</li>
-									<li>
-										<a href="#">Blog</a>
-										<ul>
-											<li><a href="blog-list.html">Blog List</a></li>
-											<li><a href="blog-grid.html">Blog Grid</a></li>
-											<li><a href="blog-detail.html">Blog Detail</a></li>
-										</ul>
-									</li>
-									<li><a href="packages.html">packages</a></li>
-									<li><a href="contactus.html">Contact</a></li>
-									<li>
+                                        </li>
+                                        <li>
+                                            <a href="#">Blog</a>
+                                            
+                                        </li>
+                                        <li><a href="packages.html">packages</a></li>
+                                        <li><a href="contactus.html">Contact</a></li>                                        
+                                        <!--<li>                                            
                                             <a href="#" data-toggle="modal" data-target=".tg-user-modal" title="login/signup"><i class="fa fa-user-plus"></i></a>
                                             <span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
-                                    </li>
-                                    
-								</ul>
-							</div>
-							</nav>
-						</div>
-					</div>
-				</div>
-			</div>
-		</header>
+                                        </li>-->                                                                                                                
+                                    </ul>
+                                </div>                                
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="arrow-dashboard" ng-if="checkLogIn">
+                    <a ng-href="{{back}}" class="fa fa-long-arrow-right" title="Back to dashboard"></a>
+                <div>
+            </header>
 		<!--************************************
 				Header End
 		*************************************-->
 		<!--************************************
 				Home Slider Start
 		*************************************-->
-        <div ng-controller="resultController"> <!-- -->
-		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout">
+        <div > <!-- -->
+		<!--<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout">
 			<div class="tg-searcharea tg-haslayout">
 				<div class="container">
 					<div class="row">
@@ -208,46 +220,223 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-xs-12">
-							<h1>list</h1>
+							<h1>Find a Doctor</h1>
 							<ol class="tg-breadcrumb">
-								<li><a href="#">Home</a></li>
-								<li class="active">List</li>
+								<li><a href="/">Home</a></li>
+								<li class="active">Doctors</li>
 							</ol>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</div>-->
 		<!--************************************
 				Home Slider End
 		*************************************-->
 		<!--************************************
 				Main Start
 		*************************************-->
-		<main id="main" class="tg-main-section tg-haslayout">
+		<main id="main" class="tg-main-section tg-haslayout" ng-controller="resultController" style="margin-top: 150px">
 			<div class="container">
 				<div class="row">
-					<div class="col-lg-9 col-md-8 col-sm-8 col-xs-12">
+					<div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
                         <div class="view-animate-container">				
                             <div ng-view class="view-animate">
                             </div>
 					    </div>					    
 					</div>
-					<div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+					<div class="col-lg-4 col-md-5 col-sm-5 col-xs-12">
 						<aside id="tg-sidebar">
-							<div class="tg-heading-border tg-small">
-								<h2>refine search</h2>
+							<div class="tg-widget tg-widget-accordions">
+								<ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+									<li class="panel panel-default">
+										<div class="tg-panel-heading" role="tab" id="headingOne">
+                                            <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseOne" aria-expanded="true" aria-controls="collapseOne" style="font-size: 18px;">Use simple search</a>
+                                            </h3>
+                                        </div> 
+                                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                            <div class="panel-body">
+                                            	<form class="form-refinesearch tg-haslayout">
+													<fieldset style="background-color:#ccc; padding: 10px 10px;margin-bottom: 20px">
+														<input type="text" placeholder="Enter city name" style="padding: 5px 5px;margin-top: 10px" ng-model="user.city">
+					                                    <select id="group1" placeholder="Specialty" style="padding: 5px 5px;margin-top: 10px;margin-bottom: 10px" ng-model="user.specialty">
+															<option>Acupunture</option>
+				                                            <option>Addiction Medicine</option>
+				                                            <option>Adolescent Medicine</option>
+				                                            <option>Aerospace Medicine</option>
+				                                            <option>Allergy</option>
+				                                            <option>Allergy/Immunology</option>
+				                                            <option>Anesthesiology</option>
+				                                            <option>Audiologist</option>
+				                                            <option>Bariatrician</option>
+				                                            <option>Cardiac Electrophysiology</option>
+				                                            <option>Cardiology</option>
+				                                            <option>Chiropractic</option>
+				                                            <option>Clinical Laboratory Immunology</option>
+				                                            <option>Clinical Pathology</option>
+				                                            <option>Colon/Rectal Surgery</option>
+				                                            <option>Critical Care</option>
+				                                            <option>Cythopathology</option>
+				                                            <option>Dermatology</option>
+				                                            <option>Dermatopathology</option>
+				                                            <option>Diabetes</option>
+				                                            <option>Diagnostic</option>
+				                                            <option>Emergency Medical Tech</option>
+				                                            <option>Emergency Medicine</option>
+				                                            <option>Endocrinology</option>
+				                                            <option>Endovascular Surgical Neuroradiology</option>
+				                                            <option>Family Practice</option>
+				                                            <option>Gastroenterology</option>
+				                                            <option>General Practice</option>
+				                                            <option>General Surgery</option>
+				                                            <option>Genetics</option>
+				                                            <option>Geriatrics</option>
+				                                            <option>Gynecology</option>
+				                                            <option>Gynecology Oncology</option>
+				                                            <option>Hand Surgery</option>
+				                                            <option>Hand and Neck Surgery</option>
+				                                            <option>Hematology</option>
+				                                            <option>Hematology/Oncology</option>
+				                                            <option>Hepatology</option>
+				                                            <option>Holistic Medicine</option>
+				                                            <option>Hospitalist</option>
+				                                            <option>Immunology</option>
+				                                            <option>Infectious Disease</option>
+				                                            <option>Internal Medicine</option>
+				                                            <option>Interventional Cardiology</option>
+				                                            <option>Legal Medicine</option>
+				                                            <option>Medical Oncology</option>
+				                                            <option>Medical Toxicology</option>
+				                                            <option>Neonatology</option>
+				                                            <option>Nephrology</option>
+				                                            <option>Neurology</option>
+				                                            <option>Neuroradiology</option>
+				                                            <option>Nuclear Cardiology</option>
+				                                            <option>Nuclear Medicine</option>
+				                                            <option>Nutrition</option>
+				                                            <option>Obstetrics/Gynecology</option>
+				                                            <option>Occupational Medicine</option>
+				                                            <option>Oncology</option>
+				                                            <option>Opthalmology</option>
+				                                            <option>Optometry</option>
+				                                            <option>Orthopedic Foot & Ankle</option>
+				                                            <option>Orthopedic Reconstructive Surgery</option>
+				                                            <option>Orthopedic Spine Surgery</option>
+				                                            <option>Orthopedic Surgery</option>
+				                                            <option>Osteopathy</option>
+				                                            <option>Otorhinolaryngology</option>
+				                                            <option>Pain Management</option>
+				                                            <option>Pathology</option>
+				                                            <option>PPediatric Allergy</option>
+				                                            <option>Pediatric Cardiology</option>
+				                                            <option>Pediatric Critical Care</option>
+				                                            <option>Padiatric Emergency Medicine</option>
+				                                            <option>Other</option>	
+														</select>
+										                                    
+														<button style="background-color: rgba(20,255,0,0.7); color: #fff; padding: 10px 15px; border-radius:5px" ng-click = "searchMore()">Find</button>
+													</fieldset>
+												</form>                                                                                           
+                                            </div>
+                                        </div>             
+									</li>
+									<li class="panel panel-default">
+										<div class="tg-panel-heading" role="tab" id="headingTwo">
+                                            <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseTwo" aria-expanded="false" aria-controls="collapseTwo" style="font-size: 18px;">Use refine search</a>
+                                            </h3>
+                                        </div> 
+                                        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                            <div class="panel-body">
+                                            	<form class="form-refinesearch tg-haslayout">
+													<fieldset style="background-color:#ccc; padding: 10px 10px;margin-bottom: 20px">
+														<input type="text" placeholder="Enter city name" style="padding: 5px 5px;margin-top: 10px" ng-model="refineUser.city">					                                    
+					                                    <select id="group1" class="group" placeholder="Specialty" ng-model="refineUser.specialty">
+															<option>Acupunture</option>
+				                                            <option>Addiction Medicine</option>
+				                                            <option>Adolescent Medicine</option>
+				                                            <option>Aerospace Medicine</option>
+				                                            <option>Allergy</option>
+				                                            <option>Allergy/Immunology</option>
+				                                            <option>Anesthesiology</option>
+				                                            <option>Audiologist</option>
+				                                            <option>Bariatrician</option>
+				                                            <option>Cardiac Electrophysiology</option>
+				                                            <option>Cardiology</option>
+				                                            <option>Chiropractic</option>
+				                                            <option>Clinical Laboratory Immunology</option>
+				                                            <option>Clinical Pathology</option>
+				                                            <option>Colon/Rectal Surgery</option>
+				                                            <option>Critical Care</option>
+				                                            <option>Cythopathology</option>
+				                                            <option>Dermatology</option>
+				                                            <option>Dermatopathology</option>
+				                                            <option>Diabetes</option>
+				                                            <option>Diagnostic</option>
+				                                            <option>Emergency Medical Tech</option>
+				                                            <option>Emergency Medicine</option>
+				                                            <option>Endocrinology</option>
+				                                            <option>Endovascular Surgical Neuroradiology</option>
+				                                            <option>Family Practice</option>
+				                                            <option>Gastroenterology</option>
+				                                            <option>General Practice</option>
+				                                            <option>General Surgery</option>
+				                                            <option>Genetics</option>
+				                                            <option>Geriatrics</option>
+				                                            <option>Gynecology</option>
+				                                            <option>Gynecology Oncology</option>
+				                                            <option>Hand Surgery</option>
+				                                            <option>Hand and Neck Surgery</option>
+				                                            <option>Hematology</option>
+				                                            <option>Hematology/Oncology</option>
+				                                            <option>Hepatology</option>
+				                                            <option>Holistic Medicine</option>
+				                                            <option>Hospitalist</option>
+				                                            <option>Immunology</option>
+				                                            <option>Infectious Disease</option>
+				                                            <option>Internal Medicine</option>
+				                                            <option>Interventional Cardiology</option>
+				                                            <option>Legal Medicine</option>
+				                                            <option>Medical Oncology</option>
+				                                            <option>Medical Toxicology</option>
+				                                            <option>Neonatology</option>
+				                                            <option>Nephrology</option>
+				                                            <option>Neurology</option>
+				                                            <option>Neuroradiology</option>
+				                                            <option>Nuclear Cardiology</option>
+				                                            <option>Nuclear Medicine</option>
+				                                            <option>Nutrition</option>
+				                                            <option>Obstetrics/Gynecology</option>
+				                                            <option>Occupational Medicine</option>
+				                                            <option>Oncology</option>
+				                                            <option>Opthalmology</option>
+				                                            <option>Optometry</option>
+				                                            <option>Orthopedic Foot & Ankle</option>
+				                                            <option>Orthopedic Reconstructive Surgery</option>
+				                                            <option>Orthopedic Spine Surgery</option>
+				                                            <option>Orthopedic Surgery</option>
+				                                            <option>Osteopathy</option>
+				                                            <option>Otorhinolaryngology</option>
+				                                            <option>Pain Management</option>
+				                                            <option>Pathology</option>
+				                                            <option>PPediatric Allergy</option>
+				                                            <option>Pediatric Cardiology</option>
+				                                            <option>Pediatric Critical Care</option>
+				                                            <option>Padiatric Emergency Medicine</option>
+				                                            <option>Other</option>	
+														</select>
+					                                    <input type="text" placeholder="Sub specialty*" style="padding: 5px 5px;margin-top: 10px" ng-model="refineUser.sub_specialty" required>
+														<input type="text" placeholder="Procedure" style="padding: 5px 5px;margin: 10px 0px" ng-model="refineUser.procedure">
+														<button style="background-color: rgba(20,255,0,0.7); color: #fff; padding: 10px 15px; border-radius:5px" ng-click="refineSearch()">Find</button>
+													</fieldset>
+												</form>                                                                                           
+                                            </div>
+                                        </div>             
+									</li>
+								</ul>						
+								
 							</div>
-							<form class="form-refinesearch tg-haslayout">
-								<fieldset style="background-color:#ccc; padding: 10px 10px;margin-bottom: 20px">
-									<input type="text" placeholder="Enter city name" style="padding: 5px 5px;margin-top: 10px" ng-model="refineUser.city">
-                                    <input type="text" placeholder="Specialty" style="padding: 5px 5px;margin-top: 10px" ng-model="refineUser.specialty">
-                                    <input type="text" placeholder="Sub specialty*" style="padding: 5px 5px;margin-top: 10px" ng-model="refineUser.sub_specialty" required>
-									<input type="text" placeholder="Procedure" style="padding: 5px 5px;margin: 10px 0px" ng-model="refineUser.procedure">
-									<button style="background-color: rgba(20,255,0,0.7); color: #fff; padding: 10px 15px; border-radius:5px" ng-click="refineSearch()">Filter Search</button>
-								</fieldset>
-							</form>
-							
 						</aside>
 					</div>
 				</div>
@@ -899,6 +1088,8 @@
         <script src="/assets/js/main.js"></script>
         <script src="/assets/js/modalService.js"></script>
         <script src="/assets/js/moment.min.js"></script>
-        <script src="/assets/js/angular-moment.min.js"></script>    
+        <script src="/assets/js/angular-moment.min.js"></script>
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>
+        <script src="/assets/js/angular-clipboard.js"></script>    
     </body>
 </html>

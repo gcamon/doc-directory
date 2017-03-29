@@ -6,7 +6,7 @@ var express = require('express'),
     config = require('./config'),
     route = require('./route'),
     signupRoute = require('./signup'),
-    loginRoute = require('./login'),    
+    loginRoute = require('./login'),  
     app = express(),
     model = db(), 
     port = process.env.PORT || 9000;
@@ -19,5 +19,4 @@ config.configuration(app,model);
 route(model);
 signupRoute(model);
 loginRoute(model);
-
 

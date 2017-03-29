@@ -35,31 +35,46 @@
 		<!--************************************
 				Header Start
 		*************************************-->
-		<header id="header" class="tg-haslayout tg-inner-header">
-			<div class="container">
-				<div class="row">
-					<div class="col-xs-12">
-						<div class="tg-navigationarea tg-haslayout">
-							<strong class="logo">
-								<a href="/"><img src="/assets/images/logo.png" alt="image description"></a>
-							</strong>
-							<nav id="tg-nav" class="tg-nav">
-								<div class="navbar-header">
-									<button type="button" class="navbar-toggle collapsed" userInfo-toggle="collapse" userInfo-target="#tg-navigation" aria-expanded="false">
-										<span class="sr-only">Toggle navigation</span>
-										<span class="icon-bar"></span>
-										<span class="icon-bar"></span>
-										<span class="icon-bar"></span>
-									</button>
-								</div>
-								<div class="collapse navbar-collapse" id="tg-navigation">
-								<ul>
-									<li>
-										<a href="/">Home</a>										
-									</li>
-									<li>
-										<a href="#">doctors</a>
-										<ul> 
+		<header id="header" class="tg-haslayout top-header"  ng-controller="topHeaderController">
+                <div  class="navbar-header top-navbar">
+                    <div style="width: 70%; padding-right: 30px;display:inline-block">
+                        <span data-toggle="modal" data-target=".tg-user-modal" title="login/signup" ng-if="!checkLogIn">Log in / Sign up</span>
+                        <span class="fa fa-sign-out" aria-hidden="true" ng-if="checkLogIn" ng-click="logout()"> Log out</span>
+                        <i class="fa fa-ellipsis-v" aria-hidden="true" style="color:#fff;font-size:23px;font-weight:100; cursor:pointer" title="Menu" ng-click="isClicked()"></i>
+                    </div>
+                    <ul ng-if="drop === true" class="drp-list">
+                        <li><a href="/user/find-specialist">Find A Doctor</a></li>
+                        <li><a href="/user/find-drug">Find Drug</a></li>
+                        <li><a href="/user/find-scan-test">Find Scan</a></li>
+                        <li><a href="/user/find-lab-test">Find Test</a></li>
+                        <li><a href="#">Get help</a></li>                        
+                    </ul>
+
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <strong class="logo">
+                                <a href="/"><img src="/assets/images/logo.png" alt="image description"></a>
+                            </strong>
+                            <nav id="tg-nav" class="tg-nav">
+                                <div class="navbar-header">
+                                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#tg-navigation" aria-expanded="false">
+                                        <span class="sr-only">Toggle navigation</span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </button>
+                                </div>
+                                <div class="collapse navbar-collapse top-nav" id="tg-navigation">
+                                    <ul>
+                                        <li>
+                                            <a href="/">Home</a>                                           
+                                        </li>
+                                        <li><a href="/how-it-works">How it works</a></li>
+                                        <li>
+                                            <a href="#">Top Ranking</a>
+                                            <ul> 
                                                 <li><a href="/topview/doctors">Doctors</a></li>                                                     
                                                 <li><a href="/topview/hospitals">Hospitals</a></li>
                                                 <li><a href="/topview/clinics">Clinics</a></li>
@@ -69,22 +84,27 @@
                                                 <li><a href="/topview/fitness">fitness Centers</a></li>                                                                           
                                                 <!--<li><a href="doctor-detail2.html">Doctor Detail 2</a></li>-->
                                             </ul>
-									</li>
-									
-									<li><a href="packages.html">packages</a></li>
-									<li><a href="contactus.html">Contact</a></li>
-									<li>
-                                        <a href="#" data-toggle="modal" data-target=".tg-user-modal" title="login/signup"><i class="fa fa-user-plus"></i></a>
-                                        <span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
-                                    </li>                                    
-								</ul>
-							</div>
-							</nav>
-						</div>
-					</div>
-				</div>
-			</div>
-		</header>
+                                        </li>
+                                        <li>
+                                            <a href="#">Blog</a>
+                                            
+                                        </li>
+                                        <li><a href="packages.html">packages</a></li>
+                                        <li><a href="contactus.html">Contact</a></li>                                        
+                                        <!--<li>                                            
+                                            <a href="#" data-toggle="modal" data-target=".tg-user-modal" title="login/signup"><i class="fa fa-user-plus"></i></a>
+                                            <span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
+                                        </li>-->                                                                                                                
+                                    </ul>
+                                </div>                                
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <div class="arrow-dashboard" ng-if="checkLogIn">
+                    <a ng-href="{{back}}" class="fa fa-long-arrow-right" title="Back to dashboard"></a>
+                <div>
+            </header>
 		<!--************************************
 				Header End
 		*************************************-->
@@ -196,10 +216,10 @@
 				<div class="container">
 					<div class="row">
 						<div class="col-xs-12">
-							<h1>list</h1>
+							<h1>Doctors search</h1>
 							<ol class="tg-breadcrumb">
-								<li><a href="#">Home</a></li>
-								<li class="active">List</li>
+								<li><a href="/">Home</a></li>
+								<li class="active">find doctor</li>
 							</ol>
 						</div>
 					</div>
@@ -904,6 +924,8 @@
         <script src="/assets/js/main.js"></script>
         <script src="/assets/js/modalService.js"></script>
         <script src="/assets/js/moment.min.js"></script>
-        <script src="/assets/js/angular-moment.min.js"></script>    
+        <script src="/assets/js/angular-moment.min.js"></script>
+        <script src="/assets/js/angular-clipboard.js"></script>
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>    
     </body>
 </html>

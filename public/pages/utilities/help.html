@@ -1,26 +1,36 @@
-<a href="#/drug" style="font-size: 22px; font-weight: 100; color: #000"><i class="fa fa-arrow-left"> &nbsp;Find Drug</i></a>
+<a ng-href="{{pageUrl}}" style="font-size: 22px; font-weight: 100; color: #000"><i class="fa fa-arrow-left"> &nbsp;Back</i></a>
 <div>
-	<p style="font-size: 18px">Welcome {{user.firstname}}, How may we help you?</p>
-	<span>Please fiil the form we'll contact you soon.</span>
-	<form>
+	<p style="font-size: 18px;text-align:center;padding: 20px 10px">Welcome {{user.firstname}}, How may we help you?</p>	
+	<form style="width: 90%;margin: 0 auto">
 		<div>
-			<label>Type of help * <label>
+			<label>Type of help * : <label>
 			<select ng-model="user.helpType" required>
+				<option>Need a Doctor</option>
 				<option>Pharmaceutical</option>
 				<option>Laboratory</option>
 				<option>Radiology</option>
-				<option>Special centers</option>
-				<option>Need a Doctor</option>
+				<option>Special centers</option>				
 				<option>Others</option>
 			</select>
 		</div>
-		
-		<div>
+		<div ng-repeat="i in symptomsList" ng-if="user.helpType === 'Need a Doctor'">				
+			<input name="states" id="states" type="text" placeholder="Enter symptom" ng-model="name" uib-typeahead="name for name in symptoms | filter:$viewValue | limitTo:15" class="form-control" style="width: 95%">
+			{{getSymptom(name)}} 
+			<i class="fa fa-times" style="cursor: pointer;font-weight: 100; font-size: 16px;color:grey" ng-click="remove(i.sn)" ng-if="i.sn !== 'a'"></i>
+		</div>
+		<div style="text-align:right;padding: 20px" ng-if="user.helpType === 'Need a Doctor'">
+			<i class="fa fa-plus btn btn-primary" style="cursor: pointer;background-color: #7dbb00" ng-click="add()">&nbsp;Add symptom</i> 
+		</div>
+		<div ng-if="user.helpType === 'Need a Doctor'">
+			<label>Briefly describe how you feel right now *<small>(e.g I am having body pain,can't eat,i feel so weak, i vomit sometimes but not regular.)</small></label>
+			<textarea placeholder="Write..." ng-model="user.description" style="height: 200px"></textarea>
+		</div>
+		<div ng-if="user.helpType !== 'Need a Doctor' && user.helpType">
 			<label>Briefly describe what you need *<small>(e.g I am looking for a center for dialysis.Please I need your help.)</small></label>
 			<textarea placeholder="Write..." ng-model="user.description" style="height: 200px"></textarea>
 		</div>
-		<div>		
-			<input type="button" value="submit" class="btn btn-primary" ng-click="sendHelp()">
+		<div ng-if="user.helpType" style="margin-top: 20px">		
+			<input type="button" value="submit" class="btn btn-primary" style="background-color: #7dbb00" ng-click="sendHelp()">
 		</div>
 	</form>
 </div>

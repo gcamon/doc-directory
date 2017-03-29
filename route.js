@@ -4,6 +4,7 @@ var route = require('./config');
 var router = route.router;
 var fs = require("fs");
 var dateTime = require("node-datetime");
+var deleteItem = require("./delete");
 
 //var token = require("./twilio");
 //var randomUserName = require("./randos");
@@ -142,12 +143,42 @@ var basicRoute = function (model) {
   });
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //handles all change picture 
+  router.put("/user/update/profile-pic",function(req,res){
+    console.log(typeof req.files[0].size)
+    console.log(req.files[0].mimetype)
+    if(req.user){
+      if(req.files.length > 0 && req.files[0].mimetype === "image/jpg" || req.files[0].mimetype === "image/jpeg" && req.files[0].size < 2097152) {
+          model.user.update({email: req.user.email},{$set : {
+          "profile_pic.filename": req.files[0].filename,
+          "profile_pic.path":  req.files[0].path,
+          "profile_pic.mimetype":  req.files[0].mimetype,
+          "profile_pic.encoding":  req.files[0].encoding,
+          "profile_pic.size":  req.files[0].size,
+          "profile_pic.destination":  req.files[0].destination,
+          "profile_pic.fieldname":  req.files[0].fieldname,
+          "profile_pic.originalname":  req.files[0].originalname,
+          profile_pic_url: "/download/profile_pic/" + req.files[0].filename
+          }},function(err,info){        
+          if(err) throw err;
+          console.log(info) 
+          var pic = "/download/profile_pic/"  + req.files[0].filename;      
+          res.send({profile_pic_url: pic});   //repalce with "success" as fallback               
+          });
+      } else {
+          res.send({error: "Picture does not meet specifications"});
+      }
+    } else {
+      res.end("Unauthorized access!")
+    }
+  });
   //doctors profile update route
   router.put("/user/update",function(req,res){
+
     if(req.user){
         switch(req.body.type){
         case "picture":            
-            if(req.files.length > 0) {
+            if(req.files.length > 0 && req.files[0].mimetype === "image/jpg" || req.files[0].mimetype === "image/jpeg" && req.files[0].size < 2097152){
                 model.user.update({email: req.user.email},{$set : {
                 "profile_pic.filename": req.files[0].filename,
                 "profile_pic.path":  req.files[0].path,
@@ -165,7 +196,7 @@ var basicRoute = function (model) {
                 res.send(pic);   //repalce with "success" as fallback               
                 });
             } else {
-                res.end();
+                res.send({error: "Picture does not meet specifications"});
             }
             break; 
         case "form":
@@ -239,53 +270,13 @@ var basicRoute = function (model) {
                         
                     }
                     result.save(function(err){
-                        if(err) throw err;
-                        console.log("updated");                        
+                        if(err) throw err;                       
                         res.send("success");
                     });
                 }
             )
 
-            /*for(var i in req.body){
-                if(req.body.hasOwnProperty(i)){
-                    if(Object.prototype.toString.call( req.body[i] ) === '[object Array]'){
-                        model.user.update(
-                            {email: req.user.email}, 
-                            {$push: {education: {
-                                school: "Hello World",
-                                certificate: "933ujrfn393r..............????"
-                            }}
-                        },function(err,info){
-                            console.log(info);
-                        });
-                    } else {
-                        var prop = i;
-                        model.user.update(
-                            {email: req.user.email}, 
-                            {$set: {prop: req.body[i]}
-                        },function(err,info){
-                            console.log(i + ":" + req.body[i])
-                            console.log(info);
-                        });
-                    }
-                } 
-            }
-             res.send("success")
-             //
-            for(var i in req.body){
-                if(req.body.hasOwnProperty(i)){
-                    model.user.Update(
-                        {email: req.user.email}, 
-                        {$push: {education: {
-                            school: "Hello World",
-                            certificate: "933ujrfn393r"
-                        }}
-                    }).exec(function(err, post) {
-                        console.log(post);
-                        res.send(post);
-                    });
-                }
-            }  */             
+            
           break;
           default:
             res.end();
@@ -330,7 +321,6 @@ var basicRoute = function (model) {
     router.put("/patient-profile/update", function(req,res){
         if(req.user){
             model.user.update({email: req.user.email},req.body,function(err,info){
-                console.log(info)
                 res.send("updated");
             });
         } else {
@@ -621,12 +611,15 @@ var basicRoute = function (model) {
     router.get("/doctor/notifications",function(req,res){
          if(req.user){
          model.user.findOne({email:req.user.email},{doctor_notification:1,_id:0},function(err,data){                
-                res.send(data);
+            res.send(data);
          })
         } else {
             res.send("not allowed");
         }
     });
+
+
+
 
      router.get("/doctor/get-patient-prescription-request",function(req,res){        
          if(req.user){
@@ -646,8 +639,8 @@ var basicRoute = function (model) {
                 },
                 {
                     ewallet:1,
-                    patient_notification: 1,
-                    service_access: 1
+                    patient_mail: 1,
+                    service_access: 1,
                 }
             )
             .exec(
@@ -656,30 +649,45 @@ var basicRoute = function (model) {
                         req.body.service_access = true;
                         result.ewallet.available_amount -= req.body.consultation_fee;
                     }
-                    result.patient_notification.push({
-                        doctor_id: req.body.doctor_id,
-                        doctor_firstname: req.body.doctor_firstname,
-                        doctor_lastname: req.body.doctor_lastname,
-                        date: req.body.date,
-                        consultation_fee: req.body.consultation_fee,
-                        service_access: req.body.service_access,
-                        doctor_profile_pic_url: req.body.doctor_profile_pic_url,
-                        doctor_specialty: req.body.doctor_specialty
+                        
+                    result.patient_mail.push({
+                      doctor_id: req.body.doctor_id,
+                      doctor_firstname: req.body.doctor_firstname,
+                      doctor_lastname: req.body.doctor_lastname,
+                      title: req.user.title,
+                      message: "Consultation request accepted",
+                      date: req.body.date,
+                      consultation_fee: req.body.consultation_fee,
+                      service_access: req.body.service_access,
+                      doctor_profile_pic_url: req.body.doctor_profile_pic_url,
+                      doctor_specialty: req.body.doctor_specialty
                     });
 
                     result.save(function(err){
-                        if(err) throw err;
-                        console.log("updated");                        
-                        res.send("success");
+                      if(err) throw err;
+                      console.log("updated");                        
+                      res.send("success");
                     });
+
                 }
             )
-
             
         } else {
            res.send("not allowed");
         }
     });
+
+router.put("/admin/patient-mail",function(req,res){
+
+});
+
+router.put("/doctor/decline-mail",function(req,res){
+
+})
+
+router.put("/doctor/redirect-mail",function(req,res){
+  
+})
     
 
     //this router gets all the patient medical records and prescriptions and send it to the front end as soon as the patient logs in. 
@@ -696,19 +704,7 @@ var basicRoute = function (model) {
       }
     });
 
-    //this route send all notification to the front end as soon as the patient logs in.
-    router.get("/patient/get-notification",function(req,res){
-      // You can set time interval on this block to notify patients on real time.
-      if(req.user) {
-        model.user.findOne({email:req.user.email},{patient_notification:1},function(err,patient_notification){
-          if(err) throw err;
-          res.send(patient_notification);
-        });
-        
-      } else {
-        res.end("Unauthorized access! Please log in")
-      }
-    });
+    
 
     //this route gets all referral for a pharmacy.
     router.get("/pharmacy/get-referral",function(req,res){
@@ -781,14 +777,14 @@ var basicRoute = function (model) {
                 },
                 {
                     accepted_doctors : 1,
-                    patient_notification: 1
+                    patient_mail: 1
                     
                 }
             )
             .exec(
                 function(err, result){                    
-                    for (var i = 0; i < result.patient_notification.length; i++) {
-                        if (result.patient_notification[i].doctor_id === req.body.doctor_id) {
+                    for (var i = 0; i < result.patient_mail.length; i++) {
+                        if (result.patient_mail[i].doctor_id === req.body.doctor_id) {
                             result.accepted_doctors.push(req.body);
                             deleteFromPatientNotification(i);
                             updateDoctorPatientList();
@@ -796,7 +792,7 @@ var basicRoute = function (model) {
                     }
 
                     function deleteFromPatientNotification(index) {
-                        result.patient_notification.splice(index,1);                                  
+                        result.patient_mail.splice(index,1);                                  
                     }
 
                     function updateDoctorPatientList() {
@@ -839,8 +835,9 @@ var basicRoute = function (model) {
            res.end();
         }
     });
-
-    router.put("/patient/acceptance/prescription",function(req,res){
+    
+    //not neccessary since view notifictaion from the drop down is note implemented
+   /* router.put("/patient/acceptance/prescription",function(req,res){
       if(req.user){                  
         model.user.findOne(
                 {
@@ -871,7 +868,7 @@ var basicRoute = function (model) {
         res.end("Unauthorized Access");
       }
 
-    });
+    });*/
 
   // this route runs when the patients wants to view his prescription track record. ie patient wants to see 
     //where all his prescriptions has been send sent to.
@@ -1557,6 +1554,29 @@ var basicRoute = function (model) {
       }
     });
 
+    //this route is like above only it only updates the patient lab test on the patient dashboard. this is used for patient on em profile and 
+    //patient who requested test without doctors approval.
+    router.put("/laboratory/test-result/patient-test-update",function(req,res){
+      model.user.findOne({user_id: req.body.laboratory.patient_id},{medical_records: 1}).exec(function(err,data){
+        if(err) throw err;       
+        var elementPos = data.medical_records.laboratory_test.map(function(x) {return x.ref_id; }).indexOf(req.body.ref_id);
+        var objectFound = data.medical_records.laboratory_test[elementPos];           
+        objectFound.report = req.body.laboratory.report || objectFound.report;
+        objectFound.conclusion = req.body.laboratory.conclusion || objectFound.conclusion;
+        objectFound.test_to_run = req.body.laboratory.test_ran || objectFound.test_to_run;
+        objectFound.sent_date = req.body.date || objectFound.sent_date;
+        objectFound.receive_date = req.body.laboratory.date;
+
+        
+        data.save(function(err,info){
+          if(err) res.send({status: "error"});           
+          res.send({status: "success"});
+        });
+      
+      });
+    })
+
+
     
     //updating radiology result in doctor's treatment page with patient.
     router.put("/radiology/test-result/session-update",function(req,res){      
@@ -1625,6 +1645,28 @@ var basicRoute = function (model) {
       }
 
     });
+  
+    //this route is like above only it only updates the patient scan test on the patient dashboard. this is used for patient on em profile and 
+    //patient who requested test without doctors approval.
+    router.put("/radiology/test-result/patient-scan-update",function(req,res){
+      console.log(req.body)
+      model.user.findOne({user_id: req.body.radiology.patient_id},{medical_records: 1}).exec(function(err,data){
+        if(err) throw err;
+        var elementPos = data.medical_records.radiology_test.map(function(x) {return x.ref_id; }).indexOf(req.body.ref_id);
+        var objectFound = data.medical_records.radiology_test[elementPos];           
+        objectFound.report = req.body.radiology.report || objectFound.report;
+        objectFound.conclusion = req.body.radiology.conclusion || objectFound.conclusion;
+        objectFound.test_to_run = req.body.radiology.test_ran || objectFound.test_to_run;
+        objectFound.sent_date = req.body.date || objectFound.sent_date;
+        objectFound.receive_date = req.body.radiology.date;
+        objectFound.files = req.body.radiology.filesUrl;
+
+        data.save(function(err,info){
+          if(err) res.send({status: "error"});           
+          res.send({status: "success"});
+        });
+      });
+    })
 
     router.put("/radiology/upload-scan",function(req,res){
       if(req.user){        
@@ -1676,7 +1718,6 @@ var basicRoute = function (model) {
 
     //doctor creates session with a patient
     router.post("/doctor/patient-session",function(req,res){
-      console.log(req.body)
       if(req.user){        
         var session_id = Math.floor(Math.random() * 99999999999999922888);
 
@@ -1769,16 +1810,15 @@ var basicRoute = function (model) {
       }
     });
 
-    router.put("/patient/appointment/view",function(req,res){
+    router.get("/patient/appointment/view",function(req,res){
       if(req.user){
         model.user.findOne({user_id: req.user.user_id},{appointment:1,_id:0},function(err,data){     
           if(err) throw err;
-          var elementPos = data.appointment.map(function(x) {return x.session_id; }).indexOf(req.body.id);
-          var objectFound = data.appointment[elementPos];          
-          res.send(objectFound);         
+          console.log(data.appointment);
+          res.send(data.appointment);
         });
       } else {
-        res.end("Unauthorized access")
+        res.end("Unauthorized access");
       }
     });
 
@@ -2079,8 +2119,8 @@ var basicRoute = function (model) {
         if(req.user) {  
         var random = Math.floor(Math.random() * 9999999);
         var testId = Math.floor(Math.random() * 9999999999999999);       
-        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1})        
-        .exec(function(err,result){                  
+        model.user.findOne({user_id: req.body.user_id},
+          {diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1}).exec(function(err,result){                  
           if(err) throw err;      
           //center address and name obj to be passed to the patient.
           var centerObj = {
@@ -2582,10 +2622,28 @@ var basicRoute = function (model) {
 
     
 
-    /*router.get("/gcamon",function(req,res){
-        var identity = "gcamon";
-        res.send(JSON.stringify({ token: token(identity), identity: identity }))
-    });*/
+   
+    //patients get notifications/messages/appointments
+    router.get("/patient/notifications",function(req,res){
+      if(req.user){
+        model.user.findOne({user_id: req.user.user_id},{patient_notification:1},function(err,data){
+          if(err) throw err;
+          res.send(data.patient_notification);
+        });
+      } else {
+        res.end("Unauthorized access!!!");
+      }
+    });
+
+    router.get("/patient/get-message",function(req,res){
+      if(req.user){
+        model.user.findOne({user_id: req.user.user_id},{patient_mail: 1},function(err,data){
+          res.send(data.patient_mail);
+        });
+      } else {
+        res.end("Unauthorized access");
+      }
+    });
 
     router.get("/center/notification",function(req,res){
       if(req.user) {
@@ -2629,7 +2687,7 @@ var basicRoute = function (model) {
           address: req.user.address,
           city: req.user.city,
           country: req.user.country,
-          type: req.user.type,
+          type: req.user.type
         }
         res.render("find-drug",{userInfo: userObj})
       } else {
@@ -2638,12 +2696,7 @@ var basicRoute = function (model) {
       
     });
 
-    router.put("/user/search-drug",function(req,res){
-
-    });
-
     //searching for a particular test
-
     router.get("/user/find-lab-test",function(req,res){
       if(req.user) {
         var userObj = {
@@ -2912,6 +2965,7 @@ var basicRoute = function (model) {
     });
 
     router.put("/pharmacy/search/find-drugs",function(req,res){
+      console.log(req.body)
       if(req.user && req.body.city === undefined)
         req.body.city = req.user.city;
       model.services.find({type:"Pharmacy",center_city:req.body.city},
@@ -3136,7 +3190,6 @@ router.put("/laboratory/search/find-tests",function(req,res){
     var listOfTests = req.body.testList;        
     for(var i = 0; i < listOfTests.length; i++){
       var elements = data.map(function(x){return x.unavailable_services});
-      console.log(elements)
       var count = 0;
       var foundTest = [];          
       while(count < elements.length){
@@ -3336,7 +3389,7 @@ router.put("/test-search/laboratory/referral",function(req,res){
 
 //for scan test search
 router.put("/radiology/search/find-tests",function(req,res){
-  console.log(req.body)
+  
   if(req.user && req.body.city === undefined)
     req.body.city = req.user.city;
   model.services.find({type:"Radiology",center_city:req.body.city},
@@ -3538,91 +3591,7 @@ router.put("/scan-search/radiology/referral",function(req,res){
   }
 });
 
-/**
-//center address and name obj to be passed to the patient.
-    var centerObj = {
-      name: result.name,
-      address: result.address,
-      city: result.city,
-      country: result.country,
-      phone: result.phone,
-      id: result.user_id
-    }
 
-    var refObj = {
-      ref_id: req.body.ref_id,
-      referral_firstname: req.user.firstname,
-      referral_lastname: req.user.lastname,
-      referral_title: req.user.title,
-      referral_id: req.user.user_id,    
-      date: req.body.date,            
-      laboratory: {
-        test_to_run : req.body.laboratory.test_to_run,
-        patient_firstname: req.body.laboratory.patient_firstname,
-        patient_lastname: req.body.laboratory.patient_lastname,
-        patient_profile_pic_url: req.body.laboratory.patient_profilePic,
-        patient_title: req.body.laboratory.patient_title,
-        patient_phone: req.body.laboratory.phone,
-        session_id: req.body.laboratory.session_id,
-        patient_id: req.body.laboratory.patient_id,
-        attended: false
-      }             
-    }
-
-    //this is notification for the center.
-    var refNotification = {
-      sender_firstname: req.user.firstname,
-      sender_lastname: req.user.lastname,
-      sender_title : req.user.title,
-      sent_date: req.body.date,
-      ref_id: req.body.ref_id,
-      note_id: req.body.ref_id,
-      sender_profile_pic_url: req.user.profile_pic_url,
-      message: "Please run the test for my patient"
-    }
-
-    result.referral.push(refObj);
-    result.diagnostic_center_notification.push(refNotification);
-
-    result.save(function(err,info){
-      if(err) throw err;            
-    });
-    tellPatient(centerObj);
-  });
-
-  var tellPatient = function(centerInfo){
-    //remember sms will be sent to the patient
-    model.user.findOne({user_id: req.body.laboratory.patient_id},{medical_records: 1,user_id}).exec(function(err,record){
-      if(err) throw err;     
-      var recordObj = {
-        test_to_run: req.body.laboratory.test_to_run,
-        center_address: centerInfo.address,
-        center_city: centerInfo.city,
-        center_country: centerInfo.country,
-        center_name: centerInfo.name,
-        center_phone: centerInfo.phone,
-        center_id: centerInfo.id,
-        patient_id: record.user_id,
-        ref_id: req.body.ref_id,
-        referral_firstname: req.user.firstname,
-        referral_lastname: req.user.lastname,
-        referral_title: req.user.title,
-        sent_date: req.body.date,
-        session_id: req.body.session_id,
-        report: "Pending",
-        conclusion: "Pending"
-      }
-      record.medical_records.laboratory_test.unshift(recordObj);
-      record.save(function(err,info){
-        if(err) {
-          throw err;
-          res.end('500: Internal server error')
-        }
-        res.json({success:true,ref_no:req.body.ref_id});
-      });
-
-    });
-**/
 
 router.post("/user/help",function(req,res){
   model.help.findOne({user_id: req.user.user_id}).exec(function(err,user){
@@ -3630,6 +3599,7 @@ router.post("/user/help",function(req,res){
       helpType: req.body.helpType,
       description: req.body.description,
       sent_date: req.body.date,
+      symptoms: req.body.symptoms
     }
 
     if(!user){
@@ -3678,16 +3648,21 @@ router.get("/user/logout",function(req,res){
 /***************For emergency profile *************/
 
 router.get("/patient/EM/profile/:id",function(req,res){
-  console.log(req.params);
   model.user.findOne({user_id: req.params.id},{_id:0},function(err,result){
-    if(err) throw err;     
-    res.render("emergency-profile",{userInfo:result})
+    if(err) throw err;
+    if(!result) {
+      res.sendFile(path.join(__dirname + "/404.html"))
+    } else {
+      res.render("emergency-profile",{userInfo:result});
+    }
   })
   
 });
 
-router.put("/patient-panel/get-medical-record/em",function(req,res){      
+router.put("/patient/get-medical-record/em",function(req,res){ 
+console.log(req.body)     
   model.user.findOne({user_id: req.body.patient_id},{medical_records: 1,medications:1},function(err,data){
+    console.log(data.medical_records.laboratory_test)
     res.json({medical_records: data.medical_records,prescriptions: data.medications})
     //Note from model, medications holds all prescriptions while medical_records holds all laboratory and radiology tests
     // though there is prescription property on medical_record obj but not used yet.
@@ -3700,6 +3675,35 @@ router.put("/patient/get-prescription/track-record/em",function(req,res){
     console.log(data.prescription_tracking);
     res.send(data.prescription_tracking);
   });
+});
+
+/********** All delete route *******/
+
+router.delete("/patient/delete-one",function(req,res){
+  var projection = {};
+  projection[req.body.dest] = 1;
+  var del = new deleteItem(req.body.item,req.user.user_id);
+  del.DeleteByUserId(model,projection);
+  res.send("deleted");
+});
+
+
+router.delete("/patient/delete-one/appointment",function(req,res){
+  var projection = {};
+  projection[req.body.dest] = 1;
+  var del = new deleteItem(req.body.item,req.user.user_id);
+  del.DeleteBySessionId(model,projection);
+  res.send("deleted");
+});
+
+
+router.delete("/patient/delete-many",function(req,res){
+  console.log(req.body);
+  var projection = {};
+  projection[req.body.dest] = 1;
+  var del = new deleteItem(req.body.item,req.user.user_id);
+  del.DeleteAll(model,projection);
+  res.send("deleted");
 });
 
 }

@@ -41,7 +41,7 @@
 				<i class="fa fa-user-md" aria-hidden="true" style="color:green;font-size: 18px;margin-right:20px;cursor:pointer;font-weight:bold" title="send test result to your doctor(s)" ng-click="sendDocTest(test)" ng-if="test.report !== 'Pending'"></i>
 				<i class="fa fa-user-md" aria-hidden="true" style="color:#ccc;font-size: 18px;margin-right:20px;cursor:pointer;font-weight:bold" title="send test result to your doctor(s)"  ng-if="test.report === 'Pending'"></i>
 				<i class="fa fa-download" aria-hidden="true" style="color:green;font-size: 18px;margin-right:20px;cursor:pointer" title="Download this test" ng-click="downloadTest(test)"></i>
-				<i class="fa fa-arrow-right" aria-hidden="true" style="color:green;font-size:18px;margin-right:20px;cursor:pointer" title="Forward this test to a Laboratory center" ng-click="forwardTest(test)"></i>
+				<i class="fa fa-share" aria-hidden="true" style="color:green;font-size:18px;margin-right:20px;cursor:pointer" title="Forward this test to a Laboratory center" ng-click="forwardTest(test)"></i>
 				<i class="fa fa-times" aria-hidden="true" style="color:green;font-size:18px;margin-right:20px;cursor:pointer" title="Forward this test to a Laboratory center" ng-click="deleteTest(test.ref_id)" ng-if="test.report !== 'Pending'"></i>					    	
 			</div>		    	
 		</div>

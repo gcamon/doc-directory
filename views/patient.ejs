@@ -43,7 +43,88 @@
             <!--************************************
                             Header Start
             *************************************-->
-            <header id="header" class="tg-haslayout">
+            <header id="header" class="tg-haslayout" ng-controller="patientNotificationController">
+                <div  class="navbar-header top-navbar-dashboard" ng-controller="topHeaderController">
+                    <div style="width: 77%;margin: 0 auto;padding: 0px 5px">
+                        <div style="width: 20%;display:inline-block">                        
+                            <i class="fa fa-bars" aria-hidden="true" style="color:#fff;font-size:23px;font-weight:100; cursor:pointer" title="Menu" ng-click="isClicked()"></i>
+                        </div>
+                       <ul class="menu-list" ng-class="{'drp-list': drop}">
+                            <li><a href="/user/find-specialist">Find A Doctor</a></li>
+                            <li><a href="/user/find-drug">Find Drug</a></li>
+                            <li><a href="/user/find-scan-test">Find Scan</a></li>
+                            <li><a href="/user/find-lab-test">Find Test</a></li>
+                            <li><a href="#/help">Get help</a></li>                        
+                        </ul>
+                        <div style="width:78%; text-align:right;display:inline-block">
+                            <div style="display:inline-block;padding: 5px 25px">
+                                 <i class="fa fa-bell-o" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click="showNote()"><span style="display:inline-block;width:14px;height:14px;left: 12px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= userInfo.patient_notification.length %> > 0 " ng-cloak>{{getLen(<%= userInfo.patient_notification.length %>)}}</span></i>
+                                 <ul class="all-notify" ng-class="{'noti-drp': isView}">
+                                        <li> <h6 style="text-align: center">Notification(s)</h6> </li>
+                                        {{getPatientId(<%= userInfo.user_id %>, <%= userInfo.firstname %>, <%= userInfo.lastname %>)}}
+                                        
+                                        <li ng-repeat = "note in allNote" style="text-align: left">
+                                            <img ng-src="{{note.doctor_profile_pic_url}}" style="width: 32px; height: 32px">
+                                            <div>
+                                                <em>{{note.message}}</em>
+                                                <em style="font-size:10px;display:block;text-align:right">{{note.date | date: "mediumDate"}} {{note.date | date : "mediumTime"}}</em>
+                                                
+                                            </div>
+                                            
+                                        <li>
+                                    </ul>
+                            </div>
+                            <div style="display:inline-block;padding: 0px 25px">
+                                <i class="fa fa-envelope-o" aria-hidden="true" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click="showMsg()">
+                                <span style="display:inline-block;width:14px;height:14px;left: 14px; top:-18px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= userInfo.patient_mail.length %> > 0 " ng-cloak> {{msgLen}}</span></i>
+
+                                <ul class="all-notify" ng-class="{'msg-drp': isViewMsg}">
+                                    <li> <h6 style="text-align: center">Message(s)</h6> </li>
+                                    <li ng-repeat = "msg in allMsg" class="msg-drp-list" ng-click= "viewMessage(msg.doctor_id)">                                        
+                                        <img ng-src = "{{msg.doctor_profile_pic_url}}" style="width: 32px; height: 32px">
+                                        <div>                   
+                                            <span>{{msg.title}} {{msg.doctor_firstname}} {{msg.doctor_lastname}}</span>                      
+                                            <em>{{msg.message}}</em>
+                                        <div>                                        
+                                    </li>
+                                    <% for(var i = userInfo.patient_mail.length -1; i >= 0; i--) { %>                                                          
+                                        <div>{{getData("<%= userInfo.patient_mail[i].doctor_firstname%>","<%= userInfo.patient_mail[i].doctor_lastname %>","<%= userInfo.patient_mail[i].date %>","<%= userInfo.patient_mail[i].doctor_profile_pic_url %>","<%= userInfo.patient_mail[i].consultation_fee %>","<%= userInfo.firstname %>","<%= userInfo.ewallet.available_amount %>","<%= userInfo.patient_mail[i].doctor_id %>","<%= userInfo.patient_mail[i].service_access %>","<%= userInfo.patient_mail[i].doctor_specialty %>","<%= userInfo.patient_mail[i].message %>")}}
+                                        </div>                                                
+                                            
+                                    <% } %>
+                                </ul>
+                            </div>
+                            <div style="display:inline-block;padding: 0px 45px">
+                                <i class="fa fa-calendar" aria-hidden="true" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click = "showApp()"><span style="display:inline-block;width:14px;height:14px;left: 14px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= userInfo.appointment.length %> > 0 " ng-cloak>{{appLen}}</span></i>
+                                <ul class="all-notify" ng-class="{'msg-drp': isViewApp}">
+                                    <li> <h6 style="text-align: center">Appointment(s)</h6> </li>
+                                    <li ng-repeat = "app in allApp" class="msg-drp-list" ng-click= "viewAppointment(app.session_id)">                                       
+                                        <img ng-src = "{{app.profilePic}}" style="width: 32px; height: 32px">
+                                        <div>                   
+                                            <span>{{app.title}} {{app.firstname}} {{app.lastname}}</span>                      
+                                            <em>Hi, you have an appointment with me.</em>
+                                        <div>                                        
+                                    </li>                                                         
+                                </ul>
+                            </div>
+                            <div style="display:inline-block;padding: 0px 4px">
+                                
+                            </div>
+                            <div style="display:inline-block;padding: 0px 4px">
+                                
+                            </div>
+                            <div class="profile-drp">                            
+                                <img src="<%= userInfo.profile_pic_url %>" style="width: 38px; height: 38px; border-left: 1px solid grey;border-bottom: 1px solid grey;border-top: 1px solid grey;box-shadow:0px 2px 4px grey;cursor:pointer">
+                                <strong style="color:#fff;font-weight: 500;padding: 5px"><%= userInfo.firstname %> !</strong>
+                                <ul>
+                                    <li><a href="#/edit-picture"> Change profile picture </a></li>
+                                    <li><a href="#/edit-profile">Edit profile</a></li>
+                                    <li ng-click="logout()">Logout</li>
+                                </ul>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>            
                 <div class="container">
                     <div class="row">
                         <div class="col-xs-12">
@@ -59,11 +140,12 @@
                                         <span class="icon-bar"></span>
                                     </button>
                                 </div>
-                                <div class="collapse navbar-collapse" id="tg-navigation">
+                                <div class="collapse navbar-collapse top-nav" id="tg-navigation">
                                     <ul>
                                         <li>
                                             <a href="/home">Home</a>                                           
                                         </li>
+                                        <li><a href="/how-it-works">How it works</a></li>
                                         <li>
                                             <a href="#">Top Ranking</a>
                                             <ul> 
@@ -79,29 +161,16 @@
                                         </li>
                                         <li>
                                             <a href="#">Blog</a>
-                                            <ul>
-                                                <li><a href="blog-list.html">Blog List</a></li>
-                                                <li><a href="blog-grid.html">Blog Grid</a></li>
-                                                <li><a href="blog-detail.html">Blog Detail</a></li>
-                                            </ul>
+                                            
                                         </li>
                                         <li><a href="packages.html">packages</a></li>
                                         <li><a href="contactus.html">Contact</a></li>                                        
-                                        <!--<li>
-                                            <a href="#">
-                                                <i class="fa fa-navicon"></i>
-                                                <i>pages</i>
-                                            </a>
-                                            <ul>                                               
-                                                <li><a href="/user/dashboard" class="active">dashboard</a></li>
-                                                <li><a href="/user/user-update">Update profile</a></li>
-                                                <li><a href="/user/user-schedule">My schedule</a></li>
-                                                <li><a href="dashboard-myaccount.html">dashboard account</a></li>
-                                                <li><a href="/user/logout">Log out</a></li>
-                                            </ul>
-                                        </li>-->
+                                        <!--<li>                                            
+                                            <a href="#" data-toggle="modal" data-target=".tg-user-modal" title="login/signup"><i class="fa fa-user-plus"></i></a>
+                                            <span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
+                                        </li>-->                                                                                                                
                                     </ul>
-                                </div>
+                                </div>                                
                             </nav>
                         </div>
                     </div>
@@ -113,12 +182,12 @@
         <!--************************************
                 Home Slider Start
         *************************************-->
-        <div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="searchController">
-            <div class="tg-searcharea tg-haslayout">
+        <div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout">
+            <!--<div class="tg-searcharea tg-haslayout">
                 <div class="container">
                     <div class="row">
                         <form class="tg-searchform">
-                            <!--<div class="col-md-2 col-sm-2 col-xs-12">
+                            <div class="col-md-2 col-sm-2 col-xs-12">
                                 <div class="form-group">
                                     
                                 </div>
@@ -207,7 +276,7 @@
                                         </select>
                                     </span>
                                 </div>
-                            </div>-->
+                            </div>
                             <div class="col-md-2 col-sm-2 col-xs-4">
                                 <div class="form-group">
                                     <a id="search_banner" href="/user/find-specialist" class="tg-btn tg-btn-lg">Find A Doctor</a>
@@ -231,22 +300,23 @@
                         </form>
                     </div>
                 </div>
-            </div>
-            <div class="tg-pagebar tg-haslayout" ng-controller = "patientNotificationController">
+            </div>-->
+            <div class="tg-pagebar tg-haslayout" >
                 <div class="container-fluid">
                     <div class="row">
-                        <div class="col-xs-4 col-md-8">
+                        <div class="col-xs-4 col-md-9">
                             <h1>Patient dashboard</h1>                            
                         </div>
-                        <div class="col-xs-8 col-md-4">                            
-                            <ul class="notify">
+                        <div class="col-xs-8 col-md-3" style="text-align:right">
+                            <span style="color:#fff">Available balance | #3,000</span>                            
+                            <!--<ul class="notify">
                                 
                                 <li class="noti chat notify-icon">
-                                    <!--<i class="fa fa-commenting-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>-->
+                                    <i class="fa fa-commenting-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
                                     <strong class="signal" ng-if="isLabP" ng-click="viewLabPending()" style="cursor:pointer" title=" {{labLenPending}} Awaiting lab test result">{{labLenPending}}&nbsp;PLab</strong>
                                 </li>
                                 <li class="noti video notify-icon">
-                                    <!--<i class="fa fa-phone" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>-->
+                                    <i class="fa fa-phone" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
                                     <strong class="signal" ng-if="isScanP" ng-click="viewRadioPending()" style="cursor:pointer" title=" {{scanLenPending}} Awaiting scan test result">{{scanLenPending}} &nbsp;PScan</strong>
                                 </li>                               
                                 <li class="noti note notify-icon">
@@ -278,7 +348,7 @@
                                         <li style="text-align:center; cursor:pointer" ng-click="logout()">SIGNOUT</a></li>                                       
                                     </ul>
                                 </li>
-                            </ul>
+                            </ul>-->
                         </div>
                     </div>
                 </div>
@@ -595,7 +665,7 @@
                         <aside id="tg-sidebar">
                             
                             <div class="tg-widget tg-widget-accordions">
-                                <h3>Dashboard</h3>
+                                <h3>My Services</h3>
                                 <ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                     <li class="panel panel-default">
                                         <span ng-click="dashboardhome()"><i class="fa fa-home" style="font-size: 32px; color: rgba(0,100,0,0.7);margin-right: 10px" title="Back to dashboard home"></i></span>
@@ -605,13 +675,13 @@
                                          
                                         <span ng-click="viewTreatment()" style="cursor:pointer"><i class="icon-FirstAidKit icon-style" title="View all treatments"></i></span>
                                     </li>                                 
-                                    <li class="panel panel-default active">
+                                    <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingOne">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
                                                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseOne" aria-expanded="false" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Treatment(s)</a>
                                             </h3>
                                         </div>                                        
-                                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                                        <div id="collapseOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                                             <div class="panel-body">
                                                 <ol style="color:rgba(0,110,0,0.8)">
                                                     <% for(var k = 0; k < 1; k++) { %>
@@ -642,24 +712,20 @@
                                     <!-- change all to angularjs -->
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingSix">
-                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
-                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseSix" aria-expanded="false" aria-controls="collapseSix" style="color:rgba(0,180,0,0.6); font-size: 18px;">Appointments(<%= userInfo.appointment.length %>)</a>
+                                            <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
+                                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseSix" aria-expanded="false" aria-controls="collapseSix" style="color:rgba(0,180,0,0.6); font-size: 18px;">Awaiting Test results</a>
                                             </h3>
                                         </div>
                                         <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
-                                            <div class="panel-body appointment">
-                                                <ol>
-                                                <% for(var k = 0; k < userInfo.appointment.length; k++) { %>
-                                                <li ng-click="viewAppointment(<%= userInfo.appointment[k].session_id %>)" style="padding: 5px 2px; cursor: pointer">                                                                                                      
-                                                    <%= userInfo.appointment[k].title %> <%= userInfo.appointment[k].firstname %> <%= userInfo.appointment[k].lastname %><br> 
-                                                    <span style="padding-right: 20px">{{ "<%= userInfo.appointment[k].date %>" | date : "mediumDate"}}</span> <span>{{ "<%= userInfo.appointment[k].time %>" | date: "mediumTime" }}</span> 
-                                                </li>
-                                                <% } %>
-                                                </ol>
+                                            <div class="panel-body">
+                                                <ul>
+                                                    <li ng-click="viewLabPending()" class="awaiting">Awaiting lab test result ({{labLenPending}})</li>
+                                                    <li ng-click="viewRadioPending()" class="awaiting">Awaiting scan test result ({{scanLenPending}})</li>
+                                                </ul>
                                             </div>
                                         </div>
                                     </li>                                                                  
-                                    <li class="panel panel-default">
+                                    <!--<li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingTwo">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
                                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseTwo" aria-expanded="true" aria-controls="collapseOne" style="color:rgba(0,180,0,0.6); font-size: 18px;">Account profile</a>
@@ -670,7 +736,7 @@
                                                 <p><a href="#/edit-profile">Edit your profile</a></p>                                                
                                             </div>
                                         </div>
-                                    </li>
+                                    </li>-->
                                     <!--<li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingTwo">
                                             <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">

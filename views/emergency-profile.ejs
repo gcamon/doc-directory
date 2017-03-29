@@ -337,19 +337,20 @@
                         <aside id="tg-sidebar">
                             
                             <div class="tg-widget tg-widget-accordions">
-                                <h3>Dashboard</h3>
+                                <h3>Dashboard</h3>                                
                                 <ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                     <li class="panel panel-default">
                                         <span ng-click="dashboardhome()"><i class="fa fa-home" style="font-size: 32px; color: rgba(0,100,0,0.7);margin-right: 10px" title="Back to dashboard home"></i></span>
                                         <span ng-click="viewPrescription()" style="cursor:pointer" class="indica"><i class="icon-Pills icon-style" title="View all prescriptions"></i><strong class="signal" ng-if="isNew">new</strong></span>
-                                         <!--<span ng-click="viewLabTest()" style="cursor:pointer" class="indica"><strong class="signal">Lab</strong></span>
+                                         <span ng-click="viewLabTest()" style="cursor:pointer" class="indica"><strong class="signal">Lab</strong></span>
                                           <span ng-click="viewScanTest()" style="cursor:pointer" class="indica"><strong class="signal">Scan</strong></span>
                                          
-                                        <span ng-click="viewTreatment()" style="cursor:pointer"><i class="icon-FirstAidKit icon-style" title="View all treatments"></i></span>-->
+                                        <span ng-click="viewTreatment()" style="cursor:pointer"><i class="icon-FirstAidKit icon-style" title="View all treatments"></i></span>
                                     </li>                                 
                                     
                                     <li class="panel panel-default">
                                         <div class="tg-panel-heading" role="tab" id="headingThree">
+                                            
                                              <h3 class="panel-title" style="border-bottom: 1px solid rgba(0,0,0,0.3)">
                                                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="/#collapseThree" aria-expanded="false" aria-controls="collapseThree" style="color:rgba(0,180,0,0.6); font-size: 18px;">Prescription(<%= userInfo.medications.length %>)</a>
                                             </h3>

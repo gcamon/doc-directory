@@ -335,8 +335,8 @@ form fieldset{
 
 .pp {
 	/*border-radius: 130px!important;*/
-	width: 250px!important;
-	min-height: 250px;
+	max-width: 150px;
+	max-height: 150px;
 }
 
 .t-align {
@@ -518,7 +518,7 @@ ul.dosage {
 .all-notify li{
 	display: block;
 	color: #000;
-	padding: 20px;
+	padding: 15px;
 	font-size: 14px;
 }
 
@@ -610,6 +610,312 @@ span.dates {
     background:#7dbb00;
     color:white;
 }
+
+/**** top header style *******/
+.top-header {
+	border-bottom: 4px solid #7dbb00;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 3;
+	background-color: #fff
+}
+
+.main {
+	margin-top: 150px
+}
+
+.top-navbar {
+	background-color:#7dbb00; 
+	padding: 10px;
+	box-shadow: 2px 1px 8px #000;
+	text-align:right; 
+	float:none
+}
+
+
+.top-navbar span {
+	border: 1px solid #eee;
+	display:inline-block;
+	border-radius:10px;
+	padding:3px 10px;
+	color:#eee;
+	font-size: 16px;
+	margin-right: 30px;
+	cursor:pointer
+}
+
+
+.top-navbar span:hover {
+	background-color: #ccc;
+	color: #000;
+}
+
+.top-navbar ul {
+	position:absolute;
+	right:0;
+	top:50px;
+	width:230px;
+	border:5px solid #7dbb00;
+	background-color:#fff;
+	color:#000;
+	text-align:center;
+	z-index: 3;padding:10px;
+	list-style: none;
+}
+
+.drp-list {
+	display: block!important;
+}
+
+.drp-list li {
+	padding: 5px 2px;
+}
+
+
+.drp-list li a {
+	color: #000;
+	font-size: 18px;
+	display: block;
+}
+
+.drp-list li a:hover {
+	background-color: #7dbb00;
+	color: #fff;
+}
+
+.top-nav li a {
+	font-size: 16px;
+	font-weight: 100;
+	text-shadow: 1px 0px 1px #ccc;
+}
+
+
+.arrow-dashboard {
+	position:absolute;
+	top: 60px; 
+	right: 30px
+}
+
+.arrow-dashboard a{
+	font-size: 28px;
+	text-shadow: 1px 1px 3px #ccc;
+	color: #000;
+	cursor:pointer;
+}
+
+.display-list ul{
+	width: 70%!important;	
+	text-align: left;
+	margin: 30px 100px!important;
+}
+
+.display-list ul li {
+	line-height: 30px!important;
+	color:#fff;
+	font-size: 22px;
+	text-shadow: 1px 2px 1px #000;
+}
+
+.display-list ul li:after {
+	color: #fff!important;
+	font-size: 24px!important;
+	line-height: 30px!important;
+}
+
+
+.tg-search-category h3 {
+	color: #7dbb00!important;
+}
+
+.tell-patient li{
+	
+	font-weight: 100;
+	font-size: 15px!important;
+}
+
+
+.top-navbar-dashboard {
+	background-color:#7dbb00; 
+	padding: 10px;
+	box-shadow: 2px 1px 8px #000;
+	float:none
+}
+
+
+.top-navbar-dashboard span {
+	border: 1px solid #eee;
+	display:inline-block;
+	border-radius:10px;
+	padding:3px 10px;
+	color:#eee;
+	font-size: 16px;
+	margin-right: 30px;
+	cursor:pointer
+}
+
+
+.top-navbar-dashboard span:hover {
+	background-color: #ccc;
+	color: #000;
+}
+
+.top-navbar-dashboard ul {
+	position:absolute;
+	left:10;
+	top:47px;
+	width:230px;
+	border:5px solid #7dbb00;
+	background-color:#fff;
+	color:#000;
+	text-align:center;
+	z-index: 3;
+	padding:10px;
+	list-style: none;
+}
+
+
+.profile-drp {
+	position: relative;
+	display: inline-block;
+}
+
+.profile-drp ul{
+	position: absolute;
+	right: -32px;
+	top: 35px;
+	visibility: hidden;
+}
+
+.profile-drp li a {
+	display:  block;
+	text-transform: uppercase;
+	line-height: 30px;
+	text-align: left;
+	color: #000;
+}
+
+.profile-drp li {
+	padding: 10px;
+	width: 100%;
+	text-transform: uppercase;
+	line-height: 30px;
+	text-align: left;
+	cursor: pointer;
+}
+
+.profile-drp li:hover {
+	background-color: #7dbb00;
+	color: #fff;
+}
+
+.profile-drp:hover ul{
+	visibility: visible;
+}
+
+.tg-widget ul li ul li.awaiting {
+	line-height: 30px;
+	background-color: #eee;
+	cursor: pointer;
+	font-size: 18px;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #000;
+}
+
+.tg-widget ul li ul li.awaiting::after {
+	content: none;
+}
+
+.all-notify {
+	display: none;
+}
+
+.menu-list {
+	display: none;
+}
+
+.top-navbar-dashboard ul.noti-drp {
+	display: block!important;
+	width: 400px;
+	right: 180px;
+	max-height: 500px;
+	overflow-y: auto;
+} /* use media query to correct position on mobile*/
+
+
+.top-navbar-dashboard ul.msg-drp {
+	display: block;
+	width: 300px;
+	right: 200px;
+	max-height: 500px;
+	overflow-y: auto;
+}
+
+.msg-drp-list {
+	line-height: 15px;
+	text-align: left;
+	cursor: pointer;
+}
+
+.msg-drp-list img,.msg-drp div{
+	display: inline-block;
+}
+
+.msg-drp-list div {
+	padding-left: 5px;
+	width: 190px;
+	float:right;
+}
+
+.msg-drp-list span {
+	font-size: 12px;
+	font-weight: bold;	
+	color: black;
+	border: none;
+}
+
+.msg-drp-list em {
+	display: block;
+	font-size: 12px;
+}
+
+.msg-drp-list:hover {
+	background-color: #7dbb00;
+	color:#fff;
+}
+
+.noti-drp img,.noti-drp div{
+	display: inline-block;
+}
+
+.noti-drp div {
+	padding-left: 5px;
+	width: 270px;
+	float:right;
+}
+
+.noti-drp span {
+	font-size: 12px;
+	font-weight: bold;	
+	color: black;
+	border: none;
+}
+
+.noti-drp em {
+	font-size: 12px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*listing of available tests style*/
 .all-test-check span {
@@ -1060,11 +1366,24 @@ button.tg-btn{background: none !important;}
 	background: #5d5955;
 }
 .tg-heading-border.tg-small{
-	margin: 0 0 25px;
-	padding: 0 0 18px;
+	margin: 0 0 5px;
+	padding: 0 0 7px;
 	position: relative;
 	z-index: 3;
 }
+
+.tg-docprofile-content i {
+	color: green;
+}
+
+.password2 {
+	background-color: yellow
+}
+
+.ng-show {
+	color:#fff!important;
+}
+
 .tg-heading-border.tg-small:after{
 	height: 1px;
 	width: 230px;
@@ -2486,7 +2805,7 @@ body.tg-comming-soon #main{
 .tg-list-view .tg-box {padding: 30px;}
 .tg-list-view .tg-box figure{
 	float: left;
-	width: 240px;
+	width: 165px;
 	margin: 0 30px 0 0;
 	border: 1px solid #ddd;
 }

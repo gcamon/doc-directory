@@ -26,6 +26,7 @@
         <link rel="stylesheet" href="/assets/css/angular-carousel.css">  
         <script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Ubuntu+Condensed" rel="stylesheet">
+        
     </head>
     <body ng-app= "myApp">
         <!--[if lt IE 8]>
@@ -38,7 +39,22 @@
             <!--************************************
                             Header Start
             *************************************-->
-             <header id="header" class="tg-haslayout">
+             <header id="header" class="tg-haslayout top-header"  ng-controller="topHeaderController">
+                <div  class="navbar-header top-navbar">
+                    <div style="width: 70%; padding-right: 30px;display:inline-block">
+                        <span data-toggle="modal" data-target=".tg-user-modal" title="login/signup" ng-if="!checkLogIn">Log in / Sign up</span>
+                        <span class="fa fa-sign-out" aria-hidden="true" ng-if="checkLogIn" ng-click="logout()"> Log out</span>
+                        <i class="fa fa-ellipsis-v" aria-hidden="true" style="color:#fff;font-size:23px;font-weight:100; cursor:pointer" title="Menu" ng-click="isClicked()"></i>
+                    </div>
+                    <ul ng-if="drop === true" class="drp-list">
+                        <li><a href="/user/find-specialist">Find A Doctor</a></li>
+                        <li><a href="/user/find-drug">Find Drug</a></li>
+                        <li><a href="/user/find-scan-test">Find Scan</a></li>
+                        <li><a href="/user/find-lab-test">Find Test</a></li>
+                        <li><a href="#">Find Special Center</a></li>                        
+                    </ul>
+
+                </div>
                 <div class="container">
                     <div class="row">
                         <div class="col-xs-12">
@@ -54,11 +70,12 @@
                                         <span class="icon-bar"></span>
                                     </button>
                                 </div>
-                                <div class="collapse navbar-collapse" id="tg-navigation">
+                                <div class="collapse navbar-collapse top-nav" id="tg-navigation">
                                     <ul>
                                         <li>
                                             <a href="/">Home</a>                                           
                                         </li>
+                                        <li><a href="/how-it-works">How it works</a></li>
                                         <li>
                                             <a href="#">Top Ranking</a>
                                             <ul> 
@@ -74,24 +91,23 @@
                                         </li>
                                         <li>
                                             <a href="#">Blog</a>
-                                            <ul>
-                                                <li><a href="blog-list.html">Blog List</a></li>
-                                                <li><a href="blog-grid.html">Blog Grid</a></li>
-                                                <li><a href="blog-detail.html">Blog Detail</a></li>
-                                            </ul>
+                                            
                                         </li>
                                         <li><a href="packages.html">packages</a></li>
-                                        <li><a href="contactus.html">Contact</a></li>
-                                        <li>                                            
+                                        <li><a href="contactus.html">Contact</a></li>                                        
+                                        <!--<li>                                            
                                             <a href="#" data-toggle="modal" data-target=".tg-user-modal" title="login/signup"><i class="fa fa-user-plus"></i></a>
-                                            <!--<span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>-->
-                                        </li>                                                                                                                
+                                            <span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
+                                        </li>-->                                                                                                                
                                     </ul>
-                                </div>
+                                </div>                                
                             </nav>
                         </div>
                     </div>
                 </div>
+                <div class="arrow-dashboard" ng-if="checkLogIn">
+                    <a ng-href="{{back}}" class="fa fa-long-arrow-right" title="Back to dashboard"></a>
+                <div>
             </header>
             <!--************************************
                             Header End
@@ -99,7 +115,7 @@
             <!--************************************
                             Home Slider Start
             *************************************-->
-            <div id="tg-homebanner" class="tg-homebanner tg-overflowhidden tg-haslayout">
+            <div id="tg-homebanner" class="tg-homebanner tg-overflowhidden tg-haslayout main" ng-controller="displayController">
                 
                 <!--<div id="map_canvas" class="tg-location-map tg-haslayout"></div>-->
                 <img src="/assets/images/bg-hero-doc.jpg" id="map_canvas" class="tg-location-map tg-haslayout" alt="image"/>
@@ -111,34 +127,34 @@
                                     <div class="row">
                                         <ul id="tg-sortable" class="tg-tabs-nav tg-sortable" role="tablist">
                                             <li role="presentation" class="active">
-                                                <a href="#nephrologist" aria-controls="nephrologist" role="tab" data-toggle="tab">
-                                                    <i class="icon-FirstAidKit"></i>
+                                                <a href="#specialists" aria-controls="nephrologist" role="tab" data-toggle="tab">
+                                                    <i class="icon-stethoscope"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">doctor</span>
                                                         <span class="tg-category-doctores" id="no-of-specialists"></span>
                                                     </span>
                                                 </a>
                                             </li>
-                                            <li role="presentation">
-                                                <a href="#dentist" aria-controls="dentist" role="tab" data-toggle="tab">
+                                            <!--<li role="presentation">
+                                                <a href="#hospitals" aria-controls="dentist" role="tab" data-toggle="tab">
                                                     <i class=" icon-Hospitalmedicalsignalofacrossinacircle"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">hospital</span>
                                                         <span class="tg-category-doctores" id="no-of-hospitals"></span>
                                                     </span>
                                                 </a>
-                                            </li>
-                                            <li role="presentation">
-                                                <a href="#eye-spcialist" aria-controls="eye-spcialist" role="tab" data-toggle="tab">
+                                            </li>-->
+                                            <!--<li role="presentation">
+                                                <a href="#clinics" aria-controls="eye-spcialist" role="tab" data-toggle="tab">
                                                     <i class=" icon-Clinichistorymedicalpaperonclipboard"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">clinic</span>
                                                         <span class="tg-category-doctores" id="no-of-clinics"></span>
                                                     </span>
                                                 </a>
-                                            </li>
+                                            </li>-->
                                             <li role="presentation">
-                                                <a href="#orthopaedic" aria-controls="orthopaedic" role="tab" data-toggle="tab">
+                                                <a href="#pharmacy" aria-controls="orthopaedic" role="tab" data-toggle="tab">
                                                     <i class="icon-Pills"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">Pharmacy</span>
@@ -147,7 +163,7 @@
                                                 </a>
                                             </li>
                                             <li role="presentation">
-                                                <a href="#ent-specialist" aria-controls="ent-specialist" role="tab" data-toggle="tab">
+                                                <a href="#radiology" aria-controls="ent-specialist" role="tab" data-toggle="tab">
                                                     <i class="icon-BloodDonation"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">Radiology Center</span>
@@ -156,7 +172,7 @@
                                                 </a>
                                             </li>
                                             <li role="presentation">
-                                                <a href="#dermatologist" aria-controls="dermatologist" role="tab" data-toggle="tab">
+                                                <a href="#laboratory" aria-controls="dermatologist" role="tab" data-toggle="tab">
                                                     <i class="icon-hairs"></i>
                                                     <span class="tg-category">
                                                         <span class="tg-category-name">Laboratories</span>
@@ -164,7 +180,7 @@
                                                     </span>
                                                 </a>
                                             </li>
-                                            <li role="presentation">
+                                            <!--<li role="presentation">
                                                 <a href="#fitness" aria-controls="fitness" role="tab" data-toggle="tab">
                                                     <i class="icon-hairs"></i>
                                                     <span class="tg-category">
@@ -172,263 +188,18 @@
                                                         <span class="tg-category-doctores" id="no-of-fitness"></span>
                                                     </span>
                                                 </a>
-                                            </li>
+                                            </li>-->
                                         </ul>
                                     </div>
                                 </div>
                                 <div class="col-md-9 col-sm-7 col-xs-9 tg-verticalmiddle" ng-controller = "searchController">
                                     <div class="row">
-                                        <form class="form-searchdoctors">
-                                            <fieldset>                                                
-                                                <div class="tab-content tg-tab-content">
-                                                    <div role="tabpanel" class="tab-pane active" id="nephrologist">
-                                                        <div class="row">
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                                                                            
-                                                                <div class="form-group" class="ui-widget">                                                                   
-                                                <input type="text" id="autocom" class="form-control tj" placeholder="Location" ng-model="user.city">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <span class="select">
-                                                                        <select id="group1" class="group tj" ng-model="user.specialty">
-                                                                            <option value="all">All</option>
-                                                                            <option>Acupunture</option>
-                                                                            <option>Addiction Medicine</option>
-                                                                            <option>Adolescent Medicine</option>
-                                                                            <option>Aerospace Medicine</option>
-                                                                            <option>Allergy</option>
-                                                                            <option>Allergy/Immunology</option>
-                                                                            <option>Anesthesiology</option>
-                                                                            <option>Audiologist</option>
-                                                                            <option>Bariatrician</option>
-                                                                            <option>Cardiac Electrophysiology</option>
-                                                                            <option>Cardiology</option>
-                                                                            <option>Chiropractic</option>
-                                                                            <option>Clinical Laboratory Immunology</option>
-                                                                            <option>Clinical Pathology</option>
-                                                                            <option>Colon/Rectal Surgery</option>
-                                                                            <option>Critical Care</option>
-                                                                            <option>Cythopathology</option>
-                                                                            <option>Dermatology</option>
-                                                                            <option>Dermatopathology</option>
-                                                                            <option>Diabetes</option>
-                                                                            <option>Diagnostic</option>
-                                                                            <option>Emergency Medical Tech</option>
-                                                                            <option>Emergency Medicine</option>
-                                                                            <option>Endocrinology</option>
-                                                                            <option>Endovascular Surgical Neuroradiology</option>
-                                                                            <option>Family Practice</option>
-                                                                            <option>Gastroenterology</option>
-                                                                            <option>General Practice</option>
-                                                                            <option>General Surgery</option>
-                                                                            <option>Genetics</option>
-                                                                            <option>Geriatrics</option>
-                                                                            <option>Gynecology</option>
-                                                                            <option>Gynecology Oncology</option>
-                                                                            <option>Hand Surgery</option>
-                                                                            <option>Hand and Neck Surgery</option>
-                                                                            <option>Hematology</option>
-                                                                            <option>Hematology/Oncology</option>
-                                                                            <option>Hepatology</option>
-                                                                            <option>Holistic Medicine</option>
-                                                                            <option>Hospitalist</option>
-                                                                            <option>Immunology</option>
-                                                                            <option>Infectious Disease</option>
-                                                                            <option>Internal Medicine</option>
-                                                                            <option>Interventional Cardiology</option>
-                                                                            <option>Legal Medicine</option>
-                                                                            <option>Medical Oncology</option>
-                                                                            <option>Medical Toxicology</option>
-                                                                            <option>Neonatology</option>
-                                                                            <option>Nephrology</option>
-                                                                            <option>Neurology</option>
-                                                                            <option>Neuroradiology</option>
-                                                                            <option>Nuclear Cardiology</option>
-                                                                            <option>Nuclear Medicine</option>
-                                                                            <option>Nutrition</option>
-                                                                            <option>Obstetrics/Gynecology</option>
-                                                                            <option>Occupational Medicine</option>
-                                                                            <option>Oncology</option>
-                                                                            <option>Opthalmology</option>
-                                                                            <option>Optometry</option>
-                                                                            <option>Orthopedic Foot & Ankle</option>
-                                                                            <option>Orthopedic Reconstructive Surgery</option>
-                                                                            <option>Orthopedic Spine Surgery</option>
-                                                                            <option>Orthopedic Surgery</option>
-                                                                            <option>Osteopathy</option>
-                                                                            <option>Otorhinolaryngology</option>
-                                                                            <option>Pain Management</option>
-                                                                            <option>Pathology</option>
-                                                                            <option>Pediatric Allergy</option>
-                                                                            <option>Pediatric Cardiology</option>
-                                                                            <option>Pediatric Critical Care</option>
-                                                                            <option>Padiatric Emergency Medicine</option>
-                                                                            <option>Other</option>
-                                                                        </select>
-                                                                    </span>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <button class="search_banner tg-btn pull-right" ng-click="search()">Search</a>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <h1>FIND YOUR<span>NEAREST</span>DOCTOR<em>.</em></h1>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div role="tabpanel" class="tab-pane" id="dentist">
-                                                        <div class="row">
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <div class="form-group">
-                                                                    <input type="text" class="form-control tj" id="autocom1" placeholder="Location">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <span class="select">
-                                                                        <select id="group2" class="group tj">
-                                                                            <option value="all">All</option>
-                                                                            <option value="doctor">Hospital 1</option>
-                                                                            <option value="pharmacy">Hospital 2</option>
-                                                                            <option value="hospital">Hospital 3</option>
-                                                                        </select>
-                                                                    </span>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <a class="search_banner tg-btn pull-right" href="#">Search</a>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <h1>FIND YOUR<span>NEAREST</span>Hospital<em>.</em></h1>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div role="tabpanel" class="tab-pane" id="eye-spcialist">
-                                                        <div class="row">
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <div class="form-group">
-                                                                    <input type="text" class="form-control tj" id="autocom2" placeholder="Location">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <span class="select">
-                                                                        <select id="group3" class="group tj">
-                                                                            <option value="all">All</option>
-                                                                            <option value="doctor">Clinic 1</option>
-                                                                            <option value="pharmacy">Clinic 2</option>
-                                                                            <option value="hospital">Clinic 3</option>
-                                                                        </select>
-                                                                    </span>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <a class="search_banner tg-btn pull-right" href="#">Search</a>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <h1>FIND YOUR<span>NEAREST</span>Clinic<em>.</em></h1>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div role="tabpanel" class="tab-pane" id="orthopaedic">
-                                                        <div class="row">
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <div class="form-group">
-                                                                    <input type="text" class="form-control tj" id="autocom3" placeholder="Location">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <span class="select">
-                                                                        <select id="group4" class="group tj">
-                                                                            <option value="all">All</option>
-                                                                            <option value="doctor">Pharmacy 1</option>
-                                                                            <option value="pharmacy">Pharmacy 2</option>
-                                                                            <option value="hospital">Pharmacy 3</option>
-                                                                        </select>
-                                                                    </span>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <a class="search_banner tg-btn pull-right" href="#">Search</a>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <h1>FIND YOUR<span>NEAREST</span>Pharmacy<em>.</em></h1>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div role="tabpanel" class="tab-pane" id="ent-specialist">
-                                                        <div class="row">
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <div class="form-group">
-                                                                    <input type="text" class="form-control tj" id="autocom4" placeholder="Location">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <span class="select">
-                                                                        <select id="group5" class="group tj">
-                                                                            <option value="all">All</option>
-                                                                            <option value="doctor">Blood Bank 1</option>
-                                                                            <option value="pharmacy">Blood Bank 2</option>
-                                                                            <option value="hospital">Blood Bank 3</option>
-                                                                        </select>
-                                                                    </span>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <a class="search_banner tg-btn pull-right" href="#">Search</a>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <h1>FIND YOUR<span>NEAREST</span>Radiology Center<em>.</em></h1>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div role="tabpanel" class="tab-pane" id="dermatologist">
-                                                        <div class="row">
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <div class="form-group">
-                                                                    <input type="text" class="form-control tj" id="autocom5" placeholder="Location">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <span class="select">
-                                                                        <select id="group6" class="group tj">
-                                                                            <option value="all">All</option>
-                                                                            <option value="doctor">Fitness Center 1</option>
-                                                                            <option value="pharmacy">Fitness Center 2</option>
-                                                                            <option value="hospital">Fitness Center 3</option>
-                                                                        </select>
-                                                                    </span>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <a class="search_banner tg-btn pull-right" href="#">Search</a>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <h1>FIND YOUR<span>NEAREST</span>laboratory<em>.</em></h1>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div role="tabpanel" class="tab-pane" id="fitness">
-                                                        <div class="row">
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <div class="form-group">
-                                                                    <input type="text" class="form-control tj" id="autocom6" placeholder="Location">
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <span class="select">
-                                                                        <select id="group6" class="group tj">
-                                                                            <option value="all">All</option>
-                                                                            <option value="doctor">Fitness Center 1</option>
-                                                                            <option value="pharmacy">Fitness Center 2</option>
-                                                                            <option value="hospital">Fitness Center 3</option>
-                                                                        </select>
-                                                                    </span>
-                                                                </div>
-                                                                <div class="form-group">
-                                                                    <a class="search_banner tg-btn pull-right" href="#">Search</a>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6 col-sm-12 col-xs-12 tg-verticalmiddle">
-                                                                <h1>FIND YOUR<span>NEAREST</span>fitness/spa<em>.</em></h1>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                        <div class="col-sm-12 col-md-9 col-lg-9">                                
+                                            <div class="view-animate-container row" style="background:none">  
+                                                <div class="view-animate" ng-view >
                                                 </div>
-                                            </fieldset>
-                                        </form>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -455,27 +226,9 @@
                                     <h2>what to expect</h2>
                                     <span class="tg-roundbox"></span>
                                     <div class="tg-description">
-                                        <p>In just three simple steps, DocDirect will help you find your nearest healthcare center without having to signup. We aim to facilitate you in finding your right doctor with just few clicks without having to ask around or wonder where to find one.In addition to finding the right doctor and healthcare centers for you we make sure you get in touch with your prospect</p>
-                                        <div class="row">
-                                            <div class="col-md-4 col-lg-4">
-                                                <div class="ico-com">
-                                                <img src="/assets/images/icons/icon-chat.png" alt="image" style="margin: 10px 5px">
-                                                <span style="display: inline-block; padding: 10px 20px, text-transform:uppercase; font-size: 22px;">Live Chat with a Doctor</span>
-                                                </div>
-                                            </div>
-                                             <div class="col-md-4 col-lg-4">
-                                                <div class="ico-com">
-                                                 <img src="/assets/images/icons/icon-video.png" alt="image" style="margin: 4px 5px">
-                                                <span style="display: inline-block; padding: 10px 20px, text-transform:uppercase; font-size: 22px;">Video Chat with a Doctor</span>
-                                                </div>                                              
-                                            </div>
-                                             <div class="col-md-4 col-lg-4">
-                                                <div class="ico-com">
-                                                 <img src="/assets/images/icons/med-record.png" alt="image" style="width:80px;height:75px">
-                                                <span style="display: inline-block; padding: 10px 20px, text-transform:uppercase; font-size: 22px;">Paperless Precriptions and Medical Records</span>
-                                                </div>
-                                              </div>
-                                            </div>                                                          
+                                        <p style="font-size: 22px;line-height: 35px;font-weight: 100">We're here to help you find and receive the best medical care. We have built a system that facilitate doctor - patient interaction, easy access to diagnostic and special centers. In just few click you can get answer to your medical needs without having to ask around. AppClinic has lots of utilities to take care of your medical needs with no stress.</p>
+                                        
+                                                                                                  
                                         </div>
                                     </div>
                                 </div>
@@ -488,7 +241,7 @@
                                                 <div class="tg-box">
                                                     <h3>find your doctor</h3>
                                                     <i class="icon-stethoscope"></i>
-                                                    <span class="tg-show"><em class="icon-add"></em></span>
+                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -499,9 +252,9 @@
                                         <div class="tg-displaytable">
                                             <div class="tg-displaytablecell">
                                                 <div class="tg-box">
-                                                    <h3>nearest hospital</h3>
+                                                    <h3>Inperson meeting</h3>
                                                     <i class="icon-healthcare"></i>
-                                                    <span class="tg-show"><em class="icon-add"></em></span>
+                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
                                                 </div>
                                             </div>
                                         </div>
@@ -512,18 +265,104 @@
                                         <div class="tg-displaytable">
                                             <div class="tg-displaytablecell">
                                                 <div class="tg-box">
-                                                    <h3>nearest pharmacy</h3>
+                                                    <h3>Paperless Prescription</h3>
                                                     <i class="icon-capsules"></i>
-                                                    <span class="tg-show"><em class="icon-add"></em></span>
+                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <div class="row">
+                            <div class="col-sm-4 col-xs-4 tg-expectwidth">
+                                    <div class="tg-search-category">
+                                        <div class="tg-displaytable">
+                                            <div class="tg-displaytablecell">
+                                                <div class="tg-box">
+                                                    <h3>Live Chat/Video Call </h3>
+                                                    <i class="icon-stethoscope"></i>
+                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                            <div class="col-sm-4 col-xs-4 tg-expectwidth">
+                                    <div class="tg-search-category">
+                                        <div class="tg-displaytable">
+                                            <div class="tg-displaytablecell">
+                                                <div class="tg-box">
+                                                    <h3>Update-to-date Medical records</h3>
+                                                    <i class="icon-stethoscope"></i>
+                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                            <div class="col-sm-4 col-xs-4 tg-expectwidth">
+                                    <div class="tg-search-category">
+                                        <div class="tg-displaytable">
+                                            <div class="tg-displaytablecell">
+                                                <div class="tg-box">
+                                                    <h3>Online payment</h3>
+                                                    <i class="icon-stethoscope"></i>
+                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-xs-4 tg-expectwidth">
+                                    <div class="tg-search-category">
+                                        <div class="tg-displaytable">
+                                            <div class="tg-displaytablecell">
+                                                <div class="tg-box">
+                                                    <h3>Appointment Booking</h3>
+                                                    <i class="icon-stethoscope"></i>
+                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-xs-4 tg-expectwidth">
+                                    <div class="tg-search-category">
+                                        <div class="tg-displaytable">
+                                            <div class="tg-displaytablecell">
+                                                <div class="tg-box">
+                                                    <h3>Paperless Lab test Result</h3>
+                                                    <i class="icon-stethoscope"></i>
+                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 col-xs-4 tg-expectwidth">
+                                    <div class="tg-search-category">
+                                        <div class="tg-displaytable">
+                                            <div class="tg-displaytablecell">
+                                                <div class="tg-box">
+                                                    <h3>Paperless Scan test Result</h3>
+                                                    <i class="icon-stethoscope"></i>
+                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+
                         </div>
                     </div>
                 </section>
+                <div class="form-group" style='text-align:center'>
+                    <a class="search_banner tg-btn" href="/how-it-works" style="padding: 0px 40px;color:#00">Learn more</a>
+                </div>
                 <!--************************************
                                 What to Expect End
                 *************************************-->
@@ -537,11 +376,11 @@
                                 <div class="col-lg-6 col-md-5 col-sm-12 col-xs-12 pull-right">
                                     <div class="tg-contentbox tg-haslayout">
                                         <div class="tg-heading-border">
-                                            <h2>are you a doctor </h2>                                            
-                                            <h3>register now and reach thousands of patients</h3>
+                                            <h2>are you a doctor? </h2>                                            
+                                            <h3 style="line-height: 35px;font-weight: 100;font-size:18px; color:grey">register now and reach thousands of patients</h3>
                                         </div>
                                         <div class="tg-description">
-                                            <p>We know how much it takes to become a qualified doctor so we have taken away all your hassle to look out for your patients once you have qualified. DocDirect will give you an easy reach to all the patients, all you need is to sign up!</p>
+                                            <p style="font-size: 18px;line-height: 35px;font-weight: 100">We know what it takes to become a qualified doctor so we have taken away all your hassle to look out for your patients who need you. DocDirect will give you an easy reach to all these patients, all you need is to sign up!</p>
                                         </div>
                                         <button class="tg-btn" ng-click = "docSignup()">signup now</button>
                                     </div>
@@ -569,31 +408,44 @@
                                     <div class="tg-contentbox tg-haslayout">
                                         <div class="tg-heading-border">
                                             <h2>Do you need a Doctor?</h2>
-                                            <h4 style="color: #000;">register now and reach thousands of spacialists for your case</h4>
+                                            <h4 style="line-height: 35px;font-weight: 100;font-size:18px; color:grey">Reach thousands of spacialists for your case</h4>
                                         </div>
                                         <div class="tg-description">
-                                            <p>We know how difficult it is sometimes to find the right doctor/spaecialist on our own.Now you can 
-                                            take the advantage of meeting the right doctor/spacialists for your case anywhere in the world
-                                            with benefits like:</p>
+                                            <p style="font-size: 18px;line-height: 35px;font-weight: 100">We know how difficult it is sometimes to find the right doctor/specialist on our own.Now you can 
+                                            take the advantage of meeting the right doctor/spacialists for your case anywhere in the world.
+                                            </p>
                                         </div>
-                                        <ul>
+                                        <!--<ul class="tell-patient">
                                             <li>One-on-One chat, video call, audio call, direct messaging and more </li>
-                                            <li>You can receive prescription on the go.</li>
-                                            <li>Explore and interact with the nearest specialist within your location.</li>
-                                            <li>Access your whole medical record all from one convenient location.</li>
-                                            <li>View and exchange messages with your doctors.</li>
-                                            <li>Download or view copies of your prescriptions.</li>
-                                            <li>Find the nearest phamarcy and purchase a drug online.</li>
-                                        </ul>
+                                            <li>You can receive prescription online</li>
+                                            <li>You can receive lab test online</li>
+                                            <li>You can receive scan test online</li>
+                                            <li>Find a doctor well suited to your case.</li>
+                                            <li>Access your whole medical record anytime.</li>
+                                            <li>Forward your prescription to a pharmaceutical center of your choice.</li>
+                                            <li>Download your prescription, lab test or scan test.</li>
+                                            <li>Find the nearest pharmacy and purchase a drug online.</li>
+                                            <li>Go cashless </li>
+                                        </ul>-->
                                         <div class="tg-btns">                                            
                                             <button class="tg-btn" ng-click="patientSignup()">Register Now</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-lg-6 col-md-7 col-sm-12 col-xs-12 pull-right">
-                                    <figure class="tg-img">
-                                        <img src="assets/images/icons/Patient-Portal-artwork.png" alt="image description" style="width: 350px; height: 350px; margin-left: 50px;">
-                                    </figure>
+                                <div class="col-lg-6 col-md-7 col-sm-12 col-xs-12 pull-right">                                    
+                                    <div class="tg-contentbox tg-haslayout">
+                                        <div class="tg-heading-border">
+                                            <h2>Do you have a center? </h2>                                            
+                                            <h3 style="line-height: 35px;font-weight: 100;font-size:18px; color:grey">register now and reach thousands of patients</h3>
+                                        </div>
+                                        <div class="tg-description">
+                                            <p style="font-size: 18px;line-height: 35px;font-weight: 100">You know patients need your service, Why don't you feel in the gap!</p>
+                                        </div>
+                                        <button class="tg-btn" ng-click = "centerSignup()">signup now</button>
+                                    </div>
+                                    </div>
+                                
+                            
                                 </div>
                             </div>
                         </div>
@@ -656,7 +508,7 @@
                 <!--************************************
                                 Find HealthCare By Start
                 *************************************-->
-                <section class="tg-main-section tg-haslayout">
+                <!--<section class="tg-main-section tg-haslayout">
                     <div class="container">
                         <div class="row">
                             <div class="col-sm-10 col-sm-offset-1 col-xs-12">
@@ -792,7 +644,7 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                </section>-->
                 <!--************************************
                                 Find HealthCare By End
                 *************************************-->
@@ -962,7 +814,8 @@
                                 <div class="form-group">
                                     <span class="select">
                                         <label>Select who you are?</label>                                
-                                        <select id="select-type"  ng-model="user.typeOfUser">                                            
+                                        <select id="select-type"  ng-model="user.typeOfUser" required>
+                                            <option value=""> _Please select </option>                                            
                                             <option>Doctor</option>
                                             <option>Patient</option>
                                             <option>Hospital</option>
@@ -974,10 +827,38 @@
                                         </select>
                                     </span>
                                 </div>
-                                <div class="form-group" id="specialization">
+                                <div class="form-group" id="title" ng-if="isDP === true">
+                                    <span class="select">
+                                        <label>Select title</label>                                
+                                        <select ng-model="user.title" required>
+                                            <option value="">_Please select</option>                                            
+                                            <option>Dr</option>
+                                            <option>Mr</option>
+                                            <option>Mrs</option>
+                                            <option>Miss</option>
+                                            <option>Master</option>
+                                            <option>Chief</option>
+                                            <option>Surgeon</option>
+                                            <option>MD</option>
+                                            <option>CMD</option>
+                                            <option>Rev</option>
+                                            <option>Pastor</option>
+                                            <option>Engr</option>
+                                            <option>Barr</option>
+                                            <option>Surv</option>
+                                            <option>Hon</option>
+                                            <option>Ven</option>
+                                            <option>HRH</option>
+                                            <option>Prof</option>
+                                            <option>Justice</option>
+                                        </select>
+                                    </span>
+                                </div>
+                                <div class="form-group" id="specialization" ng-if="isDoctor === true">
                                     <span class="select">
                                         <label>Select Specialty</label> 
-                                        <select  ng-model="user.specialty">                                            
+                                        <select  ng-model="user.specialty" required> 
+                                            <option value="">_Please select</option>                                           
                                             <option>Acupunture</option>
                                             <option>Addiction Medicine</option>
                                             <option>Adolescent Medicine</option>
@@ -1053,10 +934,11 @@
                                         </select>
                                     </span>
                                 </div>
-                                <div class="form-group" id="category-of-type">
+                                <div class="form-group" id="category-of-type" ng-if="isCenter === true">
                                     <span class="select">
                                         <label>What category? </label>                                        
-                                        <select  ng-model="category_of_type">                                            
+                                        <select  ng-model="user.category_of_type" required>
+                                            <option value="">_Please select</option>                                            
                                             <option>Tertiary</option>
                                             <option>Secondary</option>
                                             <option>Primary</option>
@@ -1064,159 +946,81 @@
                                         </select>
                                     </span>
                                 </div>                                
-                                <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname">
+                                <div class="form-group" ng-if="isDP === true">
+                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname" required>
                                 </div>                                
-                                <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="lastname" ng-model="user.lastname">
+                                <div class="form-group" ng-if="isDP === true">
+                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="lastname" ng-model="user.lastname" required>
                                 </div>
-                                <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Name*" id="name" ng-model="user.name">
+                                <div  id="age" ng-if="isPatient === true">
+                                    <label> select age category</label>
+                                    <select class="form-control placeholder-color" ng-model="user.age" required>
+                                        <option value=""> _Please select</option>
+                                        <option>0 - 28 days (newborn)</option>
+                                        <option>29 days - 1 year (infant)</option>
+                                        <option>1 - 5 years (younger child)</option>
+                                        <option>6 - 12 years (older child)</option>
+                                        <option>13 - 16 years (adolescent)</option>
+                                        <option>17 - 29 years (young adult)</option>
+                                        <option>30 - 39 years (adult)</option>
+                                        <option>40 - 49 years (adult)</option>
+                                        <option>50 - 64 years (adult)</option>
+                                        <option>65 years - over (senior)</option>
+                                    </select>
                                 </div>
-                                <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Place of work*" id="work" ng-model="user.work_place">
+                                <div id="gender" ng-if="isPatient === true">
+                                    <label>select gender</label>
+                                    <select class="form-control placeholder-color" ng-model="user.gender" required>
+                                        <option value="">_Please select</option>
+                                        <option>Male</option>
+                                        <option>Female</option>                                        
+                                    </select>
                                 </div>
-                                <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">
+                                <div class="form-group" ng-if="isCenter === true">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Center name*" id="name" ng-model="user.name" required>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" ng-if="isDoctor === true">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Place of work*" id="work" ng-model="user.work_place" required>
+                                </div>
+                                <div class="form-group" ng-if="isGen === true">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address" required>
+                                </div>
+                                <div class="form-group" ng-if="isGen === true">
                                     <input type="text" class="form-control placeholder-color" placeholder="City/Town*" id="firstname" ng-model="user.city" required>
                                 </div>
-                                <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Country*" id="nationality" ng-model="user.country">
+                                <div class="form-group" ng-if="isGen === true ">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Country*" id="nationality" ng-model="user.country" required>
                                 </div>
-                                <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone">
+                                <div class="form-group" ng-if="isGen === true">
+                                    <input type="number" class="form-control placeholder-color" placeholder="Phone Number (080****)*" id="phone" ng-model="user.phone" required>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group" ng-if="isCenter === true">
                                     <input type="text" class="form-control placeholder-color" placeholder="website url" id="website" ng-model="user.website">
                                 </div>
-                                <div class="form-group">
-                                    <input type="email" class="form-control placeholder-color" placeholder="Email*" id="firstname" ng-model="user.email">
+                                <div class="form-group" ng-if="isGen === true">
+                                    <input type="email" class="form-control placeholder-color" placeholder="Email*" id="email" ng-model="user.email" required>
                                 </div>
-                                <div class="form-group">
-                                    <input type="password" class="form-control" placeholder="Password" ng-model="user.password">
-                                </div>                                                   
-                                <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" name="zip_code" placeholder="ZIP Code" ng-model="user.zip_code">
+                                <div class="form-group" ng-if="isGen === true">
+                                    <input type="password" class="form-control" placeholder="Password" ng-model="user.password" required>
                                 </div>
-                                <div class="form-group tg-checkbox">
+                                <div class="form-group" ng-if="isGen === true">
+                                    <input type="password" class="form-control" placeholder="Confirm Password" ng-model="user.password2" required>
+                                </div>                                                 
+                                
+                                <div class="form-group tg-checkbox" ng-if="isGen === true">
                                     <label>
-                                        <input type="checkbox" class="form-control" ng-model="user.check">
+                                        <input type="checkbox" class="form-control" ng-model="user.agree">
                                         I agree with the terms and conditions
                                     </label>
                                 </div>                                
-                                <button class="tg-btn tg-btn-lg" ng-click="submit()">Create an Account</button>
+                                <button class="tg-btn tg-btn-lg" ng-click="submit(user.typeOfUser,'normal')" ng-if="isClicked === true">Create an Account</button>
                             </fieldset>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-        <script type="text/javascript">
-        window.addEventListener('load',function(){
-                var type = document.getElementById("select-type");
-                var specialization = document.getElementById("specialization");
-                var name = document.getElementById("name");
-                var firstname = document.getElementById("firstname");
-                var lastname = document.getElementById("lastname");
-                var phone = document.getElementById("phone");
-                var category_of_type = document.getElementById("category-of-type");               
-                var website = document.getElementById("website");
-                var workPlace = document.getElementById("work");
-                               
-                initForm(); 
-                function setType() {                    
-                    switch(type.value) {
-                        case "Doctor":
-                            specialization.style.display = "block";
-                            firstname.style.display = "block";
-                            workPlace.style.display = "block";
-                            lastname.style.display = "block";
-                            phone.style.display = "block";
-                            name.style.display = "none";
-                            website.style.display = "none";
-                            category_of_type.style.display = "none";                                                      
-                            break;
-                        case "Patient":                                             
-                            firstname.style.display = "block";
-                            lastname.style.display = "block";
-                            phone.style.display = "block";
-                            specialization.style.display = "none";
-                            website.style.display = "none";
-                            name.style.display = "none";
-                            category_of_type.style.display = "none";
-                            workPlace.style.display = "none";             
-                            break;
-                        case "Hospital":                                                    
-                            category_of_type.style.display = "block";                            
-                            website.style.display = "block";
-                            name.style.display = "block";
-                            specialization.style.display = "none";
-                            firstname.style.display = "none";
-                            lastname.style.display = "none";
-                            workPlace.style.display = "none";
-                            break;
-                        case "Clinic":                                                       
-                            category_of_type.style.display = "block";
-                            website.style.display = "block";
-                            name.style.display = "block";
-                            specialization.style.display = "none";
-                            firstname.style.display = "none";
-                            lastname.style.display = "none";
-                            workPlace.style.display = "none";                            
-                            break;
-                        case "Radiology":
-                            name.style.display = "block";
-                            specialization.style.display = "none"; 
-                            category_of_type.style.display = "none";
-                            firstname.style.display = "none";
-                            lastname.style.display = "none";
-                            workPlace.style.display = "none";                                                     
-                            break;
-                        case "Laboratory":
-                            name.style.display = "block";
-                            specialization.style.display = "none"; 
-                            category_of_type.style.display = "none";
-                            firstname.style.display = "none";
-                            lastname.style.display = "none";
-                            workPlace.style.display = "none";                                                       
-                            break;
-                        case "Pharmacy":
-                            name.style.display = "block";
-                            specialization.style.display = "none"; 
-                            category_of_type.style.display = "none";
-                            firstname.style.display = "none";
-                            lastname.style.display = "none";
-                            workPlace.style.display = "none";                                                       
-                            break;
-                        case "Fitness Center":
-                            name.style.display = "block";
-                            specialization.style.display = "none";
-                            category_of_type.style.display = "none";
-                            firstname.style.display = "none";
-                            lastname.style.display = "none";
-                            workPlace.style.display = "none";                                                     
-                            break;
-                        default:
-                            alert("You did not identify who you are!");
-                            break;
-                    }
-                }
-
-                function initForm() {
-                    category_of_type.style.display = "none";
-                    name.style.display = "none";
-                    firstname.style.display = "none";
-                    lastname.style.display = "none";
-                    phone.style.display = "none";
-                    website.style.display = "none";
-                    specialization.style.display = "none";
-                    workPlace.style.display = "none";
-                }
-                type.addEventListener('change',setType,false)
-            }, false)
-        </script>
+        
         <script type="text/ng-template" id="doc-signup.html">
          <div class="modal fade">
           <div class="modal-dialog">
@@ -1230,10 +1034,38 @@
                             <span style="color:red" ng-cloak>{{error}}</span>
                             <fieldset>
                             <h5>Doctor signup</h5>
-                            <div class="form-group" id="specialization">
+                            <div class="form-group">
+                                <span class="select">
+                                    <label>Select title</label>                                
+                                    <select id="title"  ng-model="user.title" required>
+                                        <option value="">_Please select</option>                                           
+                                        <option>Dr</option>
+                                        <option>Mr</option>
+                                        <option>Mrs</option>
+                                        <option>Miss</option>
+                                        <option>Master</option>
+                                        <option>Chief</option>
+                                        <option>Surgeon</option>
+                                        <option>MD</option>
+                                        <option>CMD</option>
+                                        <option>Rev</option>
+                                        <option>Pastor</option>
+                                        <option>Engr</option>
+                                        <option>Barr</option>
+                                        <option>Surv</option>
+                                        <option>Hon</option>
+                                        <option>Ven</option>
+                                        <option>HRH</option>
+                                        <option>Prof</option>
+                                        <option>Justice</option>
+                                    </select>
+                                </span>
+                            </div>
+                            <div class="form-group" id="specialization" >
                                     <span class="select">
                                         <label>Select Specialty</label> 
-                                        <select  ng-model="user.specialty">                                            
+                                        <select  ng-model="user.specialty" required>
+                                            <option value="">Please select</option>                                           
                                             <option>Acupunture</option>
                                             <option>Addiction Medicine</option>
                                             <option>Adolescent Medicine</option>
@@ -1310,36 +1142,41 @@
                                     </span>
                                 </div>                                
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname">
+                                    <input type="text" class="form-control placeholder-color" placeholder="First name*" id="firstname" ng-model="user.firstname" required>
                                 </div>                                
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="lastname" ng-model="user.lastname">
+                                    <input type="text" class="form-control placeholder-color" placeholder="last name*" id="lastname" ng-model="user.lastname" required>
                                 </div>
 
                                <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Place of work*" id="work" ng-model="user.work_place">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Place of work*" id="work" ng-model="user.work_place" required>
                                 </div>
                                 
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Office address*" ng-model="user.address" required>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="City/Town*" id="firstname" ng-model="user.city" required>
+                                    <input type="text" class="form-control placeholder-color" placeholder="City/Town*" id="city" ng-model="user.city" required required>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Country*" id="nationality" ng-model="user.country" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="number" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone" required>
                                 </div>
                                 
                                 <div class="form-group">
-                                    <input type="email" class="form-control placeholder-color" placeholder="Email*" id="firstname" ng-model="user.email" required>
+                                    <input type="email" class="form-control placeholder-color" placeholder="Email*" ng-model="user.email" required>
                                 </div>
                                 <div class="form-group">
-                                    <input type="password" class="form-control" placeholder="Password" ng-model="user.password">
+                                    <input type="password" class="form-control" placeholder="Password" ng-model="user.password" required>
                                 </div>                                                   
-                               
+                                <div class="form-group">
+                                    <input type="password" class="form-control" placeholder="Confirm Password" ng-model="user.password2" required>
+                                </div> 
                                 <div class="form-group tg-checkbox">
                                     <label>
-                                        <input type="checkbox" class="form-control" ng-model="user.check">
+                                        <input type="checkbox" class="form-control" ng-model="user.agree" required>
                                         I agree with the terms and conditions
                                     </label>
                                 </div>                                
@@ -1370,17 +1207,60 @@
                             <fieldset>
                             <h5>Patient signup</h5>                                
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname">
+                                    <input type="text" class="form-control placeholder-color" placeholder="First Name*" id="firstname" ng-model="user.firstname" >
                                 </div>                                
                                 <div class="form-group">
                                     <input type="text" class="form-control placeholder-color" placeholder="lastname*" id="lastname" ng-model="user.lastname">
                                 </div>
-                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" name="gender" placeholder="Gender" ng-model="user.gender">
-                                </div>
-                               
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Age*" id="work" ng-model="user.age">
+                                    <span class="select">
+                                        <label>Select title</label>                                
+                                        <select id="title"  ng-model="user.title">
+                                            <option value="">Plesae select</option>                                            
+                                            <option>Dr</option>
+                                            <option>Mr</option>
+                                            <option>Mrs</option>
+                                            <option>Miss</option>
+                                            <option>Master</option>
+                                            <option>Chief</option>
+                                            <option>Surgeon</option>
+                                            <option>MD</option>
+                                            <option>CMD</option>
+                                            <option>Rev</option>
+                                            <option>Pastor</option>
+                                            <option>Engr</option>
+                                            <option>Barr</option>
+                                            <option>Surv</option>
+                                            <option>Hon</option>
+                                            <option>Ven</option>
+                                            <option>HRH</option>
+                                            <option>Prof</option>
+                                            <option>Justice</option>
+                                        </select>
+                                    </span>
+                                </div>
+                                 <div class="form-group">
+                                    <label>Select age category</label>  
+                                    <select class="form-control placeholder-color" placeholder="Age*"  ng-model="user.age">
+                                        <option value="">Please select</option>
+                                        <option>0 - 28 days (newborn)</option>
+                                        <option>29 days - 1 year (infant)</option>
+                                        <option>1 - 5 years (younger child)</option>
+                                        <option>6 - 12 years (older child)</option>
+                                        <option>13 - 16 years (adolescent)</option>
+                                        <option>17 - 29 years (young adult)</option>
+                                        <option>30 - 39 years (adult)</option>
+                                        <option>40 - 49 years (adult)</option>
+                                        <option>50 - 64 years (adult)</option>
+                                        <option>65 years - over (senior)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Sex</label>  
+                                    <select class="form-control placeholder-color" placeholder="Gender*" ng-model="user.gender">
+                                        <option value="">Male</option>
+                                        <option>Female</option>                                        
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <input type="text" class="form-control placeholder-color" placeholder="Address*" ng-model="user.address">
@@ -1389,7 +1269,10 @@
                                     <input type="text" class="form-control placeholder-color" placeholder="City/Town*" id="firstname" ng-model="user.city" required>
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone">
+                                    <input type="number" class="form-control placeholder-color" placeholder="Phone Number*" id="phone" ng-model="user.phone">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control placeholder-color" placeholder="Country*"  ng-model="user.country" required>
                                 </div>
                                 
                                 <div class="form-group">
@@ -1397,11 +1280,14 @@
                                 </div>
                                 <div class="form-group">
                                     <input type="password" class="form-control" placeholder="Password" ng-model="user.password">
-                                </div>                                                   
+                                </div>
+                                <div class="form-group">
+                                    <input type="password" class="form-control" placeholder="Confirm password" ng-model="user.password2" ng-class="{password2:misMatch === true}">
+                                </div>                                                      
                                
                                 <div class="form-group tg-checkbox">
                                     <label>
-                                        <input type="checkbox" class="form-control" ng-model="user.check">
+                                        <input type="checkbox" class="form-control" ng-model="user.agree">
                                         I agree with the terms and conditions
                                     </label>
                                 </div>                                

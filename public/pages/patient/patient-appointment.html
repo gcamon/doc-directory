@@ -1,4 +1,4 @@
-<div style="line-height: 30px">
+<div style="line-height: 30px" ng-if="notDeleted === true">
 	<h4>My appointment</h4>
 	
 	<span><strong>Doctors name: </strong> {{appointment.title}} {{appointment.firstname}} {{appointment.lastname}}</span>
@@ -15,5 +15,5 @@
 	</div>
 </div>
 <div style="text-align: center; margin-top: 30px">
-	<button ng-click="delAppointment(appointment.session_id)">Delete appointment</button>
+	<button ng-click="deleteApp()" style="color:#fff" ng-if="notDeleted === true">{{delbtn}}</button>
 </div>

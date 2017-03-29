@@ -31,11 +31,26 @@
 	<!--************************************
 			Wrapper Start
 	*************************************-->
-	<div id="wrapper" class="tg-haslayout" ng-controller = "drugSearchController">
+	<div id="wrapper" class="tg-haslayout">
 		<!--************************************
 				Header Start
 		*************************************-->
-		<header id="header" class="tg-haslayout">
+		<header id="header" class="tg-haslayout top-header"  ng-controller="topHeaderController">
+                <div  class="navbar-header top-navbar">
+                    <div style="width: 70%; padding-right: 30px;display:inline-block">
+                        <span data-toggle="modal" data-target=".tg-user-modal" title="login/signup" ng-if="!checkLogIn">Log in / Sign up</span>
+                        <span class="fa fa-sign-out" aria-hidden="true" ng-if="checkLogIn" ng-click="logout()"> Log out</span>
+                        <i class="fa fa-ellipsis-v" aria-hidden="true" style="color:#fff;font-size:23px;font-weight:100; cursor:pointer" title="Menu" ng-click="isClicked()"></i>
+                    </div>
+                    <ul ng-if="drop === true" class="drp-list">
+                        <li><a href="/user/find-specialist">Find A Doctor</a></li>
+                        <li><a href="/user/find-drug">Find Drug</a></li>
+                        <li><a href="/user/find-scan-test">Find Scan</a></li>
+                        <li><a href="/user/find-lab-test">Find Test</a></li>
+                        <li><a href="#/help">Get help</a></li>                        
+                    </ul>
+
+                </div>
                 <div class="container">
                     <div class="row">
                         <div class="col-xs-12">
@@ -51,16 +66,18 @@
                                         <span class="icon-bar"></span>
                                     </button>
                                 </div>
-                                <div class="collapse navbar-collapse" id="tg-navigation">
+                                <div class="collapse navbar-collapse top-nav" id="tg-navigation">
                                     <ul>
                                         <li>
                                             <a href="/">Home</a>                                           
                                         </li>
+                                        <li><a href="/how-it-works">How it works</a></li>
                                         <li>
                                             <a href="#">Top Ranking</a>
                                             <ul> 
                                                 <li><a href="/topview/doctors">Doctors</a></li>                                                     
                                                 <li><a href="/topview/hospitals">Hospitals</a></li>
+                                                <li><a href="/topview/clinics">Clinics</a></li>
                                                 <li><a href="/topview/pharmacy">Pharmacy</a></li>
                                                 <li><a href="/topview/laboratories">Laboratory Centers</a></li>
                                                 <li><a href="/topview/radiology">Radiology Centers</a></li>
@@ -70,33 +87,23 @@
                                         </li>
                                         <li>
                                             <a href="#">Blog</a>
-                                            <ul>
-                                                <li><a href="blog-list.html">Blog List</a></li>
-                                                <li><a href="blog-grid.html">Blog Grid</a></li>
-                                                <li><a href="blog-detail.html">Blog Detail</a></li>
-                                            </ul>
+                                            
                                         </li>
                                         <li><a href="packages.html">packages</a></li>
                                         <li><a href="contactus.html">Contact</a></li>                                        
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-navicon"></i>
-                                                <i>pages</i>
-                                            </a>
-                                            <ul>                                                                                            
-                                                <li><a href="/user/dashboard">dashboard</a></li>
-                                                <li><a href="/user/user-update" class="active">update profile</a></li>
-                                                <li><a href="/user/user-schedule">My schedule</a></li>
-                                                <li><a href="dashboard-myaccount.html">dashboard account</a></li>
-                                                <li><a href="/user/logout">Log out</a></li>
-                                            </ul>
-                                        </li>
+                                        <!--<li>                                            
+                                            <a href="#" data-toggle="modal" data-target=".tg-user-modal" title="login/signup"><i class="fa fa-user-plus"></i></a>
+                                            <span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
+                                        </li>-->                                                                                                                
                                     </ul>
-                                </div>
+                                </div>                                
                             </nav>
                         </div>
                     </div>
                 </div>
+                <div class="arrow-dashboard" ng-if="checkLogIn">
+                    <a ng-href="{{back}}" class="fa fa-long-arrow-right" title="Back to dashboard"></a>
+                <div>
             </header>
 		<!--************************************
 				Header End
@@ -104,7 +111,7 @@
 		<!--************************************
 				Home Slider Start
 		*************************************-->
-		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" >
+		<!--<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout"  ng-controller = "drugSearchController">
 			<div class="tg-searcharea tg-haslayout">
 				<div class="container">
 					<div class="row">
@@ -133,7 +140,7 @@
 						<span style="cursor: pointer" ng-click="backTo('<%= userInfo.type %>')">Back to dashboard</span>
 					</div>
 				</div>
-			</div>
+			</div>-->
 			<div class="tg-pagebar tg-haslayout">
 				<div class="container">
 					<div class="row">
@@ -154,7 +161,7 @@
 		<!--************************************
 				Main Start
 		*************************************-->
-		<main id="main" class="tg-main-section tg-haslayout">
+		<main id="main" class="tg-main-section tg-haslayout" ng-controller = "drugSearchController">
 			<div class="container">
 				<div class="row">
 					<div class="tg-404 tg-haslayout">
