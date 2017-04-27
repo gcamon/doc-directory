@@ -1,4 +1,5 @@
 'use strict';
+require('dotenv').config();
 var express = require('express');
 var path = require("path");
 var multer = require('multer');
@@ -24,15 +25,13 @@ var configuration = function (app,model) {
 	  saveUninitialized: true,
 	  cookie: { maxAge: 36000000 }
 	}));
-	app.use(multer({
-  	dest: './uploads'
-	}).any());
+	
 	app.use(passport.initialize());
 	app.use(passport.session());
-	app.use(flash());
-		
+	app.use(flash());		
 	app.use(bodyParser.urlencoded({ extended: false }));
-	app.use(bodyParser.json());	
+	app.use(bodyParser.json());
+	app.use(multer({dest: './uploads'}).any());	
 	app.use('/',router);	
 	app.use('/assets',express.static(__dirname + '/public'));
 	

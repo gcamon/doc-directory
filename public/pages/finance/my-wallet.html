@@ -3,7 +3,7 @@
 	{{date | date : "mediumDate"}}
 	<div>
 		<label>Payment option: </label>
-		<select ng-model="pay.mode" style="width: 300px; display:inline-block">
+		<select ng-model="pay.mode" style="width: 300px; display:inline-block;border:none;border-bottom: 1px solid #000">
 			<option value="">_Please select</option>
 			<option>Pay with ATM card/Interswitch</option>
 			<option>Pay with USSD</option>
@@ -15,9 +15,12 @@
 		<div style="text-align:center;margin-top: 40px">
 			<h6>{{pay.mode}}</h6>
 			<form>
-				<input type="number" ng-model="pay.amount" style="width: 300px" placeholder="Enter amount">
+				<div>
+					<input type="number" ng-model="pay.amount" style="width: 300px" placeholder="Enter amount">
+				</div>
+				<p style="color:red">{{errorMsg}}</p>
 				<div style="margin: 20px 0">
-					<strong style="font-size: 22px">Depositing: <em>N{{str}}</em></strong>
+					<strong style="font-size: 22px">Depositing: <em>{{str}}</em></strong>
 				</div>
 				<div>
 					<input type="button" value="Confirm" ng-click="interswitch()" class="btn btn-primary">

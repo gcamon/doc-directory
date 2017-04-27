@@ -102,6 +102,9 @@ $(document).ready(function (e) {
 		autohidemode: false,
 		cursorborder: false
 	 });
+	 
+    
+    
 	/*--------------------------------------
 			GRAPH
 	--------------------------------------*/
@@ -146,6 +149,17 @@ $(document).ready(function (e) {
             
 		
     });
+
+
+	/************************
+			nice scroll
+	****************************/
+
+	$(document).ready(
+
+        function() {
+
+        } );
 
 
 	 /*******************************************

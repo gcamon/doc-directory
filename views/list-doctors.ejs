@@ -236,16 +236,16 @@
 		<!--************************************
 				Main Start
 		*************************************-->
-		<main id="main" class="tg-main-section tg-haslayout" ng-controller="resultController" style="margin-top: 150px">
-			<div class="container">
+		<main id="main" class="tg-main-section tg-haslayout container-fluid" ng-controller="resultController" style="padding:2px;overflow:hidden">
+			<div>
 				<div class="row">
-					<div class="col-lg-8 col-md-7 col-sm-7 col-xs-12">
+					<div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
                         <div class="view-animate-container">				
                             <div ng-view class="view-animate">
                             </div>
 					    </div>					    
 					</div>
-					<div class="col-lg-4 col-md-5 col-sm-5 col-xs-12">
+					<div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
 						<aside id="tg-sidebar">
 							<div class="tg-widget tg-widget-accordions">
 								<ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -261,6 +261,7 @@
 													<fieldset style="background-color:#ccc; padding: 10px 10px;margin-bottom: 20px">
 														<input type="text" placeholder="Enter city name" style="padding: 5px 5px;margin-top: 10px" ng-model="user.city">
 					                                    <select id="group1" placeholder="Specialty" style="padding: 5px 5px;margin-top: 10px;margin-bottom: 10px" ng-model="user.specialty">
+                                                            <option value="">_select specialty</option>
 															<option>Acupunture</option>
 				                                            <option>Addiction Medicine</option>
 				                                            <option>Adolescent Medicine</option>
@@ -353,6 +354,7 @@
 													<fieldset style="background-color:#ccc; padding: 10px 10px;margin-bottom: 20px">
 														<input type="text" placeholder="Enter city name" style="padding: 5px 5px;margin-top: 10px" ng-model="refineUser.city">					                                    
 					                                    <select id="group1" class="group" placeholder="Specialty" ng-model="refineUser.specialty">
+                                                            <option value="">_select specialty</option>
 															<option>Acupunture</option>
 				                                            <option>Addiction Medicine</option>
 				                                            <option>Adolescent Medicine</option>
@@ -1090,6 +1092,7 @@
         <script src="/assets/js/moment.min.js"></script>
         <script src="/assets/js/angular-moment.min.js"></script>
         <script src="/assets/js/ui-bootstrap-tpls.js"></script>
-        <script src="/assets/js/angular-clipboard.js"></script>    
+        <script src="/assets/js/angular-clipboard.js"></script>
+        <script src="/assets/js/ngresource.js"></script>    
     </body>
 </html>

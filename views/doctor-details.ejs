@@ -37,7 +37,22 @@
             <!--************************************
                             Header Start
             *************************************-->
-            <header id="header" class="tg-haslayout">
+             <header id="header" class="tg-haslayout top-header"  ng-controller="topHeaderController">
+                <div  class="navbar-header top-navbar">
+                    <div style="width: 70%; padding-right: 30px;display:inline-block">
+                        <span data-toggle="modal" data-target=".tg-user-modal" title="login/signup" ng-if="!checkLogIn">Log in / Sign up</span>
+                        <span class="fa fa-sign-out" aria-hidden="true" ng-if="checkLogIn" ng-click="logout()"> Log out</span>
+                        <!--<i class="fa fa-ellipsis-v" aria-hidden="true" style="color:#fff;font-size:23px;font-weight:100; cursor:pointer" title="Menu" ng-click="isClicked()"></i>-->
+                    </div>
+                    <!--<ul ng-if="drop === true" class="drp-list">
+                        <li><a href="/user/find-specialist">Find A Doctor</a></li>
+                        <li><a href="/user/find-drug">Find Drug</a></li>
+                        <li><a href="/user/find-scan-test">Find Scan</a></li>
+                        <li><a href="/user/find-lab-test">Find Test</a></li>
+                        <li><a href="#">Find Special Center</a></li>                        
+                    </ul>-->
+
+                </div>
                 <div class="container">
                     <div class="row">
                         <div class="col-xs-12">
@@ -53,11 +68,12 @@
                                         <span class="icon-bar"></span>
                                     </button>
                                 </div>
-                                <div class="collapse navbar-collapse" id="tg-navigation">
+                                <div class="collapse navbar-collapse top-nav" id="tg-navigation">
                                     <ul>
                                         <li>
                                             <a href="/">Home</a>                                           
                                         </li>
+                                        <li><a href="/how-it-works">How it works</a></li>
                                         <li>
                                             <a href="#">Top Ranking</a>
                                             <ul> 
@@ -71,32 +87,25 @@
                                                 <!--<li><a href="doctor-detail2.html">Doctor Detail 2</a></li>-->
                                             </ul>
                                         </li>
-                                       <!-- blog here -->
-                                        <li><a href="packages.html">packages</a></li>
-                                        <li><a href="contactus.html">Contact</a></li>
                                         <li>
+                                            <a href="#">Blog</a>
+                                            
+                                        </li>
+                                        <li><a href="packages.html">packages</a></li>
+                                        <li><a href="contactus.html">Contact</a></li>                                        
+                                        <!--<li>                                            
                                             <a href="#" data-toggle="modal" data-target=".tg-user-modal" title="login/signup"><i class="fa fa-user-plus"></i></a>
                                             <span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
-                                        </li>
-                                        <li>
-                                            <a href="#">
-                                                <i class="fa fa-navicon"></i>
-                                                <i>pages</i>
-                                            </a>
-                                            <ul>                                                                                            
-                                                <li><a href="/user/dashboard">dashboard</a></li>
-                                                <li><a href="/user/user-update" class="active">update profile</a></li>
-                                                <li><a href="/user/user-schedule">My schedule</a></li>
-                                                <li><a href="dashboard-myaccount.html">dashboard account</a></li>
-                                                <li><a href="/user/logout">Log out</a></li>
-                                            </ul>
-                                        </li>                                        
+                                        </li>-->                                                                                                                
                                     </ul>
-                                </div>
+                                </div>                                
                             </nav>
                         </div>
                     </div>
                 </div>
+                <div class="arrow-dashboard" ng-if="checkLogIn">
+                    <a ng-href="{{back}}" class="fa fa-long-arrow-right" title="Back to dashboard"></a>
+                <div>
             </header>
 		<!--************************************
 				Header End
@@ -105,7 +114,7 @@
 				Home Slider Start
 		*************************************-->
 		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="searchController">
-			<div class="tg-searcharea tg-haslayout">
+			<!--<div class="tg-searcharea tg-haslayout">
 				<div class="container">
 					<div class="row">
 						<form class="tg-searchform">
@@ -202,7 +211,7 @@
 						</form>
 					</div>
 				</div>
-			</div>
+			</div>-->
 			<div class="tg-pagebar tg-haslayout">
 				<div class="container">
 					<div class="row">
@@ -1100,9 +1109,14 @@
         <script src="/assets/js/countTo.js"></script>
         <script src="/assets/js/map/map.js"></script>
         <script src="/assets/js/angularAnimate.js"></script>
-         <script src="/assets/js/modalService.js"></script>
+        <script src="/assets/js/modalService.js"></script>
         <script src="/assets/js/main.js"></script>
+        <script src="/assets/js/angular-touch.min.js"></script>
+        <script src="/assets/js/angular-carousel.js"></script>
         <script src="/assets/js/moment.min.js"></script>
-        <script src="/assets/js/angular-moment.min.js"></script>    
+        <script src="/assets/js/angular-moment.min.js"></script>
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>
+        <script src="/assets/js/angular-clipboard.js"></script>
+        <script src="/assets/js/ngresource.js"></script>
     </body>
 </html>

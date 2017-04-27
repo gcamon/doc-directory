@@ -122,7 +122,8 @@ var basicRoute = function (model) {
     } else {
       res.redirect("/");
     }
-  });    
+  });
+
   router.get("/download/profile_pic/:pic_id", function(req,res){        
     if(req.params.pic_id === "nopic") {
       model.files.findOne({file_id:"nopic"},function(err,data){
@@ -137,7 +138,11 @@ var basicRoute = function (model) {
   });
 
   router.get('/download/scan-image/:filename',function(req,res){
-    console.log(req.params)
+    var file = __dirname + "/uploads/" + req.params.filename;
+    res.download(file); // Set disposition and send it.
+  });
+
+  router.get('/download/sick-file/:filename',function(req,res){
     var file = __dirname + "/uploads/" + req.params.filename;
     res.download(file); // Set disposition and send it.
   });
@@ -477,7 +482,44 @@ var basicRoute = function (model) {
         });
     });
 
-  
+    
+    router.get("/patient/find-doctor",function(req,res){
+      if(req.user){
+        console.log(req.query)
+        var criteria;
+        var str;
+        if(req.query.city && !req.query.specialty){
+          str = new RegExp(req.query.city);          
+          criteria = { city : { $regex: str, $options: 'i' }};
+        } else if(req.query.city && req.query.specialty){
+          str = new RegExp(req.query.city);
+          criteria = { city : { $regex: str, $options: 'i' },specialty: req.query.specialty}
+        } else {
+          criteria = req.query;
+        }
+        model.user.find(criteria,{
+          name:1,
+          _id:0,
+          profile_pic_url: 1,
+          specialty:1,
+          profile_url:1,
+          firstname:1,
+          lastname:1,
+          country: 1,
+          city:1,
+          user_id:1,
+          address:1,
+          phone:1,
+          work_place:1
+        },function(err,data){
+          if(err) throw err;
+          res.send(data);
+          
+        });
+      } else {
+        res.send("Unauthorized access!")
+      }
+    })
 
     router.get("/user/find-specialist",function(req,res){
         res.render("list-doctors",{"userInfo":req.user})
@@ -1252,8 +1294,7 @@ router.put("/doctor/redirect-mail",function(req,res){
     })    
 
     //prescription foewarded by the doctor to a patient inbox
-    router.put("/patient/forwarded-prescription",function(req,res){
-      console.log(req.body)     
+    router.put("/patient/forwarded-prescription",function(req,res){   
       if(req.user){         
         model.user.findOne(
           {
@@ -1263,7 +1304,7 @@ router.put("/doctor/redirect-mail",function(req,res){
             medications: 1,          
           }).exec(function(err,result){            
             if(err) throw err;            
-            var date = new Date();                
+            var date = + new Date();                
             var preObj = {              
               provisional_diagnosis: req.body.provisional_diagnosis,
               date: date,
@@ -1289,7 +1330,7 @@ router.put("/doctor/redirect-mail",function(req,res){
               patient_country: req.body.country,
               prescription_body: req.body.prescriptionBody,
             }           
-            result.medications.push(preObj);
+            result.medications.unshift(preObj);
             result.save(function(err,info){             
               if(err) throw err;             
               console.log("prescription saved");          
@@ -1298,7 +1339,7 @@ router.put("/doctor/redirect-mail",function(req,res){
 
         model.user.findOne({user_id: req.body.id},{patient_notification:1,firstname:1,lastname:1}).exec(function(err,data){
           if(err) throw err;
-           var date = new Date(); 
+           var date = + new Date(); 
             data.patient_notification.push({
             doctor_firstname: req.user.firstname,
             doctor_lastname: req.user.lastname,
@@ -2894,13 +2935,13 @@ router.put("/doctor/redirect-mail",function(req,res){
 //for pharmacy
      router.post("/pharmacy/create-services",function(req,res){
         model.services.findOne({user_id:req.user.user_id}).exec(function(err,user){
-        if(err) throw err;
-        if(!user){
-          createUser()
-        } else {
-          updateUser(user)
-        }
-      })
+          if(err) throw err;
+          if(!user){
+            createUser();
+          } else {
+            updateUser(user);
+          }
+        });
 
       function createUser() {
         var user = new model.services({
@@ -2915,7 +2956,7 @@ router.put("/doctor/redirect-mail",function(req,res){
 
         user.save(function(err,info){
           if(err) throw err;
-          console.log("service created")
+          console.log("service created");
         })
       }
 
@@ -2934,7 +2975,7 @@ router.put("/doctor/redirect-mail",function(req,res){
         user.save(function(err,info){
           if(err) throw err;
           console.log("service updated")
-        })
+        });
       }
 
       res.send({message: "Saved!"})
@@ -2942,10 +2983,16 @@ router.put("/doctor/redirect-mail",function(req,res){
 
     
     router.get("/pharmacy/not-ran-services",function(req,res){
-      model.services.findOne({user_id: req.user.user_id},{unavailable_services:1,_id:0},function(err,data){
-        if(err) throw err;
-        res.send(data.unavailable_services);
-      })
+      if(req.user){
+        model.services.findOne({user_id: req.user.user_id},{unavailable_services:1,_id:0},function(err,data){
+          if(err) throw err;
+          if(!data){
+            res.send({error: "service not found"})
+          } else {
+            res.send(data.unavailable_services);
+          }
+        });
+      }
     });
 
      router.put("/pharmacy/update-services",function(req,res){    
@@ -3592,47 +3639,6 @@ router.put("/scan-search/radiology/referral",function(req,res){
 });
 
 
-
-router.post("/user/help",function(req,res){
-  model.help.findOne({user_id: req.user.user_id}).exec(function(err,user){
-    var complain = {
-      helpType: req.body.helpType,
-      description: req.body.description,
-      sent_date: req.body.date,
-      symptoms: req.body.symptoms
-    }
-
-    if(!user){
-      var newHelp = new model.help({       
-        isLoggedIn: req.body.isLoggedIn,
-        typeOfUser: req.body.typeOfUser,
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        title: req.body.title,
-        phone: req.body.phone,
-        email: req.body.email,
-        user_id: req.body.user_id,
-      });
-
-      newHelp.complaint.unshift(complain)
-
-      newHelp.save(function(err,info){
-        if(err) throw err;
-        res.send({status:true})
-      })
-    } else {
-      user.complaint.unshift(complain);
-      res.send({status:true})
-    }
-
-    user.save(function(err,info){
-      if(err) throw err;
-      console.log(info)
-    })
-  });
-  
-});
-
 router.post("/user/courier",function(req,res){
   res.send({status:true})
 });
@@ -3705,6 +3711,133 @@ router.delete("/patient/delete-many",function(req,res){
   del.DeleteAll(model,projection);
   res.send("deleted");
 });
+
+
+router.get("/patients/waiting-room",function(req,res){
+  
+    res.render("patient-waiting-room")
+  
+});
+
+router.get("/user/response/patients-histories/:batch",function(req,res){
+  var limit;
+  var index;
+  switch(req.params.batch){
+    case "1":
+      limit = 20;
+      index = 0;
+    break;
+    case "2":
+      limit = 40;
+      index = 20;
+    break;
+    case "3":
+      limit = 60;
+      index = 40;
+    break;
+    case "4":
+      limit = 80;
+      index = 60;
+    break;
+    case "5":
+      limit = 100;
+      index = 80;
+    break;
+    case "6":
+      limit = 120;
+      index = 100;
+    break;
+    case "7":
+      limit = 140;
+      index = 120;
+    break;
+    case "8":
+      limit = 160;
+      index = 140;
+    break;
+    case "9":
+      limit = 180;
+      index = 160;
+    break;
+    case "10":
+      limit = 300; //note this should be 200. ie intervals of 20. will be modified later.
+      index = 180;
+    break;
+    default:
+    break;
+  }
+  model.help.find({},function(err,data){
+    if(err) throw err;
+    var len = data.length;
+    var selected = data.slice(index,len);
+    res.send(selected);
+    
+  }).limit(limit);
+});
+
+router.post("/user/response/patients-histories",function(req,res){
+  if(req.user && req.user.type === "Doctor"){
+    model.user.findOne({user_id: req.user.user_id},{firstname:1,profile_pic_url:1,user_id:1,specialty:1,profile_url:1},function(err,data){
+      if(err) throw err;
+      model.help.findOne({complaint_id: req.body.complaint_id,patient_id:req.body.patient_id},{response:1}).exec(function(err,found){
+        req.body.doctor_name = data.firstname;
+        req.body.doctor_profile_pic_url = data.profile_pic_url;
+        req.body.doctor_profile_url = data.profile_url;
+        req.body.doctor_specialty = data.specialty;
+        req.body.doctor_user_id = data.user_id;
+        var elemPos = found.response.map(function(x){return x.doctor_user_id}).indexOf(data.user_id);
+
+        if(elemPos === -1){
+          found.response.push(req.body);
+          model.user.findOne({user_id:req.body.patient_id},{patient_mail:1}).exec(function(err,patient){            
+            if(err) throw err;
+            var date = + new Date();
+            var msg = "(" + found.response.length + ") Doctors" + " has responded to your complain.";
+            var checkComplain = patient.patient_mail.map(function(x){return x.complaint_id}).indexOf(req.body.complaint_id);
+            if(checkComplain !== -1){
+              var complain = patient.patient_mail[checkComplain];
+              complain.message = msg;
+            } else {
+              msg = "1 Doctor has responded for the complain ";
+              patient.patient_mail.push({
+                category: "need_doctor",
+                date: date,
+                doctor_id: data.user_id,
+                complaint_id: req.body.complaint_id,
+                message: msg,
+                doctor_profile_pic_url: data.profile_pic_url
+              });
+            }
+            patient.save(function(err,info){})
+            res.send({message: "Patient notified"}); 
+          });
+          
+        } else {
+          res.send({error: "You have already responded to this history"});
+
+        }
+
+        found.save(function(err,info){
+          console.log("saved successfully");          
+        });
+
+      });
+    });
+  } else {
+    res.send({error: "Unauthorized access!!!. You are not a doctor."});
+  }
+});
+
+router.get("/patient/get-response",function(req,res){
+  if(req.user && req.user.type === "Patient"){
+    model.help.findOne({complaint_id: req.query.complaintId},function(err,complain){
+      if(err) throw err;
+      res.send(complain);
+    });
+  } else {
+    res.send("Unauthorized access!");
+  }
+})
 
 }
 

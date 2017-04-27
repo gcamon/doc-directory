@@ -10,7 +10,7 @@ var http = require("http");
 
 
 
-var signupRoute = function(model) {
+var signupRoute = function(model,sms) {
 	passport.use('signup', new LocalStrategy({
 		usernameField : 'email',
 	    passwordField : 'password',
@@ -25,18 +25,19 @@ var signupRoute = function(model) {
 				} else {
 					if(req.body.agree === true) {				
 						
-						var uid = genId(req.body.email);											
+						var uid = genId(req.body.email);
+						var referrral_link = "/referral/" + uid + "/signup";											
 						var User = new model.user({
 						email: email,
 						user_id: uid,
-	                    password: salt.createHash(password),
-	                    phone: req.body.phone,
-	                    admin: false,
-	                    type: req.body.typeOfUser,
-	                    city: req.body.city,
-	                    firstname: req.body.firstname,
-	                    lastname: req.body.lastname,
-	                    username: req.body.username,
+            password: salt.createHash(password),
+            phone: req.body.phone,
+            admin: false,
+            type: req.body.typeOfUser,
+            city: req.body.city,
+            firstname: req.body.firstname,
+            lastname: req.body.lastname,
+            username: req.body.username,
 						address: req.body.address,
 						gender: req.body.gender,
 						title: req.body.title,
@@ -50,13 +51,14 @@ var signupRoute = function(model) {
 						work_place: req.body.work_place,
 						country: req.body.country,
 						name: req.body.name,
-						verified: false					
+						verified: false,
+						ref_link: referrral_link					
 						});
 
 						User.ewallet = {
 							available_amount: 0,
 							firstname: req.body.firstname,
-	                    	lastname: req.body.lastname,
+	             lastname: req.body.lastname,
 						}
 
 
@@ -87,26 +89,43 @@ var signupRoute = function(model) {
 	    // Generate a JSON response reflecting signup
 	    if (!user) {	
 	      	res.send({error:true,errorMsg: "User with that email already exist!"});
+	    } else {	    	
+	    	res.send({error: false});
+	    }
+
+	  })(req, res, next);
+	});
+
+	router.post("/referral/:id/signup",function(req,res){
+		passport.authenticate('signup', function(err, user, info) {
+	    if (err) {
+	      return next(err); // will generate a 500 error
+	    }
+	    // Generate a JSON response reflecting signup
+	    if (!user) {	
+	      	res.send({error:true,errorMsg: "User with that email already exist!"});
 	    } else {
-	    	var options = {
-	    		port: "9000",
-	    		host: "127.0.0.1",	    		
-	    		path: "/account-created",
-	    		method: "GET" 
-	    	}
-	    	
-	    	http.createServer(function(req,res){
-			    var rq = http.request(options, function(rs) {
-			        rs.on('data', function (chunk) {
-			            res.write(chunk);
-			        });
-			        rs.on('end', function () {
-			            res.end();
-			        });
-			    });
-			    rq.end();
-			}).listen(9000);
-	    	//res.send({error: false});
+	    	model.user.findOne({user_id: req.params.id},{ewallet:1}).exec(function(err,data){
+	    		if (err) throw err;
+	    		var date = + new Date();	    		
+	    		var transacObj = {
+						date: date,
+						source: "Admin",
+						actiivity: "Credit",
+						message: "referral commission",
+						body: {
+							amount: 100,
+							beneficiary: "You"
+						}
+					}
+					data.ewallet.available_amount += 100;
+					data.ewallet.transaction.push(transacObj);
+	    		data.save(function(err,info){
+	    			if(err) throw err;
+ 	    			console.log("referral commission given");
+	    		});
+	    	})	    	
+	    	res.send({error: false});
 	    }
 
 	  })(req, res, next);
@@ -120,7 +139,8 @@ var signupRoute = function(model) {
 				res.json({message: "User with this phone number " + "'" + req.body.phone + "'" + " already exist"})
 			} else {
 				var ref = Math.floor(Math.random() * 99999999);
-				var uid = genId();				
+				var uid = genId();
+				var profileUrl = "/patient/EM/profile/" + uid;				
 				var User = new model.user({
 					email: req.body.email,
 					user_id: uid,
@@ -133,7 +153,7 @@ var signupRoute = function(model) {
 					address: req.body.address,		
 					profile_pic_url: "/download/profile_pic/nopic",						
 					country: req.body.country,
-					emergency_ref_url: "/patient/EM/profile/" + uid									
+					emergency_ref_url: profileUrl									
 				});
 				
 				var patient = {
@@ -145,9 +165,8 @@ var signupRoute = function(model) {
 				}
 			  
 			  User.save(function(err,info){			  	
-			  	if(err) throw err;
-			  	console.log(User)	  	
-			  	sendSMS(req.body.phone);
+			  	if(err) throw err;  	
+			  	sendSMS(req.body.phone,profileUrl);
 			  	if(req.body.email)
 			  		sendEMAIL(req.body.email)	
 
@@ -181,7 +200,11 @@ var signupRoute = function(model) {
 		})
 
 		//importantly, sms or email if available will be sent to patient including the referrral link for the patiento view his profile.
-		function sendSMS(number){
+		function sendSMS(mobile,profileUrl){
+
+			var msgBody = "Your emergency profile link is \n" + profileUrl;
+			var phoneNunber = "234" + mobile;
+			sms.message.sendSms('Appclinic',phoneNunber,msgBody,callBack); //"2348096461927"
 			
 		}
 

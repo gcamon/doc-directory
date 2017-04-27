@@ -1,8 +1,13 @@
 <div class="row">
-	<div class="col-sm-12 col-md-12 col-lg-12">
-		<div style="padding: 30px; width:70%;float:right">
-			<marquee behavior="slide" direction="down" loop="1" scrollamount="20" style="text-shadow:1px 1px 1px #000"><i class="fa fa-motorcycle" aria-hidden="true" style="color:green;font-size: 32px;margin-right:20px"></i>We can deliver your drugs to your home.<a href="#">Learn more</a></marquee>
-		</div>
+	<div class="col-sm-12 col-md-3 col-lg-3">
+	</div>
+	<div class="col-sm-12 col-md-9 col-lg-9">
+		<ul class="prescription-options">			
+			<li ng-click="recent()" ng-class="{highlight: isRecent === true}">most recent</li>
+			<li ng-click="three()" ng-class="{highlight: isThree === true}">last three months</li>
+			<li ng-click="six()" ng-class="{highlight: isSix === true}">last six months</li>
+			<li ng-click="all()" ng-class="{highlight: isAll === true}">all</li>
+		</ul>
 	</div>
 </div>
 <div style="padding: 30px;" class="clearfix"  ng-repeat="docInfo in prescriptionRecordsResult">	

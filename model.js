@@ -43,8 +43,9 @@ var myModel = function () {
     service_access: String,
     doctor_profile_pic_url: String,
 		message: String,
-		category: String,//note categories are admin, decline, redirect.
+		category: String,//note categories are admin, decline, redirect,need_doctor.
 		reason: String,
+		complaint_id: String,
 		redirect: {
 			title: String,
 			firstname: String,
@@ -121,13 +122,15 @@ var myModel = function () {
 	});
 
 	var transactionSchema = Schema({
-		date: Date,
-		total_balance: Number,
-		firstname: String,
-		lastname: String,
-		activity: String,
-		amount_withdrawn: Number,
-		amount_deposited: Number
+		date: Number,
+		source: String,
+		message: String,
+		activity: String,		
+		body: {
+			amount: Number,
+			beneficiary: String,
+		},
+		
 	});
 
 	var noteSchema = Schema({
@@ -378,8 +381,6 @@ var myModel = function () {
 		verified: Boolean,
 		ewallet:{			
 			available_amount: Number,
-			firstname: String,
-			lastname: String,
 			transaction:[transactionSchema]
 		},
 		admin: Boolean,
@@ -433,26 +434,35 @@ var myModel = function () {
 		collections: "userinfos"
 	})
 	
-	var complainObj = Schema({
+
+	
+	var helpSchema = Schema({
 		helpType: String,
 		description: String,
 		sent_date: String,
-		symptoms: Array
-	})
-
-	var helpSchema = Schema({
-		isLoggedIn: Boolean,
-		typeOfUser: String,
-		firstname: String,
-		lastname: String,
-		phone: Number,
-		email: String,
-		user_id: String,		
-		title: String,
-		complaint: [complainObj]		
+		symptoms: Array,
+		patient_id: String,
+		complaint_id: String,
+		age: String,
+		gender: String,
+		preferred_city: String,
+		isview: Boolean,
+		response: Array,
+		files: Array
 	},{
 		collections: "helpinfos"
-	})
+	});
+
+	var pinSchema = Schema({
+		voucher: Array,
+		voucher_two: Array,
+		voucher_three: Array,
+		otp: Array
+	},{
+		collections: "pininfo"
+	});
+
+
 
 	//models
 	var models = {};
@@ -461,6 +471,7 @@ var myModel = function () {
 	models.patient = mongoose.model("patientinfo",patient_briefSchema);
 	models.services = mongoose.model("centerservices",serviceSchema);
 	models.help = mongoose.model("helpinfos",helpSchema);
+	models.pins = mongoose.model("pininfo",pinSchema);
 	/*models.award = mongoose.model('awardinfo', AwardSchema);
 	models.education = mongoose.model('educationinfo', EducationSchema);
 	models.prescribtion = mongoose.model("prescribtioninfo", prescribtionSchema);

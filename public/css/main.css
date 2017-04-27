@@ -614,15 +614,11 @@ span.dates {
 /**** top header style *******/
 .top-header {
 	border-bottom: 4px solid #7dbb00;
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: 3;
 	background-color: #fff
 }
 
 .main {
-	margin-top: 150px
+	margin-top: 150p
 }
 
 .top-navbar {
@@ -660,7 +656,8 @@ span.dates {
 	background-color:#fff;
 	color:#000;
 	text-align:center;
-	z-index: 3;padding:10px;
+	z-index: 3;
+	padding:10px;
 	list-style: none;
 }
 
@@ -736,7 +733,7 @@ span.dates {
 
 
 .top-navbar-dashboard {
-	background-color:#7dbb00; 
+	background-color:#7dbb40; 
 	padding: 10px;
 	box-shadow: 2px 1px 8px #000;
 	float:none
@@ -760,20 +757,47 @@ span.dates {
 	color: #000;
 }
 
+.menu-drp {
+	width: 32%;
+	display:inline-block;
+	position: relative;
+}
+
+.menu-drp li {
+	
+	padding: 10px;
+	border-bottom: 1px solid rgba(0,0,0,0.3)
+}
+
+.menu-drp li a {	
+	font-size: 18px;
+	color:#000;
+	display: block;
+}
+
+.no-bottom {
+	border-bottom: none!important;
+}
+
+.menu-drp:hover ul{
+	visibility: visible;
+}
+
 .top-navbar-dashboard ul {
 	position:absolute;
 	left:10;
-	top:47px;
+	top:20px;
 	width:230px;
-	border:5px solid #7dbb00;
+	border:1px solid rgba(0,0,0,0.2);
 	background-color:#fff;
 	color:#000;
-	text-align:center;
+	text-align:left;
 	z-index: 3;
 	padding:10px;
 	list-style: none;
+	box-shadow: 2px 2px 2px rgba(0,0,0,0.6);
+	visibility: hidden;
 }
-
 
 .profile-drp {
 	position: relative;
@@ -837,38 +861,221 @@ span.dates {
 .top-navbar-dashboard ul.noti-drp {
 	display: block!important;
 	width: 400px;
-	right: 180px;
+	right: 380px;
 	max-height: 500px;
 	overflow-y: auto;
+	top: 50px;
+	visibility: visible;
 } /* use media query to correct position on mobile*/
 
+.waiting-room {
+	position: relative;
+}
 
-.top-navbar-dashboard ul.msg-drp {
+.waiting-room div {
+	display:inline-block;	
+	box-shadow: 1px 2px 1px rgba(0,0,0,0.3);
+	margin-top: 30px;
+}
+
+.complain-list {
+	border: none!important;
+	width:700px;
+	min-height: 960px;
+	
+	overflow: auto;
+	padding-right: 20px  
+}
+
+.complain-list ul {
+	display: inline-block;
+}
+
+.complain-list li {
+	float: left;
+	list-style-type: none;
+	margin-right: 10px;
+}
+
+.no-view {
+	display: none!important;
+}
+
+.complain-list li a {
+	width: 100%;
+	display: block;
+	color: green;
+	font-size: 18px;
+	box-shadow: 1px 2px 2px #000;
+	padding: 10px;
+}
+
+.complain-in-view {
+	width:500px;
+	height:580px!important;
+	position:fixed;
+	top:120px;
+	left:62%;
+	background-color: #fff;
+	z-index: 4;
+	overflow-y: auto;
+	border: 1px solid rgba(0,0,0,0.2);
+}
+
+.complain-in-view aside span {
+	margin-right: 30px;
+}
+
+.complain-in-view h6{
+	padding: 15px 0 0;
+	color: green
+}
+.complain-in-view .complaint-view-head {
+	padding: 10px;
+	background-color: green;
+}
+
+.complaint-times {
+	font-size: 22px;
+	color:#fff;
+	padding:15px 20px;
+	cursor:pointer;
+	margin-left: 160px
+
+}
+
+.complaint-user {
+	font-size: 24px;
+	padding-right: 30px;
+	color:#fff;
+}
+
+.complaint-view-charge {
+	color: black;
+}
+
+.complaint-view-charge div{
+	box-shadow: none;
+	font-size: 18px;
+	font-weight: 100;
+}
+
+.complaint-view-charge input {
+	width: 200px
+}
+
+.complaint-view-charge p {
+	padding: 15px 0;
+	font-size: 18px;
+	font-weight: 100;
+}
+
+.btn-primary {
+	background-color: #7dbb30;
+}
+
+@media (max-width: 1200px) { 
+	.complain-list {
+		border: none;
+		height:200px;
+		width:100%;
+	}
+
+	.complain-in-view {
+		border: 1px solid rgba(0,0,0,0.2);
+		display: block;
+		width: 90%;
+		margin: 30px auto;
+		height:200px;
+		position:absolute;
+		background-color: rgba(255,255,255,0.9);
+		top:0;
+		left:10px;
+	}
+
+}
+
+.patient-complain {
+	margin-top: 30px;
+	font-size: 15px;
+}
+
+.patient-complain article {
+	border-bottom: 1px solid rgba(0,0,0,0.4);
+	padding: 20px;
+}
+
+.patient-complain i {
+	font-size: 22px
+}
+
+.patient-complain span {
+	font-size: 14px;
+	font-weight: bold;
+	font-style: italic;
+	padding: 0 20px;
+}
+
+.patient-symptoms {
+	font-style: italic;
+	margin-top: 10px;
+	display: inline-block;
+}
+
+.description {
+	float: left;
+	padding-right: 15px;
+	list-style: none;
+}
+
+.msg-box {
+	display:inline-block;
+	padding: 0px 25px
+}
+
+.msg-box:hover ul.msg-drp {
 	display: block;
 	width: 300px;
-	right: 200px;
+	right: 320px;
 	max-height: 500px;
 	overflow-y: auto;
+	top:45px;
+	visibility: visible;
+}
+
+.msg-box:hover ul.app-drp {
+	display: block;
+	width: 300px;
+	right: 250px;
+	max-height: 500px;
+	overflow-y: auto;
+	top:45px;
+	visibility: visible;
 }
 
 .msg-drp-list {
 	line-height: 15px;
 	text-align: left;
 	cursor: pointer;
+	height: 80px;
 }
 
-.msg-drp-list img,.msg-drp div{
-	display: inline-block;
+.msg-drp-list div, .msg-drp-list img {
+	float: left;
 }
 
 .msg-drp-list div {
-	padding-left: 5px;
+	padding-left: 15px;
 	width: 190px;
-	float:right;
+	
+}
+
+.msg-drp-list img {
+	margin-top: 12px;
 }
 
 .msg-drp-list span {
-	font-size: 12px;
+	font-size: 14px;
 	font-weight: bold;	
 	color: black;
 	border: none;
@@ -876,7 +1083,8 @@ span.dates {
 
 .msg-drp-list em {
 	display: block;
-	font-size: 12px;
+	font-size: 14px;
+	font-style: normal;
 }
 
 .msg-drp-list:hover {
@@ -907,7 +1115,28 @@ span.dates {
 
 
 
+.prescription-options {
+	display:inline-block;
+	width: 90%;
+	text-align: right;
+}
 
+.prescription-options li {
+	list-style-type: none;
+	float: left;
+	padding: 10px 15px 2px;
+	color: grey;
+	font-size: 14px;
+	font-weight: bold;
+	margin-right: 5px;
+	cursor: pointer;
+}
+
+.highlight {
+	border-bottom: 5px solid green;
+	border-radius: 3px
+	box-shadow: 1px 2px 3px rgba(0,0,0,0.4);
+}
 
 
 
@@ -1013,7 +1242,7 @@ li.note-field img, li.note-field div {
 .view-animate-container {
   position:relative;  
   background:white;
-  height:800px;
+  height:960px;
   overflow-x:hidden;
 }
 
@@ -2802,7 +3031,7 @@ body.tg-comming-soon #main{
 		Doc Profile List View & Map
 ============================================= */
 .tg-list-view .tg-doctor-profile {padding: 0px;}
-.tg-list-view .tg-box {padding: 30px;}
+.tg-list-view .tg-box {padding: 2px;}
 .tg-list-view .tg-box figure{
 	float: left;
 	width: 165px;
@@ -2816,6 +3045,15 @@ body.tg-comming-soon #main{
 	overflow: hidden;
 }
 
+
+.tg-doccontactinfo {
+	display: inline-block;
+}
+
+.tg-doccontactinfo li {
+	float: left;
+	padding: 2px
+}
 
 /* =============================================
 		Doc Detail & Map
@@ -4431,6 +4669,31 @@ div.canvas{
 #comming-countdown li:last-child span:before{ background: #fff;}
 
 
+
+/****mdia query for waiting room
+.waiting-room {
+	position: relative;
+}
+
+.waiting-room div {
+	display:inline-block;
+	border: 1px solid red;
+}
+
+.complain-list {
+	
+	width:700px;
+	height:200px;
+}
+
+.complain-in-view {
+	
+	width:430px;
+	height:200px;
+	position:absolute;
+	top:0;
+	left:62%
+}**/
 
 
 

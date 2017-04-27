@@ -26,6 +26,16 @@
         <link rel="stylesheet" href="/assets/css/angular-carousel.css">  
         <script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>
         <link href="https://fonts.googleapis.com/css?family=Ubuntu+Condensed" rel="stylesheet">
+        <script src="/assets/js/vendor/jquery-library.js"></script>
+        <script type="text/javascript" src="/assets/js/jquery.nicescroll.js"></script>
+         <script type="text/javascript">
+            $(document).ready(function(){
+                $("html").niceScroll({cursorcolor:"#ccc",cursorwidth:"10px"});
+                $("#main").niceScroll("#complaint",{cursorcolor:"#ccc"});
+                $("#complain-in-view").niceScroll({cursorcolor:"#ccc",cursorwidth:"10px"});
+            })
+        </script>
+
         
     </head>
     <body ng-app= "myApp">
@@ -112,542 +122,103 @@
             <!--************************************
                             Header End
             *************************************-->
-            <!--************************************
-                            Home Slider Start
-            *************************************-->
-            <div id="tg-homebanner" class="tg-homebanner tg-overflowhidden tg-haslayout main" ng-controller="displayController">
-                
-                <!--<div id="map_canvas" class="tg-location-map tg-haslayout"></div>-->
-                <img src="/assets/images/bg-hero-doc.jpg" id="map_canvas" class="tg-location-map tg-haslayout" style="background-repeat: no-repeat; background-size: cover; background-attachment: fixed; background-position: 50% 0px;" alt="image"/>
-                <div class="tg-banner-content">
-                    <div class="tg-displaytable">
-                        <div class="tg-displaytablecell">
-                            <div class="container">
-                                <div class="col-md-3 col-sm-5 col-xs-3 tg-verticalmiddle">
-                                    <div class="row">
-                                        <ul id="tg-sortable" class="tg-tabs-nav tg-sortable" role="tablist">
-                                            <li role="presentation" class="active">
-                                                <a href="#specialists" aria-controls="nephrologist" role="tab" data-toggle="tab">
-                                                    <i class="icon-stethoscope"></i>
-                                                    <span class="tg-category">
-                                                        <span class="tg-category-name">doctor</span>
-                                                        <span class="tg-category-doctores" id="no-of-specialists"></span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                            <!--<li role="presentation">
-                                                <a href="#hospitals" aria-controls="dentist" role="tab" data-toggle="tab">
-                                                    <i class=" icon-Hospitalmedicalsignalofacrossinacircle"></i>
-                                                    <span class="tg-category">
-                                                        <span class="tg-category-name">hospital</span>
-                                                        <span class="tg-category-doctores" id="no-of-hospitals"></span>
-                                                    </span>
-                                                </a>
-                                            </li>-->
-                                            <!--<li role="presentation">
-                                                <a href="#clinics" aria-controls="eye-spcialist" role="tab" data-toggle="tab">
-                                                    <i class=" icon-Clinichistorymedicalpaperonclipboard"></i>
-                                                    <span class="tg-category">
-                                                        <span class="tg-category-name">clinic</span>
-                                                        <span class="tg-category-doctores" id="no-of-clinics"></span>
-                                                    </span>
-                                                </a>
-                                            </li>-->
-                                            <li role="presentation">
-                                                <a href="#pharmacy" aria-controls="orthopaedic" role="tab" data-toggle="tab">
-                                                    <i class="icon-Pills"></i>
-                                                    <span class="tg-category">
-                                                        <span class="tg-category-name">Pharmacy</span>
-                                                        <span class="tg-category-doctores" id="no-of-phamarcies"></span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                            <li role="presentation">
-                                                <a href="#radiology" aria-controls="ent-specialist" role="tab" data-toggle="tab">
-                                                    <i class="icon-BloodDonation"></i>
-                                                    <span class="tg-category">
-                                                        <span class="tg-category-name">Radiology Center</span>
-                                                        <span class="tg-category-doctores"id="no-of-radiology"></span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                            <li role="presentation">
-                                                <a href="#laboratory" aria-controls="dermatologist" role="tab" data-toggle="tab">
-                                                    <i class="icon-hairs"></i>
-                                                    <span class="tg-category">
-                                                        <span class="tg-category-name">Laboratories</span>
-                                                        <span class="tg-category-doctores" id="no-of-laboratories"></span>
-                                                    </span>
-                                                </a>
-                                            </li>
-                                            <!--<li role="presentation">
-                                                <a href="#fitness" aria-controls="fitness" role="tab" data-toggle="tab">
-                                                    <i class="icon-hairs"></i>
-                                                    <span class="tg-category">
-                                                        <span class="tg-category-name">Fitness & SPA</span>
-                                                        <span class="tg-category-doctores" id="no-of-fitness"></span>
-                                                    </span>
-                                                </a>
-                                            </li>-->
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="col-md-9 col-sm-7 col-xs-9 tg-verticalmiddle" ng-controller = "searchController">
-                                    <div class="row">
-                                        <div class="col-sm-12 col-md-9 col-lg-9">                                
-                                            <div class="view-animate-container row" style="background:none">  
-                                                <div class="view-animate" ng-view >
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="show-search"><i class="fa fa-search"></i></div>
-            </div>
-            <!--************************************
-                            Home Slider End
-            *************************************-->
+            
             <!--************************************
                             Main Start
             *************************************-->
-            <main id="main" class="tg-haslayout">
-                <!--************************************
-                                What to Expect Start
-                *************************************-->
-                <section class="tg-main-section tg-haslayout">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm-10 col-sm-offset-1 col-xs-12">
-                                <div class="tg-theme-heading">
-                                    <h2>what to expect</h2>
-                                    <span class="tg-roundbox"></span>
-                                    <div class="tg-description">
-                                        <p style="font-size: 22px;line-height: 35px;font-weight: 100">We're here to help you find and receive the best medical care. We have built a system that facilitate doctor - patient interaction, easy access to diagnostic and special centers. In just few click you can get answer to your medical needs without having to ask around. AppClinic has lots of utilities to take care of your medical needs with no stress.</p>
-                                        
-                                                                                                  
-                                        </div>
-                                    </div>
+            <main id="main" class="tg-haslayout" ng-controller="patientWaitingRoomController" style="max-height:1300px;overflow-y:scroll;margin-bottom:30px" id="main">
+                <section class="container">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12 col-lg-12">                           
+                            <div class="waiting-room">
+                                <div class="complain-list" id="complaint">
+                                    <ul>
+                                        <li><a href="#/1" ng-class="{'btn-primary':batch==='1'}" ng-click="getBatch('1')">1</a></li>
+                                        <li><a href="#/2" ng-class="{'btn-primary':batch==='2'}" ng-click="getBatch('2')">2</a></li>
+                                        <li><a href="#/3" ng-class="{'btn-primary':batch==='3'}" ng-click="getBatch('3')">3</a></li>
+                                        <li><a href="#/4" ng-class="{'btn-primary':batch==='4'}" ng-click="getBatch('4')">4</a></li>
+                                        <li><a href="#/5" ng-class="{'btn-primary':batch==='5'}" ng-click="getBatch('5')">5</a></li>
+                                        <li><a href="#/6" ng-class="{'btn-primary':batch==='6'}" ng-click="getBatch('6')">6</a></li>
+                                        <li><a href="#/7" ng-class="{'btn-primary':batch==='7'}" ng-click="getBatch('7')">7</a></li>
+                                        <li><a href="#/8" ng-class="{'btn-primary':batch==='8'}" ng-click="getBatch('8')">8</a></li>
+                                        <li><a href="#/9" ng-class="{'btn-primary':batch==='9'}" ng-click="getBatch('9')">9</a></li>
+                                        <li><a href="#/10" ng-class="{'btn-primary':batch==='10'}" ng-click="getBatch('10')">10</a></li>
+                                    </ul>
+                                    <section class="patient-complain">
+                                        <article ng-repeat="i in complaints">
+                                            <i class="fa fa-user"> &nbsp; Patient</i>
+                                            <span>{{i.age}}</span>
+                                            <span>{{i.gender}}</span>
+                                            <span style="color:green">{{i.complaint_id}}</span>
+                                            <span>{{i.sent_date| date: "mediumDate"}}</span>
+                                            <ul class="patient-symptoms" >
+                                                <li><strong>Symptoms | &nbsp;</strong></li>
+                                                <li ng-repeat="symptom in i.symptoms" class="description">{{symptom}}</li>
+                                            </ul>
+                                            <p>"{{i.description}}" &nbsp; <span style="color:red;cursor:pointer;text-decoration:underline" ng-click="veiwDatail(i.complaint_id)">Respond!</span></p>
+                                        </article>
+                                    </section>
                                 </div>
-                            </div>
-                            <div class="tg-search-categories">
-                                <div class="col-sm-4 col-xs-4 tg-expectwidth">
-                                    <div class="tg-search-category">
-                                        <div class="tg-displaytable">
-                                            <div class="tg-displaytablecell">
-                                                <div class="tg-box">
-                                                    <h3>find your doctor</h3>
-                                                    <i class="icon-stethoscope"></i>
-                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 col-xs-4 tg-expectwidth">
-                                    <div class="tg-search-category">
-                                        <div class="tg-displaytable">
-                                            <div class="tg-displaytablecell">
-                                                <div class="tg-box">
-                                                    <h3>Inperson meeting</h3>
-                                                    <i class="icon-healthcare"></i>
-                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 col-xs-4 tg-expectwidth">
-                                    <div class="tg-search-category">
-                                        <div class="tg-displaytable">
-                                            <div class="tg-displaytablecell">
-                                                <div class="tg-box">
-                                                    <h3>Paperless Prescription</h3>
-                                                    <i class="icon-capsules"></i>
-                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                            <div class="col-sm-4 col-xs-4 tg-expectwidth">
-                                    <div class="tg-search-category">
-                                        <div class="tg-displaytable">
-                                            <div class="tg-displaytablecell">
-                                                <div class="tg-box">
-                                                    <h3>Live Chat/Video Call </h3>
-                                                    <i class="icon-stethoscope"></i>
-                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                            <div class="col-sm-4 col-xs-4 tg-expectwidth">
-                                    <div class="tg-search-category">
-                                        <div class="tg-displaytable">
-                                            <div class="tg-displaytablecell">
-                                                <div class="tg-box">
-                                                    <h3>Update-to-date Medical records</h3>
-                                                    <i class="icon-stethoscope"></i>
-                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                            <div class="col-sm-4 col-xs-4 tg-expectwidth">
-                                    <div class="tg-search-category">
-                                        <div class="tg-displaytable">
-                                            <div class="tg-displaytablecell">
-                                                <div class="tg-box">
-                                                    <h3>Online payment</h3>
-                                                    <i class="icon-stethoscope"></i>
-                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 col-xs-4 tg-expectwidth">
-                                    <div class="tg-search-category">
-                                        <div class="tg-displaytable">
-                                            <div class="tg-displaytablecell">
-                                                <div class="tg-box">
-                                                    <h3>Appointment Booking</h3>
-                                                    <i class="icon-stethoscope"></i>
-                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 col-xs-4 tg-expectwidth">
-                                    <div class="tg-search-category">
-                                        <div class="tg-displaytable">
-                                            <div class="tg-displaytablecell">
-                                                <div class="tg-box">
-                                                    <h3>Paperless Lab test Result</h3>
-                                                    <i class="icon-stethoscope"></i>
-                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-4 col-xs-4 tg-expectwidth">
-                                    <div class="tg-search-category">
-                                        <div class="tg-displaytable">
-                                            <div class="tg-displaytablecell">
-                                                <div class="tg-box">
-                                                    <h3>Paperless Scan test Result</h3>
-                                                    <i class="icon-stethoscope"></i>
-                                                    <span class="tg-show"><em class="fa fa-question"></em></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                        </div>
+                                <div  class="complain-in-view" ng-class="{'no-view':isViewPatient !== true}" id="complain-in-view">
+                                    <p class="complaint-view-head">
+                                        <i class="fa fa-user complaint-user"> &nbsp; Patient ({{patient.complaint_id}})</i>
+                                        <i class="fa fa-times complaint-times"  ng-click="close()" ng-if="isViewPatient === true"></i>                                     
+                                    </p>
+                                    <article style="padding:10px">                                        
+                                        <aside>
+                                            <span><strong>Age</strong> | {{patient.age}}</span>
+                                            <span><strong>Gender </strong> | {{patient.gender}}</span>
 
-                        </div>
-                    </div>
-                </section>
-                <div class="form-group" style='text-align:center'>
-                    <a class="search_banner tg-btn" href="/how-it-works" style="padding: 0px 40px;color:#00">Learn more</a>
-                </div>
-                <!--************************************
-                                What to Expect End
-                *************************************-->
-                <!--************************************
-                                Are You A Doctor Start
-                *************************************-->
-                <section class="tg-main-section tg-haslayout parallax-window tg-custom-padding" data-appear-top-offset="600" data-parallax="scroll" data-image-src="images/bgparallax/bgparallax-01.jpg">
-                    <div class="container">
-                        <div class="row">
-                            <div class="tg-areuadoctor tg-haslayout" ng-controller='homeDoctorSignupController'>
-                                <div class="col-lg-6 col-md-5 col-sm-12 col-xs-12 pull-right">
-                                    <div class="tg-contentbox tg-haslayout">
-                                        <div class="tg-heading-border">
-                                            <h2>are you a doctor? </h2>                                            
-                                            <h3 style="line-height: 35px;font-weight: 100;font-size:18px; color:grey">register now and reach thousands of patients</h3>
+                                        </aside>
+                                        <aside>
+                                           <p style="color:red;font-size:18px;padding: 10px 0;border:1px dashed rgba(0,0,0,0.8);text-align:center;border-radius: 12px;margin: 15px 0">Patient prefer doctors in {{patient.preferred_city || "Any where"}}</p>
+                                        </aside>
+                                        <h6>History</h6>
+                                        <ul class="patient-symptoms">                                            
+                                            <li ng-repeat="symptom in patient.symptoms" class="description"><strong>{{symptom}}</strong></li>
+                                        </ul>
+                                        <p>"{{patient.description}}"</p>
+                                        <h6>Attached file(s)<h6>
+                                        <div ng-if="patient.files.length > 0" ng-repeat="file in patient.files" >
+                                            <div  ng-if="file.type === 'image'" style="width: 480px;height:auto;margin:5px auto">
+                                            <img ng-src="{{file.url}}"  ng-click="viewFile()"  style="width: 100%;height:100%;margin-right:10px"class="img-responsive">
+                                            </div>
+                                            
+                                            <video width="480" controls
+                                              poster="https://archive.org/download/WebmVp8Vorbis/webmvp8.gif" ng-if="file.type === 'video'">  
+                                              <source
+                                                ng-src="{{file.url}}"
+                                                type="video/mp4">                                              
+                                              Your browser doesn't support HTML5 video tag.
+                                            </video>
                                         </div>
-                                        <div class="tg-description">
-                                            <p style="font-size: 18px;line-height: 35px;font-weight: 100">We know what it takes to become a qualified doctor so we have taken away all your hassle to look out for your patients who need you. DocDirect will give you an easy reach to all these patients, all you need is to sign up!</p>
-                                        </div>
-                                        <button class="tg-btn" ng-click = "docSignup()">signup now</button>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-7 col-sm-12 col-xs-12 pull-left">
-                                    <figure class="tg-img">
-                                        <img src="assets/images/img-01.png" alt="image description">
-                                    </figure>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                <!--************************************
-                                Are You A Doctor End
-                *************************************-->
-                <!--************************************
-                                HealthCare on the go Start
-                *************************************-->
-                <section class="tg-padding-top tg-haslayout" ng-controller="homePatientSignupController">
-                    <div class="container">
-                        <div class="row">
-                            <div class="tg-healthcareonthego tg-haslayout">
-                                <div class="col-lg-6 col-md-5 col-sm-12 col-xs-12 pull-left">
-                                    <div class="tg-contentbox tg-haslayout">
-                                        <div class="tg-heading-border">
-                                            <h2>Do you need a Doctor?</h2>
-                                            <h4 style="line-height: 35px;font-weight: 100;font-size:18px; color:grey">Reach thousands of spacialists for your case</h4>
-                                        </div>
-                                        <div class="tg-description">
-                                            <p style="font-size: 18px;line-height: 35px;font-weight: 100">We know how difficult it is sometimes to find the right doctor/specialist on our own.Now you can 
-                                            take the advantage of meeting the right doctor/spacialists for your case anywhere in the world.
+                                    </article>
+                                    <section style="padding:10px">
+                                        <h6 style="text-align:center;font-weight:bold">Your Response</h6>
+                                        <form class="complaint-view-charge">
+                                            <h6>Briefly introduce yourself</h6>
+                                            <textarea style="height:200px;" ng-model="user.introductory">
+                                            </textarea>
+                                            <div>
+                                                <h6>Consultation Fee</h6>
+                                                <span>Service charge = N1,000</span>
+                                            </div>
+                                            <div>
+                                                <span>Your charge = </span> <input type="number" placeholder="Enter amount" ng-model="user.amount">                                  
+                                            </div>
+                                            <p>
+                                                <span>Total billed for patient = {{str}}</span>
                                             </p>
-                                        </div>
-                                        <!--<ul class="tell-patient">
-                                            <li>One-on-One chat, video call, audio call, direct messaging and more </li>
-                                            <li>You can receive prescription online</li>
-                                            <li>You can receive lab test online</li>
-                                            <li>You can receive scan test online</li>
-                                            <li>Find a doctor well suited to your case.</li>
-                                            <li>Access your whole medical record anytime.</li>
-                                            <li>Forward your prescription to a pharmaceutical center of your choice.</li>
-                                            <li>Download your prescription, lab test or scan test.</li>
-                                            <li>Find the nearest pharmacy and purchase a drug online.</li>
-                                            <li>Go cashless </li>
-                                        </ul>-->
-                                        <div class="tg-btns">                                            
-                                            <button class="tg-btn" ng-click="patientSignup()">Register Now</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-7 col-sm-12 col-xs-12 pull-right">                                    
-                                    <div class="tg-contentbox tg-haslayout">
-                                        <div class="tg-heading-border">
-                                            <h2>Do you have a center? </h2>                                            
-                                            <h3 style="line-height: 35px;font-weight: 100;font-size:18px; color:grey">register now and reach thousands of patients</h3>
-                                        </div>
-                                        <div class="tg-description">
-                                            <p style="font-size: 18px;line-height: 35px;font-weight: 100">You know patients need your service, Why don't you feel in the gap!</p>
-                                        </div>
-                                        <button class="tg-btn" ng-click = "centerSignup()">signup now</button>
-                                    </div>
-                                    </div>
-                                
-                            
+                                            <p style="text-align:center">
+                                                <input type="button" value="Submit" ng-click="sendRequest()" class="btn btn-primary">
+                                            </p>
+                                        </form>
+                                    </section>
                                 </div>
                             </div>
-                        </div>
+                        </div>                                        
                     </div>
                 </section>
-                <!--************************************
-                                HealthCare on the go End
-                *************************************-->
-                <!--************************************
-                        Patient Feedback Start
-                *************************************-->
-                <section class="tg-main-section tg-haslayout parallax-window" data-appear-top-offset="600" data-parallax="scroll" data-image-src="images/bgparallax/bgparallax-02.jpg">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm-10 col-sm-offset-1 col-xs-12">
-                                <div class="tg-theme-heading">
-                                    <h2>Patient Feedback</h2>
-                                    <span class="tg-roundbox"></span>
-                                    <div class="tg-description">
-                                        <p>In just three simple steps, DocDirect will help you find your nearest healthcare setting without having to signup. We aim to facilitate you in finding your right doctor with just three clicks without having to ask around or wander to find your nearest healthcare facility.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tg-patientfeedbacks tg-haslayout">
-                                <div class="col-md-6 col-sm-6 col-xs-6 tg-feedbackwidht">
-                                    <div class="tg-patientfeedback">
-                                        <figure class="tg-patient-pic">
-                                            <img src="assets/images/patientfeedback/img-01.jpg" alt="image description">
-                                        </figure>
-                                        <div class="tg-patient-message">
-                                            <span class="tg-patient-name"><a href="#">angela Doe</a></span>
-                                            <span class="tg-doctor-name">For Dr. <a href="#">Jhon Doe</a></span>
-                                            <div class="tg-description">
-                                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore etiam processus dynamicus, qui sequitur.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-sm-6 col-xs-6 tg-feedbackwidht">
-                                    <div class="tg-patientfeedback">
-                                        <figure class="tg-patient-pic">
-                                            <img src="assets/images/patientfeedback/img-02.jpg" alt="image description">
-                                        </figure>
-                                        <div class="tg-patient-message">
-                                            <span class="tg-patient-name"><a href="#">simon Doe</a></span>
-                                            <span class="tg-doctor-name">For Dr. <a href="#">Rhino Doe</a></span>
-                                            <div class="tg-description">
-                                                <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore etiam processus dynamicus, qui sequitur.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                <!--************************************
-                        Patient Feedback End
-                *************************************-->
-                <!--************************************
-                                Find HealthCare By Start
-                *************************************-->
-                <!--<section class="tg-main-section tg-haslayout">
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm-10 col-sm-offset-1 col-xs-12">
-                                <div class="tg-theme-heading">
-                                    <h2>find healthcare by</h2>
-                                    <span class="tg-roundbox"></span>
-                                    <div class="tg-description">
-                                        <p>In just three simple steps, DocDirect will help you find your nearest healthcare setting without having to signup. We aim to facilitate you in finding your right doctor with just three clicks without having to ask around or wander to find your nearest healthcare facility.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tg-findhealthcareby tg-haslayout">
-                                <div class="col-sm-6 col-sm-6 col-xs-6 tg-findheatlhwidth">
-                                    <div class="tg-findbycategory">
-                                        <div class="tg-box">
-                                            <div class="tg-heading-border tg-small">
-                                                <i class="icon-map"></i>
-                                                <h3>location</h3>
-                                            </div>
-                                            <ul>
-                                                <li><a href="#">Louisville</a></li>
-                                                <li><a href="#">Pittsburgh</a></li>
-                                                <li><a href="#">Salt Lake City</a></li>
-                                                <li><a href="#">Memphis</a></li>
-                                                <li><a href="#">Washington, DC</a></li>
-                                                <li><a href="#">Wichita</a></li>
-                                                <li><a href="#">Los Angeles</a></li>
-                                                <li><a href="#">Seattle</a></li>
-                                                <li><a href="#">Austin</a></li>
-                                                <li><a href="#">Miami</a></li>
-                                                <li><a href="#">Tucson</a></li>
-                                                <li><a href="#">Charlotte</a></li>
-                                                <li><a href="#">Buffalo</a></li>
-                                                <li><a href="#">St. Louis</a></li>
-                                                <li><a href="#">Columbus</a></li>
-                                                <li><a href="#">Philadelphia</a></li>
-                                                <li><a href="#">Omaha</a></li>
-                                                <li><a href="#">more</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-sm-6 col-xs-6 tg-findheatlhwidth">
-                                    <div class="tg-findbycategory">
-                                        <div class="tg-box">
-                                            <div class="tg-heading-border tg-small">
-                                                <i class="fa fa-medkit"></i>
-                                                <h3>Speciality</h3>
-                                            </div>
-                                            <ul>
-                                                <li><a href="#">Louisville</a></li>
-                                                <li><a href="#">Pittsburgh</a></li>
-                                                <li><a href="#">Salt Lake City</a></li>
-                                                <li><a href="#">Memphis</a></li>
-                                                <li><a href="#">Washington, DC</a></li>
-                                                <li><a href="#">Wichita</a></li>
-                                                <li><a href="#">Los Angeles</a></li>
-                                                <li><a href="#">Seattle</a></li>
-                                                <li><a href="#">Austin</a></li>
-                                                <li><a href="#">Miami</a></li>
-                                                <li><a href="#">Tucson</a></li>
-                                                <li><a href="#">Charlotte</a></li>
-                                                <li><a href="#">Buffalo</a></li>
-                                                <li><a href="#">St. Louis</a></li>
-                                                <li><a href="#">Columbus</a></li>
-                                                <li><a href="#">Philadelphia</a></li>
-                                                <li><a href="#">Omaha</a></li>
-                                                <li><a href="#">more</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-sm-6 col-xs-6  tg-findheatlhwidth">
-                                    <div class="tg-findbycategory">
-                                        <div class="tg-box">
-                                            <div class="tg-heading-border tg-small">
-                                                <i class="fa fa-clock-o"></i>
-                                                <h3>availability</h3>
-                                            </div>
-                                            <ul>
-                                                <li><a href="#">Louisville</a></li>
-                                                <li><a href="#">Pittsburgh</a></li>
-                                                <li><a href="#">Salt Lake City</a></li>
-                                                <li><a href="#">Memphis</a></li>
-                                                <li><a href="#">Washington, DC</a></li>
-                                                <li><a href="#">Wichita</a></li>
-                                                <li><a href="#">Los Angeles</a></li>
-                                                <li><a href="#">Seattle</a></li>
-                                                <li><a href="#">Austin</a></li>
-                                                <li><a href="#">Miami</a></li>
-                                                <li><a href="#">Tucson</a></li>
-                                                <li><a href="#">Charlotte</a></li>
-                                                <li><a href="#">Buffalo</a></li>
-                                                <li><a href="#">St. Louis</a></li>
-                                                <li><a href="#">Columbus</a></li>
-                                                <li><a href="#">Philadelphia</a></li>
-                                                <li><a href="#">Omaha</a></li>
-                                                <li><a href="#">more</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-sm-6 col-xs-6 tg-findheatlhwidth">
-                                    <div class="tg-findbycategory">
-                                        <div class="tg-box">
-                                            <div class="tg-heading-border tg-small">
-                                                <i class="fa fa-star"></i>
-                                                <h3>Ranking</h3>
-                                            </div>
-                                            <ul>
-                                                <li><a href="#">Louisville</a></li>
-                                                <li><a href="#">Pittsburgh</a></li>
-                                                <li><a href="#">Salt Lake City</a></li>
-                                                <li><a href="#">Memphis</a></li>
-                                                <li><a href="#">Washington, DC</a></li>
-                                                <li><a href="#">Wichita</a></li>
-                                                <li><a href="#">Los Angeles</a></li>
-                                                <li><a href="#">Seattle</a></li>
-                                                <li><a href="#">Austin</a></li>
-                                                <li><a href="#">Miami</a></li>
-                                                <li><a href="#">Tucson</a></li>
-                                                <li><a href="#">Charlotte</a></li>
-                                                <li><a href="#">Buffalo</a></li>
-                                                <li><a href="#">St. Louis</a></li>
-                                                <li><a href="#">Columbus</a></li>
-                                                <li><a href="#">Philadelphia</a></li>
-                                                <li><a href="#">Omaha</a></li>
-                                                <li><a href="#">more</a></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>-->
-                <!--************************************
-                                Find HealthCare By End
-                *************************************-->
             </main>
             <!--************************************
                             Main End
@@ -656,7 +227,7 @@
                             Footer Start
             *************************************-->
             <footer id="footer" class="tg-haslayout">
-            <div class="tg-threecolumn">
+           <!-- <div class="tg-threecolumn">
                 <div class="container">
                     <div class="row">
                         <div class="col-sm-4">
@@ -758,7 +329,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>-->
             <div class="tg-footerbar tg-haslayout">
                 <div class="tg-copyrights">
                     <p>2015 All Rights Reserved © DocDirect</p>
@@ -1307,7 +878,7 @@
         <!--************************************
                 Sign In Sign Up Light Box End
         *************************************-->
-        <script src="/assets/js/vendor/jquery-library.js"></script>
+        
         <script src="/assets/js/vendor/bootstrap.min.js"></script>
         <script type="text/javascript" src="/assets/js/source.js"></script>
         <script type="text/javascript" src="/assets/js/angularclient.js"></script>
@@ -1326,7 +897,6 @@
         <script src="/assets/js/map/map.js"></script>
         <script src="/assets/js/angularAnimate.js"></script>
         <script src="/assets/js/modalService.js"></script>
-        <script src="/assets/js/main.js"></script>
         <script src="/assets/js/angular-touch.min.js"></script>
         <script src="/assets/js/angular-carousel.js"></script>
         <script src="/assets/js/moment.min.js"></script>
@@ -1334,5 +904,8 @@
         <script src="/assets/js/ui-bootstrap-tpls.js"></script>
         <script src="/assets/js/angular-clipboard.js"></script>
         <script src="/assets/js/ngresource.js"></script>
+        
+        
+        </script>
     </body>
 </html>

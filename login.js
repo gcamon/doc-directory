@@ -48,8 +48,7 @@ router.post('/user/login', passport.authenticate('login', {
 }));
 
 router.get('/login',function(req,res){
-        if(req.user){
-        console.log(req.user.type)      
+        if(req.user){              
          res.json({
                 isLoggedIn: true,
                 typeOfUser: req.user.type,
@@ -58,14 +57,36 @@ router.get('/login',function(req,res){
                 phone: req.user.phone,
                 email: req.user.email,
                 title: req.user.title,
-                user_id: req.user.user_id
+                user_id: req.user.user_id,
+                balance: req.user.ewallet.available_amount
             });
         } else {
         res.sendFile(path.join(__dirname + "/404.html"));
         }  
+
+        /*switch(req.user.type) {
+      case "Patient":
+        res.render("patient",{"userInfo": req.user});  
+      break;
+      case "Doctor":
+        res.render("profile",{"person":req.user});   
+      break;
+      case "Pharmacy":
+        res.render("pharmacy",{"userInfo":req.user}); 
+      break;
+      case "Laboratory":
+        res.render("laboratory",{"userInfo":req.user}); 
+      break;
+      case "Radiology":
+        res.render("radiology",{"userInfo":req.user}); 
+      break;
+      default:
+        res.render("medical",{"userInfo":req.user}); 
+      break;
+    }*/
 });
 
-router.get('/Failed',function(req,res){        
+router.get('/failed',function(req,res){        
     res.send(false);
 })
 

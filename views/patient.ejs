@@ -24,12 +24,6 @@
     <link rel="stylesheet" href="/assets/css/responsive.css">
     <link rel="stylesheet" href="/assets/css/angular-carousel.css">
 
-
-
-
-    
-
-
     <!--<script src="/assets/js/vendor/modernizr-2.8.3-respond-1.4.2.min.js"></script>-->
 </head>
 <body ng-app = "myApp">
@@ -46,17 +40,19 @@
             <header id="header" class="tg-haslayout" ng-controller="patientNotificationController">
                 <div  class="navbar-header top-navbar-dashboard" ng-controller="topHeaderController">
                     <div style="width: 77%;margin: 0 auto;padding: 0px 5px">
-                        <div style="width: 20%;display:inline-block">                        
+                        <div style="" class="menu-drp">                        
                             <i class="fa fa-bars" aria-hidden="true" style="color:#fff;font-size:23px;font-weight:100; cursor:pointer" title="Menu" ng-click="isClicked()"></i>
+                            <ul> <!--ng-class="{'drp-list': drop}"-->
+                                <li><a href="#/find-specialist">Find a doctor</a></li> <!-- /user/find-specialist -->                         
+                                <li><a href="#/drug">Find Drug</a></li><!--/user/find-drug -->
+                                <li><a href="#/scan-search">Find Scan</a></li><!--/user/find-scan-test-->
+                                <li class="no-bottom"><a href="#/search-test">Find Test</a></li> <!--/user/find-lab-test-->                                              
+                            </ul>
+                                                
                         </div>
-                       <ul class="menu-list" ng-class="{'drp-list': drop}">
-                            <li><a href="/user/find-specialist">Find A Doctor</a></li>
-                            <li><a href="/user/find-drug">Find Drug</a></li>
-                            <li><a href="/user/find-scan-test">Find Scan</a></li>
-                            <li><a href="/user/find-lab-test">Find Test</a></li>
-                            <li><a href="#/help">Get help</a></li>                        
-                        </ul>
-                        <div style="width:78%; text-align:right;display:inline-block">
+                       
+                       
+                        <div style="width:65%; text-align:right;display:inline-block">
                             <div style="display:inline-block;padding: 5px 25px">
                                  <i class="fa fa-bell-o" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click="showNote()"><span style="display:inline-block;width:14px;height:14px;left: 12px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= userInfo.patient_notification.length %> > 0 " ng-cloak>{{getLen(<%= userInfo.patient_notification.length %>)}}</span></i>
                                  <ul class="all-notify" ng-class="{'noti-drp': isView}">
@@ -74,19 +70,29 @@
                                         <li>
                                     </ul>
                             </div>
-                            <div style="display:inline-block;padding: 0px 25px">
+                            <div class="msg-box">
                                 <i class="fa fa-envelope-o" aria-hidden="true" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click="showMsg()">
                                 <span style="display:inline-block;width:14px;height:14px;left: 14px; top:-18px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= userInfo.patient_mail.length %> > 0 " ng-cloak> {{msgLen}}</span></i>
 
-                                <ul class="all-notify" ng-class="{'msg-drp': isViewMsg}">
+                                <ul id="drp-of-msg" class="all-notify msg-drp">
                                     <li> <h6 style="text-align: center">Message(s)</h6> </li>
-                                    <li ng-repeat = "msg in allMsg" class="msg-drp-list" ng-click= "viewMessage(msg.doctor_id)">                                        
-                                        <img ng-src = "{{msg.doctor_profile_pic_url}}" style="width: 32px; height: 32px">
-                                        <div>                   
-                                            <span>{{msg.title}} {{msg.doctor_firstname}} {{msg.doctor_lastname}}</span>                      
+                                    <li ng-repeat = "msg in allMsg" class="msg-drp-list" ng-click= "viewMessage(msg.doctor_id)" ng-if="msg.category !== 'need_doctor'">                                        
+                                        <img ng-src="{{msg.doctor_profile_pic_url}}" style="width: 32px; height: 32px">
+                                        <div>
+                                            <div style="text-align: right">{{msg.date | date: "mediumDate"}}</div>                   
+                                            <div>{{msg.title}} {{msg.doctor_firstname}} {{msg.doctor_lastname}}</div>                      
                                             <em>{{msg.message}}</em>
                                         <div>                                        
                                     </li>
+                                    <li ng-repeat = "msg in allMsg" class="msg-drp-list" ng-click= "viewResponse(msg.doctor_id,msg.complaint_id)" ng-if="msg.category === 'need_doctor'">                                        
+                                        <!--<img ng-src="{{msg.doctor_profile_pic_url}}" style="width: 32px; height: 32px">-->
+                                        <i class="fa fa-user-md" style="font-size: 32px"></i>
+                                        <div>
+                                            <small style="display:block;text-align: left">Ref {{msg.complaint_id}}&nbsp;&nbsp;&nbsp;&nbsp;{{msg.date | date: "mediumDate"}}</small>                  
+                                            <em>{{msg.message}}</em>
+                                        <div>                                        
+                                    </li>
+
                                     <% for(var i = userInfo.patient_mail.length -1; i >= 0; i--) { %>                                                          
                                         <div>{{getData("<%= userInfo.patient_mail[i].doctor_firstname%>","<%= userInfo.patient_mail[i].doctor_lastname %>","<%= userInfo.patient_mail[i].date %>","<%= userInfo.patient_mail[i].doctor_profile_pic_url %>","<%= userInfo.patient_mail[i].consultation_fee %>","<%= userInfo.firstname %>","<%= userInfo.ewallet.available_amount %>","<%= userInfo.patient_mail[i].doctor_id %>","<%= userInfo.patient_mail[i].service_access %>","<%= userInfo.patient_mail[i].doctor_specialty %>","<%= userInfo.patient_mail[i].message %>")}}
                                         </div>                                                
@@ -94,9 +100,9 @@
                                     <% } %>
                                 </ul>
                             </div>
-                            <div style="display:inline-block;padding: 0px 45px">
+                            <div class="msg-box">
                                 <i class="fa fa-calendar" aria-hidden="true" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click = "showApp()"><span style="display:inline-block;width:14px;height:14px;left: 14px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= userInfo.appointment.length %> > 0 " ng-cloak>{{appLen}}</span></i>
-                                <ul class="all-notify" ng-class="{'msg-drp': isViewApp}">
+                                <ul class="all-notify app-drp">
                                     <li> <h6 style="text-align: center">Appointment(s)</h6> </li>
                                     <li ng-repeat = "app in allApp" class="msg-drp-list" ng-click= "viewAppointment(app.session_id)">                                       
                                         <img ng-src = "{{app.profilePic}}" style="width: 32px; height: 32px">
@@ -115,7 +121,8 @@
                             </div>
                             <div class="profile-drp">                            
                                 <img src="<%= userInfo.profile_pic_url %>" style="width: 38px; height: 38px; border-left: 1px solid grey;border-bottom: 1px solid grey;border-top: 1px solid grey;box-shadow:0px 2px 4px grey;cursor:pointer">
-                                <strong style="color:#fff;font-weight: 500;padding: 5px"><%= userInfo.firstname %> !</strong>
+                                <strong style="color:#fff;font-weight: 500;padding: 5px 10px 5px 5px;border-right:2px solid rgba(200,220,220,0.3);border-radius: 2px"><%= userInfo.firstname %> !</strong>
+                                <strong style="color:#fff;font-weight: 100;padding: 5px">ID <%= userInfo.user_id %></strong>
                                 <ul>
                                     <li><a href="#/edit-picture"> Change profile picture </a></li>
                                     <li><a href="#/edit-profile">Edit profile</a></li>
@@ -307,9 +314,9 @@
                         <div class="col-xs-4 col-md-9">
                             <h1>Patient dashboard</h1>                            
                         </div>
-                        <div class="col-xs-8 col-md-3" style="text-align:right">
-                            <span style="color:#fff">Available balance | #3,000</span>                            
-                            <!--<ul class="notify">
+                        <div class="col-xs-8 col-md-3">
+                            <span style="color:#fff">Available balance | {{balance}}</span>                            
+                            <!--<ul class="notify"
                                 
                                 <li class="noti chat notify-icon">
                                     <i class="fa fa-commenting-o" style="font-size:24px;color:rgba(0,180,0,0.8)"></i>
@@ -663,7 +670,8 @@
                     </div>-->
                     <div class="col-lg-3 col-md-3 col-sm-4 col-xs-12" ng-controller="patientPanelController">
                         <aside id="tg-sidebar">
-                            
+                            <a href="#/help" style="color:#000;font-size:18px;padding-left: 25px;text-decoration:underline">Need help?</a>
+                        <a href="#/need-specialist" style="color:#000;font-size: 18px;padding: 20px;text-decoration:underline">Need a doctor?</a>
                             <div class="tg-widget tg-widget-accordions">
                                 <h3>My Services</h3>
                                 <ul class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
@@ -760,11 +768,10 @@
                                             </h3>
                                         </div>
                                         <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
-                                            <div class="panel-body">
-                                                {{convertToDollar('<%= userInfo.ewallet.available_amount %>')}}
-                                                <p>Avalaible amount | <strong>{{amount | currency}}</strong></p>
+                                            <div class="panel-body">                                                
                                                 <p><a href="#/wallet">Fund wallet</a></p>
-                                                <p><a href="#/wallet">View all Transactions</a></p>
+                                                <p><a href="#/transfer">Transfer fund</a></p>
+                                                <p><a href="#/transactions">View Transactions</a></p>
                                             </div>
                                         </div>
                                     </li>
@@ -1133,6 +1140,75 @@
           </div>
         </div>
      </script>
+     <script type="text/ng-template" id="selected-doc.html">
+    <div class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true" style="color:red;font-size: 32px">&times;</button>
+            </div>                                     
+          </div>
+          <div class="row">
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <div class="modal-body">
+                    <h6 style="text-align:center">{{message}}</h6>                      
+                    <div style="padding: 30px;" class="clearfix" ng-if="isViewDoc">
+                        <div class="col-sm-12 col-md-3 col-lg-3 pull-right" style="padding-right: 0px;">
+                            <div class="tg-widget tg-widget-doctor">
+                                <figure class="tg-docprofile-img">
+                                    <figcaption>
+                                    <span>online</span>                                                    
+                                    </figcaption>
+                                    <span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
+                                    <img alt="image description" ng-src="{{docInfo.profile_pic_url}}">                                  
+                                </figure>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-9 col-lg-9">
+                            <h4 style="text-align:center">Dr. {{docInfo.firstname}} {{docInfo.lastname}}</h4>
+                             <h6 style="border-bottom: 1px solid rgba(0,0,0,0.3);  text-align:center">{{docInfo.specialty}}</h6>
+                            <hr/>
+                            <h6>Address: <span style="font-weight: 200; color:black">{{docInfo.work_place}}</span> | <span style="font-style:italic; color:black;font-size:12px">{{docInfo.address}}</span></h6>
+                            <h6>Availability: <span style="color:rgba(0,0,0,0.7); font-size: 12px">avalible at this time<span></h6>
+                            <h6>Experience: <span style="color:black">{{docInfo.experience + " years"}}</span></h6>
+                            <h6>Office hours</h6>       
+                            <ul>        
+                                <li ng-repeat = "i in docInfo.office_hour "><span>{{i.day}}</span>, <span>from {{i.from}}</span> <span>to {{i.to}}</span></li> 
+                            </ul>
+                            <p style="margin-top: 10px"><a ng-href= "{{docInfo.profile_url}}" style="color:rgba(0,0,0,0.6)">view doctors detail</a></p>
+                            <div class="in-patient-com" style="text-align:center">
+                                <article>You can &nbsp; <strong>CHAT</strong>&nbsp; <strong>MAKE VIDEO CALL 
+                                </strong>&nbsp; <strong>MAKE AUDIO CALL</strong> &nbsp;or &nbsp;<strong>SHARE FILES</strong> with  Dr. {{docInfo.firstname}} {{docInfo.lastname}} if Your request is granted by the doctor. 
+                                </article>
+                                <button ng-click="request()">SEND CONSULTATION REQUEST</button>     
+                                                
+                            </div>      
+                        </div>    
+                    </div>
+
+                    <div ng-if="isToConfirm" >
+                        <h6 style="text-align: center">You want to send Consultation request 
+                        <span style="display:block;margin-top: 20px">To</span> 
+                        </h6>                                                                              
+                        <form class="tg-form-modal tg-form-signin" style="text-align: center">                        
+                        <fieldset>
+                        <img ng-src="{{docInfo.profile_pic_url}}" style="width:150px; height:150px;margin-bottom: 20px;margin-top:-10px"/>
+                        <h6>Dr. {{docInfo.firstname}} {{docInfo.lastname}}</h6>
+                        <span style="display:block;margin-top: -10px; margin-bottom:20px">{{docInfo.specialty}}</span>
+                        <p>Note: consultation fees will apply if your request is granted. </p>                                 
+                        <button class="tg-btn tg-btn-lg" ng-click="sendRequest()">Continue</button>
+                        </fieldset>
+                        </form>
+                    </div>
+                </div> 
+            </div>
+          </div>         
+        </div>
+      </div>
+    </div>
+    </script>
     <!--************************************
         Sign In Sign Up Light Box End
     *************************************-->
@@ -1151,6 +1227,14 @@
         <script src="/assets/js/map/markerclusterer.min.js"></script>
         <script src="/assets/js/countdown.js"></script>
         <script src="/assets/js/jquery.nicescroll.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $("#drp-of-msg").niceScroll({cursorcolor:"#ccc",cursorwidth:"5px"});
+                $(".view-animate-container").niceScroll({cursorcolor:"#ccc",cursorwidth:"10px"});
+                
+            })
+        </script>
+        <script src="/assets/js/main.js"></script>
         <script src="/assets/js/parallax.js"></script>
         <script src="/assets/js/owl.carousel.js"></script>
         <script src="/assets/js/prettyPhoto.js"></script>
@@ -1159,18 +1243,13 @@
         <script src="/assets/js/map/map.js"></script>
         <script src="/assets/js/angularAnimate.js"></script>
         <script src="/assets/js/modalService.js"></script>
-        <script src="/assets/js/main.js"></script>
         <script src="/assets/js/angular-touch.min.js"></script>
         <script src="/assets/js/angular-carousel.js"></script>
         <script src="/assets/js/moment.min.js"></script>
         <script src="/assets/js/angular-moment.min.js"></script>
-       <script src="/assets/js/ui-bootstrap-tpls.js"></script>
-       <script src="/assets/js/angular-clipboard.js"></script> 
-          
-        
-        
-
-
+        <script src="/assets/js/ui-bootstrap-tpls.js"></script>
+        <script src="/assets/js/angular-clipboard.js"></script>
+        <script src="/assets/js/ngresource.js"></script>
    <!--<script src="http://angular-ui.github.com/bootstrap/ui-bootstrap-tpls-0.2.0.js"></script>-->
 
        <!--<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">-->

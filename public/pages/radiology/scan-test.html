@@ -1,4 +1,16 @@
 <div class="col-sm-12 col-md-12 col-lg-12">
+	<div class="row">
+		<div class="col-sm-12 col-md-3 col-lg-3">
+		</div>
+		<div class="col-sm-12 col-md-9 col-lg-9">
+			<ul class="prescription-options">			
+				<li ng-click="recent()" ng-class="{highlight: isRecent === true}">most recent</li>
+				<li ng-click="three()" ng-class="{highlight: isThree === true}">last three months</li>
+				<li ng-click="six()" ng-class="{highlight: isSix === true}">last six months</li>
+				<li ng-click="all()" ng-class="{highlight: isAll === true}">all</li>
+			</ul>
+		</div>
+	</div>
 	<section ng-repeat="test in labTest">
 		<div class="row">
 			<div class="col-sm-12 col-lg-3 col-md-3 pull-right">

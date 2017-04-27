@@ -36,7 +36,7 @@
             <!--************************************
                             Header Start
             *************************************-->
-            <header id="header" class="tg-haslayout">
+            <!--<header id="header" class="tg-haslayout">
                 <div  class="navbar-header top-navbar">
                     <div style="width: 70%; padding-right: 30px;display:inline-block">
                         <span data-toggle="modal" data-target=".tg-user-modal" title="login/signup" ng-if="!checkLogIn">Log in / Sign up</span>
@@ -82,7 +82,7 @@
                                                 <li><a href="/topview/laboratories">Laboratory Centers</a></li>
                                                 <li><a href="/topview/radiology">Radiology Centers</a></li>
                                                 <li><a href="/topview/fitness">fitness Centers</a></li>                                                                           
-                                                <!--<li><a href="doctor-detail2.html">Doctor Detail 2</a></li>-->
+                                                
                                             </ul>
                                         </li>
                                         <li>
@@ -110,6 +110,139 @@
                                         </li>
                                     </ul>
                                 </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </header>-->
+            <header id="header" class="tg-haslayout" ng-controller="docNotificationController">
+                <div  class="navbar-header top-navbar-dashboard" ng-controller="topHeaderController">
+                    <div style="width: 77%;margin: 0 auto;padding: 0px 5px">
+                        <div style="width: 20%;display:inline-block">                        
+                            <i class="fa fa-bars" aria-hidden="true" style="color:#fff;font-size:23px;font-weight:100; cursor:pointer" title="Menu" ng-click="isClicked()"></i>
+                        </div>
+                       <ul class="menu-list" ng-class="{'drp-list': drop}">
+                            <li><a href="/user/find-specialist">Find A Doctor</a></li>
+                            <li><a href="/user/find-drug">Find Drug</a></li>
+                            <li><a href="/user/find-scan-test">Find Scan</a></li>
+                            <li><a href="/user/find-lab-test">Find Test</a></li>
+                            <li><a href="#/help">Get help</a></li>                        
+                        </ul>
+                        <div style="width:78%; text-align:right;display:inline-block">
+                            <div style="display:inline-block;padding: 5px 25px">
+                                 <i class="fa fa-bell-o" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click="showNote()"><span style="display:inline-block;width:14px;height:14px;left: 12px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= person.doctor_notification.length %> > 0 " ng-cloak>{{getLen(<%= person.doctor_notification.length %>)}}</span></i>
+                                 <ul class="all-notify" ng-class="{'noti-drp': isView}">
+                                        <li> <h6 style="text-align: center">Notification(s)</h6> </li>
+                                        {{getPatientId(<%= person.user_id %>, <%= person.firstname %>, <%= person.lastname %>)}}
+                                        
+                                        <li ng-repeat = "note in allNote" style="text-align: left">
+                                            <img ng-src="{{note.doctor_profile_pic_url}}" style="width: 32px; height: 32px">
+                                            <div>
+                                                <em>{{note.message}}</em>
+                                                <em style="font-size:10px;display:block;text-align:right">{{note.date | date: "mediumDate"}} {{note.date | date : "mediumTime"}}</em>
+                                                
+                                            </div>
+                                            
+                                        <li>
+                                    </ul>
+                            </div>
+                            <div style="display:inline-block;padding: 0px 25px">
+                                <i class="fa fa-envelope-o" aria-hidden="true" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click="showMsg()">
+                                <span style="display:inline-block;width:14px;height:14px;left: 14px; top:-18px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= person.patient_mail.length %> > 0 " ng-cloak> {{msgLen}}</span></i>
+
+                                <ul class="all-notify" ng-class="{'msg-drp': isViewMsg}">
+                                    <li> <h6 style="text-align: center">Message(s)</h6> </li>
+                                    <li ng-repeat = "msg in allMsg" class="msg-drp-list" ng-click= "viewMessage(msg.doctor_id)">                                        
+                                        <img ng-src = "{{msg.doctor_profile_pic_url}}" style="width: 32px; height: 32px">
+                                        <div>                   
+                                            <span>{{msg.title}} {{msg.doctor_firstname}} {{msg.doctor_lastname}}</span>                      
+                                            <em>{{msg.message}}</em>
+                                        <div>                                        
+                                    </li>
+                                    <% for(var i = person.patient_mail.length -1; i >= 0; i--) { %>                                                          
+                                        <div>{{getData("<%= person.patient_mail[i].doctor_firstname%>","<%= person.patient_mail[i].doctor_lastname %>","<%= person.patient_mail[i].date %>","<%= person.patient_mail[i].doctor_profile_pic_url %>","<%= person.patient_mail[i].consultation_fee %>","<%= person.firstname %>","<%= person.ewallet.available_amount %>","<%= person.patient_mail[i].doctor_id %>","<%= person.patient_mail[i].service_access %>","<%= person.patient_mail[i].doctor_specialty %>","<%= person.patient_mail[i].message %>")}}
+                                        </div>                                                
+                                            
+                                    <% } %>
+                                </ul>
+                            </div>
+                            <div style="display:inline-block;padding: 0px 45px">
+                                <i class="fa fa-calendar" aria-hidden="true" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click = "showApp()"><span style="display:inline-block;width:14px;height:14px;left: 14px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= person.appointment.length %> > 0 " ng-cloak>{{appLen}}</span></i>
+                                <ul class="all-notify" ng-class="{'msg-drp': isViewApp}">
+                                    <li> <h6 style="text-align: center">Appointment(s)</h6> </li>
+                                    <li ng-repeat = "app in allApp" class="msg-drp-list" ng-click= "viewAppointment(app.session_id)">                                       
+                                        <img ng-src = "{{app.profilePic}}" style="width: 32px; height: 32px">
+                                        <div>                   
+                                            <span>{{app.title}} {{app.firstname}} {{app.lastname}}</span>                      
+                                            <em>Hi, you have an appointment with me.</em>
+                                        <div>                                        
+                                    </li>                                                         
+                                </ul>
+                            </div>
+                            <div style="display:inline-block;padding: 0px 4px">
+                                
+                            </div>
+                            <div style="display:inline-block;padding: 0px 4px">
+                                
+                            </div>
+                            <div class="profile-drp">                            
+                                <img src="<%= person.profile_pic_url %>" style="width: 38px; height: 38px; border-left: 1px solid grey;border-bottom: 1px solid grey;border-top: 1px solid grey;box-shadow:0px 2px 4px grey;cursor:pointer">
+                                <strong style="color:#fff;font-weight: 500;padding: 5px"><%= person.firstname %> !</strong>
+                                <ul>
+                                    <li><a href="#/edit-picture"> Change profile picture </a></li>
+                                    <li><a href="#/edit-profile">Edit profile</a></li>
+                                    <li ng-click="logout()">Logout</li>
+                                </ul>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>            
+                <div class="container">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <strong class="logo">
+                                <a href="/"><img src="/assets/images/logo.png" alt="image description"></a>
+                            </strong>
+                            <nav id="tg-nav" class="tg-nav">
+                                <div class="navbar-header">
+                                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#tg-navigation" aria-expanded="false">
+                                        <span class="sr-only">Toggle navigation</span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                        <span class="icon-bar"></span>
+                                    </button>
+                                </div>
+                                <div class="collapse navbar-collapse top-nav" id="tg-navigation">
+                                    <ul>
+                                        <li>
+                                            <a href="/home">Home</a>                                           
+                                        </li>
+                                        <li><a href="/how-it-works">How it works</a></li>
+                                        <li>
+                                            <a href="#">Top Ranking</a>
+                                            <ul> 
+                                                <li><a href="/topview/doctors">Doctors</a></li>                                                     
+                                                <li><a href="/topview/hospitals">Hospitals</a></li>
+                                                <li><a href="/topview/clinics">Clinics</a></li>
+                                                <li><a href="/topview/pharmacy">Pharmacy</a></li>
+                                                <li><a href="/topview/laboratories">Laboratory Centers</a></li>
+                                                <li><a href="/topview/radiology">Radiology Centers</a></li>
+                                                <li><a href="/topview/fitness">fitness Centers</a></li>                                                                           
+                                                <!--<li><a href="doctor-detail2.html">Doctor Detail 2</a></li>-->
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <a href="#">Blog</a>
+                                            
+                                        </li>
+                                        <li><a href="packages.html">packages</a></li>
+                                        <li><a href="contactus.html">Contact</a></li>                                        
+                                        <!--<li>                                            
+                                            <a href="#" data-toggle="modal" data-target=".tg-user-modal" title="login/signup"><i class="fa fa-user-plus"></i></a>
+                                            <span><a href="#" data-toggle="modal" data-target=".tg-user-modal">login/signup</a></span>
+                                        </li>-->                                                                                                                
+                                    </ul>
+                                </div>                                
                             </nav>
                         </div>
                     </div>
@@ -1174,7 +1307,8 @@
         <script src="/assets/js/angular-moment.min.js"></script>
         <script src="/assets/js/angucomplete-alt.min.js"></script> 
         <script src="/assets/js/ui-bootstrap-tpls.js"></script>
-        <script src="/assets/js/angular-clipboard.js"></script>       
+        <script src="/assets/js/angular-clipboard.js"></script>
+        <script src="/assets/js/ngresource.js"></script>       
              
         
 
