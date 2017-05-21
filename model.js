@@ -33,15 +33,16 @@ var myModel = function () {
 	});
 
 	var mailSchema = Schema({
-		doctor_firstname: String,
+		firstname: String,
+		message_id: Number,
 		title: String,
-		doctor_lastname: String,
+		lastname: String,
 		specialty: String,
-		doctor_id: String,
+		user_id: String,
 		date: String,
 		consultation_fee: Number,
     service_access: String,
-    doctor_profile_pic_url: String,
+    profile_pic_url: String,
 		message: String,
 		category: String,//note categories are admin, decline, redirect,need_doctor.
 		reason: String,
@@ -93,7 +94,7 @@ var myModel = function () {
 	var prescriptionSchema = Schema({
 		prescriptionId: Number,
 		provisional_diagnosis: String,
-		date: Date,
+		date: String,
 		doctor_experience: Number,	
 		doctor_firstname: String,
 		doctor_lastname: String,
@@ -113,7 +114,7 @@ var myModel = function () {
 		patient_lastname: String,
 		patient_address: String,
 		patient_gender: String,
-		patient_age: Number,
+		patient_age: String,
 		patient_city: String,
 		patient_country: String,
 		prescription_body: [prescriptionBodySchema],
@@ -122,7 +123,7 @@ var myModel = function () {
 	});
 
 	var transactionSchema = Schema({
-		date: Number,
+		date: String,
 		source: String,
 		message: String,
 		activity: String,		
@@ -166,24 +167,21 @@ var myModel = function () {
 	});
 
 	var patient_noteSchema = Schema({
-		doctor_id: String,
-		doctor_firstname: String,
-		doctor_lastname: String,
-		date: Date,
-		consultation_fee: Number,
-		service_access: Boolean,
-		doctor_profile_pic_url: String,
-		doctor_specialty: String,
+		date: String,
+		note_id: Number,
+		ref_id: Number,
+		session_id: Number,
+		type: String,
 		message: String
 	});
 
 	var doc_briefSchema = Schema({
 		doctor_id: String,
-		date_of_acceptance: Date,
+		date_of_acceptance: String,
 		doctor_firstname: String,
 		doctor_lastname: String,
 		doctor_profile_pic_url: String,
-		service_access: String,
+		service_access: Boolean,
 		doctor_specialty: String,
 		work_place: String,
 		office_hour:[periodSchema],
@@ -330,7 +328,8 @@ var myModel = function () {
 		radiology_test_results: [testResultSchema],
 		ecg_test_result: [testResultSchema],
 		others: [testResultSchema],
-		final_diagnosis: String
+		final_diagnosis: String,
+		files: Array
 	});
 
 	var sessionSchema = Schema({
@@ -429,7 +428,13 @@ var myModel = function () {
 		doctor_patient_session: [sessionSchema],
 		doctor_prescriptionRequest: [requestSchema],
 		emergency_ref_url: String,
-		patient_mail: [mailSchema]		
+		patient_mail: [mailSchema],
+		presence: Boolean,
+		set_presence:{
+			general: Boolean,
+			particular: Array // sets the presence of the user and controls who sends messages to the user.
+		},
+		watch_list: Array		
 	},{
 		collections: "userinfos"
 	})
@@ -441,6 +446,7 @@ var myModel = function () {
 		description: String,
 		sent_date: String,
 		symptoms: Array,
+		introductory: String,
 		patient_id: String,
 		complaint_id: String,
 		age: String,
@@ -453,6 +459,10 @@ var myModel = function () {
 		collections: "helpinfos"
 	});
 
+	var DocRequestSchema = Schema({
+
+	})
+
 	var pinSchema = Schema({
 		voucher: Array,
 		voucher_two: Array,
@@ -462,7 +472,29 @@ var myModel = function () {
 		collections: "pininfo"
 	});
 
+	var inConversationSchema = Schema({
+		ongoing_conversation: Array
+	},{
+		collections:"callinfo"
+	});
 
+	var chatSchema = Schema({
+		chat_id: String,
+		type: String,
+		messages: Array,
+		date_created: String
+	},{
+		collections: "chatinfos"
+	});
+
+	/*var callRequestSchema = Schema({
+		message_id: String,
+		type: String,
+		request: Array,
+		date: String
+	},{
+		collections: "requestinfos"
+	});*/
 
 	//models
 	var models = {};
@@ -472,6 +504,9 @@ var myModel = function () {
 	models.services = mongoose.model("centerservices",serviceSchema);
 	models.help = mongoose.model("helpinfos",helpSchema);
 	models.pins = mongoose.model("pininfo",pinSchema);
+	models.communication = mongoose.model("callinfo",inConversationSchema);
+	models.chats = mongoose.model("chatinfos",chatSchema);
+	//models.requests = mongoose.model("requestinfos",chatSchema);
 	/*models.award = mongoose.model('awardinfo', AwardSchema);
 	models.education = mongoose.model('educationinfo', EducationSchema);
 	models.prescribtion = mongoose.model("prescribtioninfo", prescribtionSchema);

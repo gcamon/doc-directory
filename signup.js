@@ -23,7 +23,7 @@ var signupRoute = function(model,sms) {
 				if(user){
 					return done(null, false, req.flash('signupMessage', 'That email has already been use please find another one'));	
 				} else {
-					if(req.body.agree === true) {				
+					if(req.body.agree === true) {			
 						
 						var uid = genId(req.body.email);
 						var referrral_link = "/referral/" + uid + "/signup";											
@@ -55,10 +55,14 @@ var signupRoute = function(model,sms) {
 						ref_link: referrral_link					
 						});
 
+						if(req.body.typeOfUser === "Doctor"){
+							User.name = "Dr " + req.body.firstname + " " + req.body.lastname.slice(0,1).toUpperCase();
+						}
+
 						User.ewallet = {
 							available_amount: 0,
 							firstname: req.body.firstname,
-	             lastname: req.body.lastname,
+	            lastname: req.body.lastname,
 						}
 
 
@@ -213,7 +217,7 @@ var signupRoute = function(model,sms) {
 		}
 		
 		function tellDoctor(patientObj) {
-			model.user.findOne({email: req.user.email},{doctor_patients_list:1}).exec(function(err,data){
+			model.user.findOne({user_id: req.user.user_id},{doctor_patients_list:1}).exec(function(err,data){
 				if(err) throw err;
 				data.doctor_patients_list.unshift(patientObj);
 				data.save(function(err,info){
@@ -224,7 +228,7 @@ var signupRoute = function(model,sms) {
 		}
 
 		function tellCenter(patientObj) {
-			model.user.findOne({email: req.user.email},{referral:1}).exec(function(err,result){
+			model.user.findOne({user_id: req.user.user_id},{referral:1}).exec(function(err,result){
 				if(err) throw err;
 				try{
 				var centerObj = {

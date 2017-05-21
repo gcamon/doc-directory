@@ -42,13 +42,20 @@ var loginRoute = function(model) {
     }));
 
 router.post('/user/login', passport.authenticate('login', {
-        successRedirect : '/login', // redirect to the secure profile section
-        failureRedirect : '/failed', // redirect back to the signup page if there is an error
-        failureFlash : true // allow flash messages
+  successRedirect : '/login', // redirect to the secure profile section
+  failureRedirect : '/failed', // redirect back to the signup page if there is an error
+  failureFlash : true // allow flash messages
 }));
 
 router.get('/login',function(req,res){
-        if(req.user){              
+        if(req.user){ 
+         model.user.findOne({user_id: req.user.user_id},{presence:1,set_presence:1}).exec(function(err,data){
+          data.presence = true;
+          data.set_presence.general = true;
+          data.save(function(err,info){
+            console.log("presence is true;")
+          })
+         })           
          res.json({
                 isLoggedIn: true,
                 typeOfUser: req.user.type,
@@ -58,7 +65,8 @@ router.get('/login',function(req,res){
                 email: req.user.email,
                 title: req.user.title,
                 user_id: req.user.user_id,
-                balance: req.user.ewallet.available_amount
+                balance: req.user.ewallet.available_amount,
+                profile_pic_url: req.user.profile_pic_url
             });
         } else {
         res.sendFile(path.join(__dirname + "/404.html"));

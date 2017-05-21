@@ -1,14 +1,15 @@
 "use strict";
 
 var express = require('express'),
-    mongoose = require('mongoose'),
-    https = require('https'),
+    mongoose = require('mongoose'),    
     db = require('./model'),
     config = require('./config'),    
     route = require('./route'),
     signupRoute = require('./signup'),
     loginRoute = require('./login'),  
     app = express(),
+    http = require('http').Server(app),
+    io = require('socket.io')(http),
     model = db(),
     payments = require("./finance"),
     Nexmo = require("nexmo"),    
@@ -17,66 +18,31 @@ var express = require('express'),
  			apiSecret: process.env.NEXMO_API_SECRET
     }), 
     placement = require("./placement"),
+    mySocket = require("./socket"),
     port = process.env.PORT || 9000;
 
 
-app.listen(port);
+
+//var ExpressPeerServer = require('peer').ExpressPeerServer;
+http.listen(port,function(){
+    console.log('listening on *:9000')
+});
+//var options = { debug: true}
+
+//app.use('/peer', ExpressPeerServer(server, options));
+
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://127.0.0.1:27017/medicalmull");
 config.configuration(app,model);
-route(model);
+route(model,sms);
+mySocket(model,io)
 signupRoute(model,sms);
 loginRoute(model);
 payments(model,sms);
 placement(model,sms);
 
-var a = ["a","b","c","d"];
-var b = a.slice(0,3)
-console.log(b)
-/**var now = new Date();
-var oneYr = new Date();
-oneYr.setYear(now.getFullYear() - 1);
-var stamp = + new Date(oneYr);
-console.log(stamp);
+var a = ["a","b","c","d"]
+a.splice(0);
+console.log(a)
 
-var oneMonth = new Date();
-oneMonth.setMonth(now.getMonth() - 2);
-var stamp2 = + new Date(oneMonth)
-console.log(stamp2)**/
-
-/*var data = JSON.stringify({
- api_key: "1c9ae030",
- api_secret: "ddb306aa9194c137",
- to: '2348159074941',
- from: '2348096461927',
- text: 'Hello from Nexmo'
-});
-
-var options = {
- host: 'rest.nexmo.com',
- path: '/sms/json',
- port: 443,
- method: 'POST',
- headers: {
-   'Content-Type': 'application/json',
-   'Content-Length': Buffer.byteLength(data)
- }
-};
-
-var req = https.request(options);
-
-req.write(data);
-req.end();
-
-var responseData = '';
-req.on('response', function(res){
- res.on('data', function(chunk){
- 	console.log(data)
-   responseData += chunk;
- });
-
- res.on('end', function(){
-   console.log(responseData);
- });
-});*/
 

@@ -117,21 +117,21 @@
             </header>-->
             <header id="header" class="tg-haslayout" ng-controller="docNotificationController">
                 <div  class="navbar-header top-navbar-dashboard" ng-controller="topHeaderController">
-                    <div style="width: 77%;margin: 0 auto;padding: 0px 5px">
-                        <div style="width: 20%;display:inline-block">                        
+                    <div style="width: 77%;margin: 0 auto;padding: 0px 5px;">
+                        <div style="" class="menu-drp">                        
                             <i class="fa fa-bars" aria-hidden="true" style="color:#fff;font-size:23px;font-weight:100; cursor:pointer" title="Menu" ng-click="isClicked()"></i>
+                            <ul> <!--ng-class="{'drp-list': drop}"-->
+                                <li><a href="#/find-specialist">Find a doctor</a></li> <!-- /user/find-specialist -->                         
+                                <li><a href="#/drug">Find Drug</a></li><!--/user/find-drug -->
+                                <li><a href="#/scan-search">Find Scan</a></li><!--/user/find-scan-test-->
+                                <li class="no-bottom"><a href="#/search-test">Find Test</a></li> <!--/user/find-lab-test-->                
+                            </ul>
+                                                
                         </div>
-                       <ul class="menu-list" ng-class="{'drp-list': drop}">
-                            <li><a href="/user/find-specialist">Find A Doctor</a></li>
-                            <li><a href="/user/find-drug">Find Drug</a></li>
-                            <li><a href="/user/find-scan-test">Find Scan</a></li>
-                            <li><a href="/user/find-lab-test">Find Test</a></li>
-                            <li><a href="#/help">Get help</a></li>                        
-                        </ul>
-                        <div style="width:78%; text-align:right;display:inline-block">
-                            <div style="display:inline-block;padding: 5px 25px">
-                                 <i class="fa fa-bell-o" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click="showNote()"><span style="display:inline-block;width:14px;height:14px;left: 12px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= person.doctor_notification.length %> > 0 " ng-cloak>{{getLen(<%= person.doctor_notification.length %>)}}</span></i>
-                                 <ul class="all-notify" ng-class="{'noti-drp': isView}">
+                        <div style="width: 75%; text-align:right;display:inline-block" ng-controller = "createRoomController">
+                            <div style="display:inline-block;padding: 0px 25px">
+                                 <i class="fa fa-bell-o" style="font-size:20px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click="showNote()"><span style="display:inline-block;width:14px;height:14px;left: 12px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= person.doctor_notification.length %> > 0 " ng-cloak>{{getLen(<%= person.doctor_notification.length %>)}}</span></i>
+                                 <ul class="all-notify" id="noti-drp-list">
                                         <li> <h6 style="text-align: center">Notification(s)</h6> </li>
                                         {{getPatientId(<%= person.user_id %>, <%= person.firstname %>, <%= person.lastname %>)}}
                                         
@@ -146,30 +146,60 @@
                                         <li>
                                     </ul>
                             </div>
-                            <div style="display:inline-block;padding: 0px 25px">
-                                <i class="fa fa-envelope-o" aria-hidden="true" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click="showMsg()">
-                                <span style="display:inline-block;width:14px;height:14px;left: 14px; top:-18px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= person.patient_mail.length %> > 0 " ng-cloak> {{msgLen}}</span></i>
+                            <div class="msg-box">
+                                <i class="fa fa-envelope-o" aria-hidden="true" style="font-size:20px;color:#fff;position:relative;top:4px;cursor:pointer">
+                                <span style="display:inline-block;width:14px;height:14px;left: 14px; top:-18px;position:absolute;color:#fff;font-size:18px;border:none" ng-cloak> {{questionLen}}</span></i>
 
-                                <ul class="all-notify" ng-class="{'msg-drp': isViewMsg}">
+                                <ul class="all-notify  msg-drp drp-of-msg">
                                     <li> <h6 style="text-align: center">Message(s)</h6> </li>
-                                    <li ng-repeat = "msg in allMsg" class="msg-drp-list" ng-click= "viewMessage(msg.doctor_id)">                                        
-                                        <img ng-src = "{{msg.doctor_profile_pic_url}}" style="width: 32px; height: 32px">
-                                        <div>                   
-                                            <span>{{msg.title}} {{msg.doctor_firstname}} {{msg.doctor_lastname}}</span>                      
-                                            <em>{{msg.message}}</em>
-                                        <div>                                        
+                                    <li ng-repeat = "msg in question" class="msg-drp-list" ng-click= "viewMessage(msg)">                                        
+                                        <img ng-src = "{{msg.sender_profile_pic_url}}" style="width: 32px; height: 32px">
+                                        <div>
+                                            <div style="padding:5px 0;font-size:12px;">{{msg.date | date : "mediumDate"}} &nbsp;&nbsp;{{msg.date | date: "shortTime"}}</div>                   
+                                            <strong style="padding-left:0px;font-size:12px;">{{msg.title}} {{msg.sender_firstname}} {{msg.sender_lastname}}</strong>                      
+                                            <em style="font-size:12px;">{{msg.message}}</em>
+                                        <div>                      
                                     </li>
-                                    <% for(var i = person.patient_mail.length -1; i >= 0; i--) { %>                                                          
-                                        <div>{{getData("<%= person.patient_mail[i].doctor_firstname%>","<%= person.patient_mail[i].doctor_lastname %>","<%= person.patient_mail[i].date %>","<%= person.patient_mail[i].doctor_profile_pic_url %>","<%= person.patient_mail[i].consultation_fee %>","<%= person.firstname %>","<%= person.ewallet.available_amount %>","<%= person.patient_mail[i].doctor_id %>","<%= person.patient_mail[i].service_access %>","<%= person.patient_mail[i].doctor_specialty %>","<%= person.patient_mail[i].message %>")}}
-                                        </div>                                                
-                                            
-                                    <% } %>
+                                    
                                 </ul>
                             </div>
-                            <div style="display:inline-block;padding: 0px 45px">
-                                <i class="fa fa-calendar" aria-hidden="true" style="font-size:24px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click = "showApp()"><span style="display:inline-block;width:14px;height:14px;left: 14px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= person.appointment.length %> > 0 " ng-cloak>{{appLen}}</span></i>
-                                <ul class="all-notify" ng-class="{'msg-drp': isViewApp}">
-                                    <li> <h6 style="text-align: center">Appointment(s)</h6> </li>
+                            <div class="msg-box">
+                                <i class="fa fa-user-plus" aria-hidden="true" style="font-size:20px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click = "showRequest()" title="Consultation requests"><span style="display:inline-block;width:14px;height:14px;left: 14px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= person.doctor_notification.length %> > 0 " ng-cloak>{{consultationLen}}</span></i>
+                                <ul class="all-notify  msg-drp drp-of-msg"  style="right: 600px">
+                                    <li> <h6 style="text-align: center">Consultation Request(s)</h6> </li>
+                                    <li ng-repeat = "patient in consultation" class="msg-drp-list" ng-click= "view(patient)">                                       
+                                        <img ng-src = "{{patient.sender_profile_pic_url}}" style="width: 32px; height: 32px">
+                                        <div>
+                                            <div style="padding:5px 0;font-size:12px;">{{patient.date | date : "mediumDate"}} &nbsp;&nbsp;{{patient.date | date: "shortTime"}}</div>                   
+                                            <strong style="padding-left:0px;font-size:12px;">{{patient.title}} {{patient.sender_firstname}} {{patient.sender_lastname}}</strong>                      
+                                            <em style="font-size:12px;">{{patient.message}}</em>
+                                        <div>        
+                                                               
+                                    </li>                                                         
+                                </ul>
+                            </div>
+                            
+                            <div class="msg-box">
+                                <i class="icon-Pills" aria-hidden="true" style="font-size:20px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click = "showApp()"><span style="display:inline-block;width:14px;height:14px;left: 14px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="isNew">{{len}}
+                                      </span></i>
+
+                                
+                                <ul class="all-notify app-drp drp-of-msg">
+                                    <li> <h6 style="text-align: center">Prescription Request(s)</h6> </li>
+                                     <li ng-repeat="request in allRequest" ng-click="viewPatient(request.sender_id)" style="cursor:pointer;border-bottom: 1px solid #000">
+                                        <img ng-src="{{request.sender_profile_pic_url}}" style="width:32px;height:32px">
+                                        <span>{{request.sender_firstname}}</span>
+                                        <span>{{request.sender_lastname}}</span>
+                                        <span><small>{{request.date_sent | date : "mediumDate"}}</small></span>
+                                        <span><small>{{request.date_sent | date : "mediumTime"}}</small></span>
+                                     </li>                               
+                                </ul>
+                            </div>
+
+                            <div class="msg-box">
+                                <i class="fa fa-calendar" aria-hidden="true" style="font-size:20px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click = "showApp()"><span style="display:inline-block;width:14px;height:14px;left: 14px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="<%= person.appointment.length %> > 0 " ng-cloak>{{appLen}}</span></i>
+                                <ul class="all-notify app-drp drp-of-msg">
+                                    <li> <h6 style="text-align: center">In-Person Appointment Request</h6> </li>
                                     <li ng-repeat = "app in allApp" class="msg-drp-list" ng-click= "viewAppointment(app.session_id)">                                       
                                         <img ng-src = "{{app.profilePic}}" style="width: 32px; height: 32px">
                                         <div>                   
@@ -179,15 +209,67 @@
                                     </li>                                                         
                                 </ul>
                             </div>
-                            <div style="display:inline-block;padding: 0px 4px">
+                    
+                                
+                            <div class="msg-box">
+                                 <i class="fa fa-phone" style="font-size:20px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click = "showApp()"><span style="display:inline-block;width:14px;height:14px;left: 14px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="audioRequestLen > 0 " ng-cloak>{{audioRequestLen}}
+                                      </span></i>
+                                
+                                <ul class="all-notify app-drp drp-of-msg">
+                                    <li> <h6 style="text-align: center">Audio Call Request(s)</h6> </li>
+                                    <li ng-repeat = "patient in audioRequest" class="msg-drp-list" >                                       
+                                        <img ng-src = "{{patient.sender_profile_pic_url}}" style="width: 32px; height: 32px">
+                                        <div>
+                                            <div style="padding:5px 0;font-size:12px;">{{patient.date | date : "mediumDate"}} &nbsp;&nbsp;{{patient.date | date: "shortTime"}}</div>                   
+                                            <strong style="padding-left:0px;font-size:12px;">{{patient.title}} {{patient.sender_firstname}} {{patient.sender_lastname}}</strong>                      
+                                            <em style="font-size:12px;">Hi doc, I want to have <strong>{{patient.type}}</strong> with you</em>
+                                            <button ng-click= "viewVideoRequest(patient.message_id)" style="font-size: 12px;margin-top: 2px;float:right;color:#fff">View</button>
+                                        <div>                                     
+                                    </li>                                                            
+                                </ul>
+                            </div>
+                                
+                            <div class="msg-box">
+                                <i class="fa fa-video-camera" style="font-size:20px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click = "showApp()"><span style="display:inline-block;width:14px;height:14px;left: 14px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="videoRequestLen > 0 " ng-cloak>{{videoRequestLen}}
+                                      </span></i>
+
+                                
+                                <ul class="all-notify app-drp drp-of-msg">
+                                    <li> <h6 style="text-align: center">Video Call Request(s)</h6> </li>
+                                    <li ng-repeat = "patient in videoRequest" class="msg-drp-list" >                                       
+                                        <img ng-src = "{{patient.sender_profile_pic_url}}" style="width: 32px; height: 32px">
+                                        <div>
+                                            <div style="padding:5px 0;font-size:12px;">{{patient.date | date : "mediumDate"}} &nbsp;&nbsp;{{patient.date | date: "shortTime"}}</div>                   
+                                            <strong style="padding-left:0px;font-size:12px;">{{patient.title}} {{patient.sender_firstname}} {{patient.sender_lastname}}</strong>                      
+                                            <em style="font-size:12px;">Hi doc, I want to have <strong>{{patient.type}}</strong> with you</em>
+                                            <button ng-click= "viewAudioRequest(patient.message_id)" style="font-size: 12px;margin-top: 2px;float:right;color:#fff">View</button>
+                                        <div>                                     
+                                    </li>                                                         
+                                </ul>
                                 
                             </div>
-                            <div style="display:inline-block;padding: 0px 4px">
+                            <div class="msg-box">
+                                <i class="fa fa-comments" style="font-size:20px;color:#fff;position:relative;top:4px;cursor:pointer" ng-click = "showApp()"><span style="display:inline-block;width:14px;height:14px;left: 14px; top:-14px;position:absolute;color:#fff;font-size:18px;border:none" ng-if="chatRequestLen > 0 " ng-cloak>{{chatRequestLen}}
+                                      </span></i>
+
                                 
+                                <ul class="all-notify app-drp drp-of-msg">
+                                    <li> <h6 style="text-align: center">Chat Request(s)</h6> </li>
+                                    <li ng-repeat = "patient in chatRequest" class="msg-drp-list" >                                       
+                                        <img ng-src = "{{patient.sender_profile_pic_url}}" style="width: 32px; height: 32px">
+                                        <div>
+                                            <div style="padding:5px 0;font-size:12px;">{{patient.date | date : "mediumDate"}} &nbsp;&nbsp;{{patient.date | date: "shortTime"}}</div>                   
+                                            <strong style="padding-left:0px;font-size:12px;">{{patient.title}} {{patient.sender_firstname}} {{patient.sender_lastname}}</strong>                      
+                                            <em style="font-size:12px;">Hi doc, I want to have <strong>{{patient.type}}</strong> with you</em>
+                                            <button ng-click= "viewChatRequest(patient.message_id)" style="font-size: 12px;margin-top: 2px;float:right;color:#fff">View</button>
+                                        <div>                                     
+                                    </li>                                                         
+                                </ul>
                             </div>
                             <div class="profile-drp">                            
                                 <img src="<%= person.profile_pic_url %>" style="width: 38px; height: 38px; border-left: 1px solid grey;border-bottom: 1px solid grey;border-top: 1px solid grey;box-shadow:0px 2px 4px grey;cursor:pointer">
-                                <strong style="color:#fff;font-weight: 500;padding: 5px"><%= person.firstname %> !</strong>
+                                <strong style="color:#fff;font-weight: 500;padding: 5px;border-right:2px solid rgba(200,220,220,0.3);border-radius: 2px"><%= person.firstname %> !</strong>
+                                <strong style="color:#fff;font-weight: 100;padding: 5px">ID <%= person.user_id %></strong>
                                 <ul>
                                     <li><a href="#/edit-picture"> Change profile picture </a></li>
                                     <li><a href="#/edit-profile">Edit profile</a></li>
@@ -255,7 +337,7 @@
 				Home Slider Start
 		*************************************-->
 		<div id="tg-innerbanner" class="tg-innerbanner tg-bglight tg-haslayout" ng-controller="searchController">
-			<div class="tg-searcharea tg-haslayout">
+			<!--<div class="tg-searcharea tg-haslayout">
 				<div class="container">
 					<div class="row">                        
 						<form class="tg-searchform">
@@ -357,7 +439,7 @@
 						</form>
 					</div>
 				</div>
-			</div>
+			</div>-->
 			<div class="tg-pagebar tg-haslayout" ng-controller="doctorBarNotificationController">
 				<div class="container">
 					<div class="row">
@@ -471,11 +553,15 @@
                                             <li ng-repeat="patient in patientList | filter : patient.firstname || patient.lastname" style="list-style-type: none; padding: 10px;border-bottom: 1px dashed rgba(0,0,0,0.2);border-radius: 20px;cursor: pointer" class="clearfix">
                                                 <div style="cursor: pointer;" ng-click="userPatient(patient.patient_id)">                                           
                                                     <img ng-src="{{patient.patient_profile_pic_url }}" style="width:32px;height:32px" alt="image description">
-                                                    <span style="font-size: 12px; padding-left: 10px"> {{patient.patient_firstname}} {{patient.patient_lastname}}</span>                                                  
+                                                    <span style="font-size: 16px;padding-left: 10px"> {{patient.patient_firstname}} {{patient.patient_lastname}}</span>
+                                                     <img src="/assets/images/icons/online.png" ng-if="patient.presence === true" style="float:right;margin-top:5px">
+                                                    <img src="/assets/images/icons/offline2.png" ng-if="patient.presence !== true" style="float:right;margin-top:5px">
+                                                    <i class="fa fa-comment" style="top:15px;display:inline-block;position:absolute;right: 45px;color:#d2ed88;text-shadow:0px 2px 1px rgba(79,98,35,0.7)" ng-if="patient.queueLen > 0"></i>
+                                                    <strong ng-if="patient.queueLen > 0" style="top:-4px;display:inline-block;position:absolute;right: 30px;font-size: 12px;color:#d16d1c;border-radius:5px;padding:1px 7px;text-align:center">{{i.queueLen}}</strong>                                                  
                                                 </div>
                                                 <div>
                                                 </div>
-                                            </li>
+                                            </li>                                            
                                           
                                     </ul>
                                 </div>
@@ -657,14 +743,14 @@
 					<div class="col-lg-3 col-md-3 col-sm-4 col-xs-12">
 						<aside id="tg-sidebar">
 							<div class="tg-widget tg-widget-doctor">
-								<figure class="tg-docprofile-img">
+								<!--<figure class="tg-docprofile-img">
 									<figcaption>
 										<h4>Dr.<%= person.firstname %> <%= person.lastname %></h4>
 										<span><%= person.specialty %></span>
 									</figcaption>
 									<span class="tg-featuredicon"><em class="fa fa-bolt"></em></span>
 									<a href="#"><img alt="image description" src="<%= person.profile_pic_url %>"></a>									
-								</figure>
+								</figure>-->
 							</div>
 							<div class="tg-widget tg-widget-accordions">
 								<h3> Doctor Dashboard</h3>
@@ -1286,11 +1372,20 @@
         <script type="text/javascript" src="/assets/js/source.js"></script>
         <script type="text/javascript" src="/assets/js/angularclient.js"></script>
         <script type="text/javascript" src="/assets/js/ngroute.js"></script>
+        <script src="/socket.io/socket.io.js"></script>   
+        <script src="/assets/js/angular-socket-io-master/socket.min.js"></script>
         <script src="/assets/js/jquery-ui.js"></script>
         <!--<script src="http://maps.google.com/maps/api/js?sensor=false"></script>
         <script src="/assets/js/map/jquery.gomap.js"></script>-->
         <script src="/assets/js/map/markerclusterer.min.js"></script>
         <script src="/assets/js/countdown.js"></script>
+        <script src="/assets/js/jquery.nicescroll.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $(".drp-of-msg").niceScroll({cursorcolor:"#ccc",cursorwidth:"5px"});                
+                $(".view-animate-container").niceScroll({cursorcolor:"#ccc",cursorwidth:"3px"});
+            })
+        </script>
         <script src="/assets/js/jquery.nicescroll.js"></script>
         <script src="/assets/js/parallax.js"></script>
         <script src="/assets/js/owl.carousel.js"></script>
@@ -1352,7 +1447,7 @@
                 <p style="text-align: center">{{data.firstname}} {{data.lastname}}</p>
                 <form>
                 <span>Your consultation fee(amount) below</span><input type="number" placeholder="$ enter your consultation fee amount.*" ng-model="user.fee" required>
-                <span>Total bill to patient including service charge:</a> {{total | currency}}</span>
+                <span>Total bill to patient including service charge:</a> {{total}}</span>
                 <span style="font-size: 12px; color: rgba(0,0,0,0.7);display:block;padding:5px 0px"> Note: total bill is what the patient will see <a href="#" style="color: rgba(0,200,0,0.6)">learn more</a></span>
                 <button class="tg-btn tg-btn-lg" ng-click="sendAcceptance()">Continue</button>
                 </form>

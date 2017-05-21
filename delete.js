@@ -28,6 +28,7 @@ Delete.prototype.DeleteByUserId = function(model,projection) {
 
 Delete.prototype.DeleteByRefId = function(model,projection) {
 	
+	
 }
 
 Delete.prototype.DeleteBySessionId = function(model,projection) {
@@ -61,7 +62,24 @@ Delete.prototype.DeleteAll = function(model,projection) {
 				key = i;
 			}
 		}			
-		data[key] = [];
+		data[key].splice(0);
+
+		data.save(function(err,info){
+			if(err) throw err;
+		});
+	});
+}
+
+Delete.prototype.deleteAllChat = function(model,projection){
+	model.chats.findOne({chat_id:this.item},projection).exec(function(err,data){
+		if(err) throw err;
+		var key;	
+		for(var i in projection)	{
+			if(projection.hasOwnProperty(i)){
+				key = i;
+			}
+		}		
+		data[key].splice(0);
 
 		data.save(function(err,info){
 			if(err) throw err;

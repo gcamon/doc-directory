@@ -13,7 +13,27 @@ Wallet.prototype.credit = function(model,receiver,amount){
 		var self = this;
 		model.user.findOne(receiver,{ewallet:1}).exec(function(err,data){
 			if(err) throw err;
-			
+			if(self.message === "Consultation fee"){
+			  amount -= 1000;
+				model.user.findOne({admin: true},{ewallet:1}).exec(function(err,admin){
+					if(err) throw err;
+					admin.ewallet.available_amount += 1000;
+					var names = self.firstname + " " + self.lastname;
+					var transacObj = {
+						date: self.date,
+						source: names,
+						activity: "Credit",
+						message: self.message,
+						body: {
+							amount: amount,
+							beneficiary: "Admin"
+						}
+					}
+					admin.save(function(err,info){
+						console.log("admin fee paid");
+					})
+				})
+			}
 			data.ewallet.available_amount += amount;			
 			var names = self.firstname + " " + self.lastname;
 			var transacObj = {
@@ -40,7 +60,7 @@ Wallet.prototype.credit = function(model,receiver,amount){
 Wallet.prototype.debit = function(model,amount,debitor){
 	//debit the user of the service
 	debitor.ewallet.available_amount -= amount;
-	var names = this.beneficiary || this.firstname + " " + this.lastname;
+	var names = this.beneficiary || this.firstname + " " + this.lastname;	
 	var transacObj = {
 		date: this.date,
 		source: names,	
@@ -53,6 +73,8 @@ Wallet.prototype.debit = function(model,amount,debitor){
 
 	if(this.message === "Fund transfer"){
 		transacObj.activity = "Transfer";
+		transacObj.source = "You";		
+	} else if(this.message === "Consultation fee"){
 		transacObj.source = "You";
 	} else {
 		transacObj.activity = "Debit";
@@ -75,12 +97,25 @@ Wallet.prototype.payment = function(model,amount,debitor,reciever_id){
 	
 }
 
-Wallet.prototype.transfer = function(model,amount,debitor,reciever,person){
+Wallet.prototype.consultation = function(model,amount,debitor,reciever_id){
+	var creditor = {user_id: reciever_id};
+	//credit the render of the service;
+	this.credit(model,creditor,amount);
+	var self = this;
+	model.user.findOne({user_id: reciever_id},{firstname:1,lastname:1,name:1},function(err,person){
+		if(err) throw err;
+		self.beneficiary =  person.name || person.firstname + " " + person.lastname;
+		//debit the user of the service
+		self.debit(model,amount,debitor);
+	});	
 	
+}
+
+
+Wallet.prototype.transfer = function(model,amount,debitor,reciever,person){	
 		this.credit(model,reciever,amount);
 		this.beneficiary = person.firstname + " " + person.lastname || person.name;
-		this.debit(model,amount,debitor);
-	
+		this.debit(model,amount,debitor);	
 }
 
 Wallet.prototype.withdraw = function(amount,wallet){
