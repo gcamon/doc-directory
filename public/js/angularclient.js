@@ -357,7 +357,7 @@ app.config(function($routeProvider){
   
  .when("/patient/selected-doctor",{
   templateUrl: "/assets/pages/patient/selected-doctor.html",
-  controller: "selectedDoctorToSendTestController"
+  controller: 'selectedDoctorToSendTestController'
  })
 
  /**for emergency profile user **/
@@ -635,6 +635,8 @@ app.service('templateService',[function(){
     var audio = new Audio(trackurl);
     audio.play();
   }
+
+  this.holdBriefForSpecificPatient;
 
   
 }]);
@@ -1102,7 +1104,7 @@ app.controller("pharmacyDrugNotHaveBycenterController",["$scope","$http",functio
 
 
 app.controller('loginController',["$scope","$http","$location","$window","ModalService","templateService","localManager",
-  "$rootScope",function($scope,$http,$location,$window,ModalService,templateService,localManager,$rootScope) {
+  "$rootScope","mySocket",function($scope,$http,$location,$window,ModalService,templateService,localManager,$rootScope,mySocket) {
   $scope.login = {};
   $scope.error = "";
   
@@ -1122,9 +1124,11 @@ app.controller('loginController',["$scope","$http","$location","$window","ModalS
              //user joins a room in socket.io and intantiayes his own socket
             switch(data.typeOfUser) {
               case "Patient":
+                createAwareness(data)
                 $window.location.href = '/patient/dashboard';  
               break;
               case "Doctor":
+                createAwareness(data)
                $window.location.href = '/doctor/dashboard';   
               break;
               case "Pharmacy":
@@ -1145,8 +1149,24 @@ app.controller('loginController',["$scope","$http","$location","$window","ModalS
           } else {       
             $scope.error = "Email or Password incorrect!";            
           }
-        });	                                 //multiData.sendData(uploadUrl,$scope.logInfo);
+          
+        });
+    //multiData.sendData(uploadUrl,$scope.logInfo);
 	}
+
+  //this updates the current availability of user in real time.
+  function createAwareness(data) {
+    mySocket.emit("set presence",{status:"online",userId:data.user_id},function(response){
+      if(response.status === true){
+        if(data.typeOfUser === "Doctor"){
+          mySocket.emit("doctor connect",{userId:data.user_id});
+        } else if(data.typeOfUser === "Patient") {
+          mySocket.emit("patient connect",data);
+        }
+      }
+    });                                  
+    
+  }
 
   $scope.close = function(result) {
     close(result,500);
@@ -1770,8 +1790,6 @@ app.controller("bookingDocModalController",["$scope","templateService","$http",f
   $scope.docInfo = templateService.holdForSpecificDoc;
   $scope.isViewDoc = true;
 
-  console.log(templateService.holdForSpecificDoc)
-
   $scope.request = function() {
     $scope.isViewDoc = false;
     $scope.isToConfirm = true;
@@ -1791,10 +1809,15 @@ app.controller("bookingDocModalController",["$scope","templateService","$http",f
             data : $scope.patient,
             headers : {'Content-Type': 'application/json'} 
             })
-          .success(function(data) {
-            console.log(data)
-              if(data)              
-               $scope.message = "Your consultation request has been sent!";
+          .success(function(data) {            
+              if(data.status) {             
+                $scope.message = "Your consultation request has been sent!";
+                 mySocket.emit("i sent consultation",{doctorId:$scope.docInfo.user_id},function(response){
+                  if(response.error){
+                    alert(response.error);
+                  }
+                });
+              }
               $scope.isViewDoc = false;
               $scope.isToConfirm = false;
                //use settime out to clear the textfieeld and the response message
@@ -1836,14 +1859,14 @@ app.controller("inDoctorDashboardController",["$scope","$location","$http","loca
   function($scope,$location,$http,localManager,templateService,ModalService,$rootScope){
     //remember that templateservice.getid is used in another controller in case you wish to modify this block to use ajax to fetch data when
     //doctor's dashboard page loads.
-    $scope.getName = function(firstname,lastname,id,pic,specialty){
+    /*$scope.getName = function(firstname,lastname,id,pic,specialty){
       templateService.getfirstname = firstname;
       templateService.getlastname = lastname;
       templateService.getid = id;
       templateService.getpic = pic;
       templateService.getspecialty = specialty;
       setId(id,firstname,lastname);
-    }
+    }*/
 
     function setId(id,firstname,lastname){
       var comObj = {
@@ -1854,51 +1877,31 @@ app.controller("inDoctorDashboardController",["$scope","$location","$http","loca
 
       templateService.holdDoctorIdForCommunication = comObj;
     }
-      
+   
+    
     $location.path(localManager.getValue("currentPage") || "/welcome");
-
     //highlits modal to fill in new patient basic information.
-    $scope.newPatient = function(){
-      ModalService.showModal({
-            templateUrl: 'patient-emergency-form.html',
-            controller: "newPatientModalController"
-        }).then(function(modal) {
-            modal.element.modal();
-            modal.close.then(function(result) {
-               
-        });
-      });
-   }
-
-   $http({
-      method  : 'GET',
-      url     : "/doctor/my-patients",
-      headers : {'Content-Type': 'application/json'} 
-      })
-    .success(function(data) {  
-      console.log(data)            
-      templateService.holdDocPatientList = data.doctor_patients_list;
-      $rootScope.patientList = templateService.holdDocPatientList;
-    });
-
     
 
 }]);
 
 //sends a request to get all notifications for the logged in doctor and also filters the result.
-app.controller("docNotificationController",["$scope","$location","$resource","$interval","localManager","templateService","requestManager",
-  function($scope,$location,$resource,$interval,localManager,templateService,requestManager){
+app.controller("docNotificationController",["$scope","$location","$resource","$interval","localManager","templateService",
+  "requestManager","mySocket","$rootScope","$timeout","ModalService",
+  function($scope,$location,$resource,$interval,localManager,templateService,requestManager,mySocket,$rootScope,$timeout,ModalService){
     var getPerson = localManager.getValue("resolveUser");
-
+    localManager.removeItem("callOptionMany");// removes call many if any was set before call page was redirected to
     var getRequestInTime = $resource("/doctor/:userId/get-all-request",{userId:getPerson.user_id});
     
     var random;
+    //sets array to hold requests from patients temporarily.
+    //but clears when doctor logs out.
     
-
     var getRequest = function() {
       var filterList = [];
       var filter = {};
       var filter2 = {};
+
 
      var requests =  getRequestInTime.get(null,function(data){
 
@@ -1912,18 +1915,23 @@ app.controller("docNotificationController",["$scope","$location","$resource","$i
         }
 
         $scope.name = templateService.getfirstname;
-        $scope.total = data.doctor_notification.length;
-        $scope.question = filter.question;
+        $scope.total = data.doctor_notification.length;        
         $scope.consultation = filter.consultation;
-        $scope.inPersonRequest = filter["Meet In-Person"];
-        $scope.videoRequest = filter["Video Call"];
-        $scope.audioRequest = filter["Audio Call"];
-        $scope.chatRequest = filter["Live Chat"];        
+
+        $rootScope.videoRequest = (!localManager.getValue("videoCallerList")) ? localManager.getValue("videoCallerList") : null;
+        $rootScope.audioRequest = (!localManager.getValue("audioCallerList")) ? localManager.getValue("audioCallerList") : null;
+        $scope.inPersonRequest = (!localManager.getValue("meetInPersonList")) ? localManager.getValue("meetInPersonList") : null;
+        
+        //$scope.inPersonRequest = filter["Meet In-Person"];
+        //$scope.videoRequest = filter["Video Call"];
+        //$scope.audioRequest = filter["Audio Call"];
+        //$scope.chatRequest = filter["Live Chat"]; 
+        //$scope.question = filter.question;       
 
         if(filter.hasOwnProperty("consultation"))
           $scope.consultationLen = filter.consultation.length;
 
-        if(filter.hasOwnProperty("question"))
+        /*if(filter.hasOwnProperty("question"))
           $scope.questionLen = filter.question.length;
         
         if(filter.hasOwnProperty("Video Call"))         
@@ -1936,7 +1944,7 @@ app.controller("docNotificationController",["$scope","$location","$resource","$i
           $scope.audioRequestLen = filter["Audio Call"].length;
 
         if(filter.hasOwnProperty("Live Chat"))
-          $scope.chatRequestLen = filter["Live Chat"].length;
+          $scope.chatRequestLen = filter["Live Chat"].length;*/
 
         
 
@@ -2001,12 +2009,282 @@ app.controller("docNotificationController",["$scope","$location","$resource","$i
         
     }
 
-    if(getPerson.typeOfUser === "Doctor"){
-      $interval(getRequest, 900000);
-      getRequest()
+    
+  getRequest();
+
+/*
+Meet In-Person',docInfo)"><i class="fa fa-user"> </i> &nbsp;Meet IN-PERSON</li>            
+                <li ng-click="audioRequest('Audio Call',docInfo)"><i class="fa fa-phone"> </i> &nbsp;Audio Call Request</li>
+                <li ng-click="videoRequest('Video Call',docInfo)
+*/
+
+
+  //alerting for quest this is note save to the database. when doctor refreshes the page he loose data. 
+  //the implementation is slightly different from getting from the following
+  //1) real time updating for consultation request
+  //2) real time updating for prescription request.
+  //3) real time updatating for notification request.
+ 
+  var video = [];
+  var audio = [];
+  var meeting = [];
+
+  //Note list clears when page is refreshed. will be improved later
+  mySocket.on("receive signal",function(data){   
+    alert("i received " + data.type + " request");
+    switch(data.type){
+      case "Meet In-Person":        
+        meeting.unshift(data);
+        $scope.inPersonRequest = meeting;
+        $scope.inPersonRequestLen = meeting.length;
+        //save(meeting,"meetInPersonList")        
+      break;
+      case "Audio Call":
+        audio.unshift(data);
+        $rootScope.audioRequest = audio;
+        $scope.audioRequestLen = audio.length;
+        //save(audio,"audioCallerList")            
+      break;
+      case "Video Call":        
+        video.unshift(data);
+        $rootScope.videoRequest = video;
+        $scope.videoRequestLen = video.length;
+        //save(video,"videoCallerList");               
+      break;
+      default:
+      break;
     }
-  
+
+    function save(video,type){
+      localManager.setValue(type,video);      
+    }
+    popout(data);
+  });
+
+
+  //doctor receives prescription request in real time.
+  mySocket.on("receive prescription request",function(data){
+    alert("yes i received test")
+    // instead of geting the data from back end and adding it to the list of prescription request
+    // i simply called the function below for "/doctor/:userId/get-all-request" for doctors to update its 
+    // request and do thsame.
+    // this may not be the best way compare to earlier but iwas done because earlier has been implemented before later
+    // it could be modified if all are traced appropriately.
+    getRequest();
+    var msg = "You have new prescription request. Please attend."
+    data.info = msg;
+    popout(data);    
+  });
+
+  //doctor receives consultation request in real time.
+  mySocket.on("receive consultation request",function(data){
+    alert("yes i received test")
+    // instead of geting the data from back end and adding it to the list of prescription request
+    // i simply called the function below for "/doctor/:userId/get-all-request" for doctors to update its 
+    // request and do thsame.
+    // this may not be the best way compare to earlier but iwas done because earlier has been implemented before later
+    // it could be modified if all are traced appropriately.
+    getRequest();
+    var msg = "You have new consultation request. Please attend";
+    data.info = msg;
+    popout(data);    
+  }); 
+
+
+  function popout(data) {
+    templateService.playAudio(1);
+    $rootScope.sender = data;
+    $scope.isReceivedRequest = true;
+    $timeout(function(){
+      $scope.isReceivedRequest = false;
+    },10000);
+  }
+ 
+
+  $scope.viewRequest = function(id,type,firstname,lastname,pic){
+    templateService.holdBriefForSpecificPatient = {
+      id: id,
+      type: type,
+      firstname: firstname,
+      lastname: lastname,
+      profile_pic_url: pic,
+    }
+
+    localManager.setValue("patientInfoforCommunication",templateService.holdBriefForSpecificPatient);
+    ModalService.showModal({
+        templateUrl: 'set-conversation-time.html',
+        controller: "setTimeForConversationController"
+    }).then(function(modal) {
+        modal.element.modal();
+        modal.close.then(function(result) {
+           
+        });
+    });
+  }
+
+  $scope.viewApp = function(id,firstname,lastname,pic) {
+    templateService.holdBriefForSpecificPatient = {
+      user_id: id,
+      firstname: firstname,
+      lastname: lastname,
+      profilePic: pic
+    }
+
+    ModalService.showModal({
+        templateUrl: 'calender-template.html',
+        controller: "appointmentModalController"
+    }).then(function(modal) {
+        modal.element.modal();
+        modal.close.then(function(result) {
+           
+        });
+    });
+  }
+
+  mySocket.on("user rejected calls",function(data){
+    if(data.status) {
+      alert("Calling failed! Reason: Your " + data.status);
+    }
+  });
+
+
+  $scope.doctorResponse = function(){
+    var sendObject = {
+      to: "135920854",
+      time: 30000,
+      status: "accepted",
+      type: "Video Call",
+      firstname: "obinna",
+      profile_pic_url:""
+    }
+    mySocket.emit("signal response",sendObject);
+  }
+
 }]);
+
+//modal controiller for pick time slot for video or audio request from patients.
+app.controller("setTimeForConversationController",["$scope","$rootScope","$window","mySocket","$timeout","localManager","templateService",
+  function($scope,$rootScope,$window,mySocket,$timeout,localManager,templateService){
+
+  var user = localManager.getValue("resolveUser");
+  var sender = templateService.holdBriefForSpecificPatient;
+  $scope.patient = sender;
+  var theSelected = {};
+
+  $scope.pickedTime = function(time) {
+    $scope.isPicked = time;
+    theSelected.currentlyPicked = time;
+    //$scope.patient.otherTime = null;
+  }
+
+  /*$scope.$watch("patient.otherTime",function(newVal,oldVal){
+    if(newVal){
+      theSelected.currentlyPicked = $scope.patient.otherTime;
+    }
+  });*/
+
+  
+  
+  $scope.selectedTime = function(quantity){  
+    if(sender.type === "Video Call"){
+      theSelected.list = $rootScope.videoRequest;      
+    } else if(sender.type === "Audio Call"){
+      theSelected.list = $rootScope.audioRequest;
+    }   
+    /*
+    concept: when a patient requests for video or audio conversation doctor picks a convinent time slot. doctor cannot pick 
+    thesame time slot seperately for two patients else, Doctor can pick a time slot for all requested patients when he clicks the appropriate
+    button.
+    */
+    var caller = genId();
+    var receiver = genId();
+   
+    if(theSelected.currentlyPicked === 0){      
+      localManager.setValue("personToCall",sender.id); //this is the id of the person to be called which is useful in communication controllers
+      localManager.setValue("receiver",receiver); 
+      localManager.setValue('caller',caller); 
+      $window.location.href = "/doctor/call";
+    } else {      
+      alert("doc give me ime oooo");      
+      var index =  theSelected.list.map(function(x){return x.from}).indexOf(sender.id);
+      if(!theSelected.list[index].hasOwnProperty("bookedTime")){
+        var actualTime = theSelected.currentlyPicked * 60000;
+        //gives doc option to call just one or many
+        if(quantity === 'single') {
+          tellPatient(theSelected.currentlyPicked);
+        } else if(quantity === 'many') {
+          tellAllPatients(theSelected.currentlyPicked);
+        } 
+        //checks to see if a patient has already been booked.
+        time(actualTime); 
+      } else {
+        alert("This patient has already been booked!");
+      } 
+    }
+  }
+
+  function tellPatient(time) {
+    var sendObject = {
+      to: sender.id,
+      time: theSelected.currentlyPicked,
+      status: "accepted",
+      type: sender.type,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      profile_pic_url:user.profile_pic_url,
+      from: user.user_id
+    }  
+    
+    $rootScope.isBooked = time; //hides the time slots for onces already booked
+    var elemPos = theSelected.list.map(function(x){return x.from}).indexOf(sender.id);
+    theSelected.list[elemPos].bookedTime = time + " minutes";
+    mySocket.emit("signal response",sendObject);
+  }
+
+  function tellAllPatients(time){    
+    $rootScope.isBooked = time;
+    localManager.setValue("callOptionMany",true); // to be used in communicationDoctor Controller for sending in call signal
+    // for all doctor's patients
+    //sends to all patieents that request for video call at the instance.
+    theSelected.list.forEach(function(patient){
+      var sendObject = {
+        to: patient.from,
+        time: theSelected.currentlyPicked,
+        status: "accepted",
+        type: patient.type,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        profile_pic_url:user.profile_pic_url,
+        from: user.user_id
+      }
+      patient.bookedTime = time + " minutes"; // sets the booked time on the drop down list
+      mySocket.emit("signal response",sendObject);
+    });
+  }
+
+  function time(time) {    
+    $timeout(function(){
+      var reminder = confirm("You have " + $scope.patient.type + " appointment with " + $scope.patient.firstname + " " + $scope.patient.lastname + " now!");
+      if(reminder){
+        localManager.setValue("personToCall",sender.id);
+        localManager.setValue("receiver",receiver); 
+        localManager.setValue('caller',caller); 
+        $window.location.href = "/doctor/call";
+      } 
+    },time);
+  }
+
+  function genId() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567899966600555777222";
+
+      for( var i=0; i < 12; i++ )
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+      return text;
+  }
+
+}]);
+
 /*$scope.viewNote = function(id){
     templateService.holdId = id;
     $location.path("/granted-request/" + id);
@@ -2151,7 +2429,7 @@ app.controller("docNotificationController",["$scope","$location","$resource","$i
     }
   }*/
 
-app.controller("doctorBarNotificationController",["$scope","$location","$http","$window","templateService","localManager",function($scope,$location,$http,
+/*app.controller("doctorBarNotificationController",["$scope","$location","$http","$window","templateService","localManager",function($scope,$location,$http,
   $window,templateService,localManager){  
   var filter = {};
   $scope.getData = function(firstname,lastname,date,pic,fee,patientName,wallet_amount,doc_id,service_access,specialty,message){
@@ -2205,7 +2483,7 @@ app.controller("doctorBarNotificationController",["$scope","$location","$http","
     $location.path("/granted-request/" + id);
   }
 
-}]);
+}]);*/
 
 app.controller("docAppointmentController",["$scope","$location","$http","$window","templateService","localManager",
   function($scope,$location,$http,$window,templateService,localManager){
@@ -2382,7 +2660,6 @@ app.controller("inTreatmentController",["$scope","$http","localManager","$locati
  }
 
  $scope.bookAppointment = function(){
-    console.log($scope.sessionData)
     ModalService.showModal({
         templateUrl: 'calender-template.html',
         controller: "appointmentModalController"
@@ -3291,7 +3568,8 @@ app.controller("grantedRequestController",["$scope","$http","ModalService","requ
    
 }]);*/
 
-app.controller("joinRoomController2",["$scope","mySocket","localManager","$rootScope",function($scope,mySocket,localManager,$rootScope){
+app.controller("joinRoomController2",["$scope","mySocket","localManager","$rootScope","$http","$window",
+  function($scope,mySocket,localManager,$rootScope,$http,$window){
    $scope.user = {};
 
   //var user = localManager.getValue("resolveUser");
@@ -3315,9 +3593,10 @@ app.controller("joinRoomController2",["$scope","mySocket","localManager","$rootS
       msg.isReceived = false;
       msg.isSent = false;
       $rootScope.message1.push(msg);
+      var getIndex = $rootScope.message1.length -1 ;
       msg.userId = "135920854";
       msg.partnerId = "161792665";      
-      Socket.emit("isSent",msg,function(status){
+      mySocket.emit("isSent",msg,function(status){
         $rootScope.message1[getIndex].isSent = status;
         mySocket.emit("save message",msg);
       });
@@ -3335,6 +3614,7 @@ app.controller("joinRoomController2",["$scope","mySocket","localManager","$rootS
       var date = + new Date();
       var msg = {};
       msg.time = date;
+      //alert("it happend")
       msg.received = data.message;
       if(data.from === "161792665") {
         $rootScope.message1.push(msg);
@@ -3342,12 +3622,11 @@ app.controller("joinRoomController2",["$scope","mySocket","localManager","$rootS
         msg.partnerId = "161792665";
         mySocket.emit("save message",msg);
       } else {
-        alert("new message from another patient");
         
         //then push the message to the list of patients so that user can view later.
       }
 
-      mySocket.emit("msg received",{to: data.from}); 
+      mySocket.emit("msg received",{to: "161792665"}); 
   });
 
   $scope.$watch("user.text2",function(newVal,oldVal){
@@ -3359,12 +3638,125 @@ app.controller("joinRoomController2",["$scope","mySocket","localManager","$rootS
   });
 
   mySocket.on("typing", function(data) {
-    console.log(data)
     $scope.typing = data;
   });
 
 
-  
+  $scope.sendCommunictionRequest = function () {
+    var date = + new Date();
+    var random = Math.floor(Math.random() * 99999);
+    mySocket.emit("convseration signaling",{
+      date:date,
+      reqId: random,
+      message: "I want have a video chat with you doc",
+      to:"161792665",
+      type:"Video Call",
+      from: "135920854",
+      sender_profile_pic_url: "",
+      sender_firstname: "Ede",
+      sender_lastname: "gcamon"
+    },function(data){
+      if(data.error){
+        alert(data.error)
+      }
+    });
+  }
+
+  $scope.send = function() {
+    var date = new Date;
+    var dataToSend = {
+      type_of_test: "laboratory:",
+      doctorId: "161792665",
+      center_name: "jude lab",
+      center_address: "12 chezoka",
+      cente_city: "Enugu",
+      center_country: "Nigeria",
+      test_result: [],
+      conclusion: "Malaria",
+      files:[],
+      date_sent: "",
+      ref_id: 2525636363
+    }
+
+    $http({
+    method  : 'PUT',
+    url     : "/patient/test-result/forward",
+    data    : dataToSend,
+    headers : {'Content-Type': 'application/json'} 
+    })
+    .success(function(data) {
+      if(data.status) {       
+        alert("Test rssult sent successfully!!!");
+        
+        inRelTime("161792665")
+      } else {
+        alert("Oops! Something went wrong while sending test reusult. Try again...")
+      }
+    }); 
+  }
+
+  function inRelTime(id) {
+//notify doctor in real time
+    mySocket.emit("i sent test",{doctorId:id},function(response){
+      if(response.error){
+        alert(response.error);
+      }
+    });
+  }
+
+  $scope.patient = {}
+  $scope.sendRequest = function() {          
+  var random = Math.floor(Math.random() * 1000);       
+   $scope.patient.type = "consultation";      
+   $scope.patient.message_id = 76767632;
+   $scope.patient.date = + new Date();
+   $scope.patient.receiverId = "161792665";
+    $http({
+        method  : 'PUT',
+        url     : "/patient/doctor/connection",
+        data : $scope.patient,
+        headers : {'Content-Type': 'application/json'} 
+        })
+      .success(function(data) {            
+          if(data.status) {             
+            $scope.message = "Your consultation request has been sent!";
+             mySocket.emit("i sent consultation",{doctorId:"161792665"},function(response){
+              if(response.error){
+                alert(response.error);
+              }
+            });
+          }
+          $scope.isViewDoc = false;
+          $scope.isToConfirm = false;
+           //use settime out to clear the textfieeld and the response message
+      });
+        
+    }
+
+    $scope.logout = function(){
+      mySocket.emit("set presence",{status:"offline",userId:"135920854"},function(response){
+        if(response.status === false){          
+          mySocket.emit("patient disconnect",{user_id:"135920854"});          
+        }
+      });
+    }
+
+    $scope.login = function(){
+      mySocket.emit("set presence",{status:"online",userId:"135920854"},function(response){
+        if(response.status === true){        
+          mySocket.emit("patient connect",{user_id:"135920854"});        
+        }
+      });          
+    }
+
+    mySocket.on("calling",function(data){
+      alert(data.callerFirstname + " " + data.callerLastname  + " wants have video chat now!!!");
+      localManager.setValue("caller",data.receiver);
+      localManager.setValue("receiver",data.caller);
+      $window.location.href = "/doctor/call";
+      console.log(data);
+      mySocket.emit("in call connected",{to:data.from});
+    });
 
 }])
 
@@ -3396,8 +3788,8 @@ app.controller('patientWelcomeController',["$scope",function($scope){
 // this controller gets  the patient medical records from the backend and seperates laboratory tsest from radiology test 
 //to store then templateService. Note patient prescription  is not amonge the data filtered so far.
 app.controller("patientNotificationController",["$scope","$location","$http","$window","$rootScope","$resource",
-  "templateService","localManager","deleteFactory",
-  function($scope,$location,$http, $window,$rootScope,$resource,templateService,localManager,deleteFactory){
+  "templateService","localManager","deleteFactory","mySocket","$timeout",
+  function($scope,$location,$http, $window,$rootScope,$resource,templateService,localManager,deleteFactory,mySocket,$timeout){
   
   var filter = {};
   $scope.getPatientId = function(id,firstname,lastname){
@@ -3488,34 +3880,7 @@ app.controller("patientNotificationController",["$scope","$location","$http","$w
      $scope.realDate = templateService.getRealDate;
    } 
 
-  /*$scope.logout = function () {
-    localManager.removeItem("userInfo");
-    localManager.removeItem("currentPage");
-    localManager.removeItem("currentPageForPatients");
-    localManager.removeItem("receiver");
-    localManager.removeItem('caller');
-    localManager.removeItem("doctorInfoforCommunication")
-    localManager.removeItem("patientInfoforCommunication");
-    localManager.removeItem("resolveUser");
-    localManager.removeItem("patientPrescriptions");
-    localManager.removeItem("holdPrescriptionId");
-    localManager.removeItem("patientTests");
-    localManager.removeItem("holdLabData");
-    localManager.removeItem("holdScanData");
-    localManager.removeItem("holdPrescriptions"); 
-
-    console.log(localManager.getValue())        
-     $http({
-        method  : 'GET',
-        url     : "/user/logout",
-        headers : {'Content-Type': 'application/json'} 
-        })
-      .success(function(data) {
-        $scope.userData = data;
-        $window.location.href = '/';
-
-     });
-  }*/
+  
 
   $scope.viewNote = function(id,type){
     templateService.holdId = id;
@@ -3554,16 +3919,18 @@ app.controller("patientNotificationController",["$scope","$location","$http","$w
 
   $scope.isView = false;
 
-  $http({
-    method  : 'GET',
-    url     : "/patient/notifications",
-    headers : {'Content-Type': 'application/json'} 
-    })
-  .success(function(data){       
-    $scope.allNote = data;
-    console.log(data)
-    $rootScope.noteLen = data.length;            
-  });
+  function getNotification() {
+    $http({
+      method  : 'GET',
+      url     : "/patient/notifications",
+      headers : {'Content-Type': 'application/json'} 
+      })
+    .success(function(data){       
+      $scope.allNote = data;
+      console.log(data)
+      $rootScope.noteLen = data.length;            
+    });
+  }
              
     
   $scope.viewNoteLab = function(id){
@@ -3591,44 +3958,26 @@ app.controller("patientNotificationController",["$scope","$location","$http","$w
 
 
 
-  //mesage views
-  $http({
-    method  : 'GET',
-    url     : "/patient/get-message",
-    headers : {'Content-Type': 'application/json'} 
-    })
-    .success(function(data){
-       console.log(data)  
-      var len = data.length;
-      if(len > 0){
-        $rootScope.msgLen = templateService.holdMsgLen(len);   
-        $scope.allMsg = data;
-        templateService.holdMsg = data;
-      }  
-         
-  });
-
-  /*var msgView = false;
-  $scope.showMsg = function(){
-    if(!msgView){
-      $scope.isViewMsg = true;
-      msgView = true;
-      viewMsg();
-    } else {
-      $scope.isViewMsg = false;
-      msgView = false;
-    }
-   
+  function getMessages() {
+    //mesage views
+    $http({
+      method  : 'GET',
+      url     : "/patient/get-message",
+      headers : {'Content-Type': 'application/json'} 
+      })
+      .success(function(data){
+         console.log(data)  
+        var len = data.length;
+        if(len > 0){
+          $rootScope.msgLen = templateService.holdMsgLen(len);   
+          $scope.allMsg = data;
+          templateService.holdMsg = data;
+        }  
+           
+    });
   }
 
-  var msgArr = {};
-  var viewMsg = function(){
-    if(!msgArr.hasOwnProperty("isViewed")) {    
-      $scope.allMsg = templateService.holdMsg;
-      msgArr.isViewed = true;
-    } 
-
-  }*/
+ 
 
   $scope.viewMessage = function(id,msgId){    
     templateService.holdId = id;
@@ -3653,37 +4002,22 @@ app.controller("patientNotificationController",["$scope","$location","$http","$w
 
 
   //appointment views
-  $http({
-    method  : 'GET',
-    url     : "/patient/appointment/view",
-    headers : {'Content-Type': 'application/json'} 
-    })
-  .success(function(data) { 
-    var len = data.length;
-    if(len > 0) {
-      $rootScope.appLen = templateService.holdAppLen(len);             
-      //templateService.holdAppointmentData = data; 
-      $scope.allApp = data;
-    }   
-  });
+  function getAppointment (){
+    $http({
+      method  : 'GET',
+      url     : "/patient/appointment/view",
+      headers : {'Content-Type': 'application/json'} 
+      })
+    .success(function(data) { 
+      var len = data.length;
+      if(len > 0) {
+        $rootScope.appLen = templateService.holdAppLen(len);             
+        //templateService.holdAppointmentData = data; 
+        $scope.allApp = data;
+      }   
+    });
+  }
   
-  /*var appView = false;
-  $scope.showApp = function(){
-    if(!appView){
-      $scope.isViewApp = true;
-      appView = true;
-      viewApp();
-    } else {
-      $scope.isViewApp = false;
-      appView = false;
-    }
-   
-  }  
-
-
-  var viewApp = function(){
-    $scope.allApp = templateService.holdAppointmentData;
-  }*/
 
   $scope.viewAppointment = function(sessionId){
     templateService.holdId = sessionId;
@@ -3698,6 +4032,98 @@ app.controller("patientNotificationController",["$scope","$location","$http","$w
       if($rootScope.noteLen > 0)
         $rootScope.noteLen--
   }
+
+
+  $scope.holdVideoCallResponse = [];
+  $scope.holdAudioCallResponse = [];
+
+  mySocket.on("conversation status",function(data){
+    alert(data.firstname + "says yes");
+    console.log(data)
+    templateService.playAudio(1);
+    if(data.type === "Video Call"){
+      $scope.holdVideoCallResponse.unshift(data);
+      $scope.videoLen = $scope.holdVideoCallResponse.length;
+    } else if(data.type === "Audio Call"){
+      $scope.holdAudioCallResponse.unshift(data);
+      $scope.audioLen = $scope.holdAudioCallResponse.length;
+    }
+    $rootScope.sender = data;
+    $scope.isReceivedRequest = true;
+    $timeout(function(){
+      $scope.isReceivedRequest = false;
+    },10000);
+    //console.log(data);
+  });
+
+
+  //patient receives appointment in real time.
+  mySocket.on("appointment status",function(data){
+    if(data.status){
+      templateService.playAudio(1);
+      data.type = "Meet In-Person";
+      $scope.isReceivedRequest = true;
+      $timeout(function(){
+        $scope.isReceivedRequest = false;
+      },10000);
+      getAppointment();
+    }
+  });
+
+  //patient receives message in real time.
+  mySocket.on("message notification",function(){
+    if(data.status){
+      templateService.playAudio(0);
+      data.type = "message";
+      $scope.isReceivedRequest = true;
+      $timeout(function(){
+        $scope.isReceivedRequest = false;
+      },10000);
+      getMessages();
+    }
+  });
+
+  mySocket.on("notification",function(data){
+    if(data.status){
+      templateService.playAudio(0);
+      data.type = "notification";
+      $scope.isReceivedRequest = true;
+      $timeout(function(){
+        $scope.isReceivedRequest = false;
+      },10000);
+      getNotification();
+    }
+  })
+
+
+
+  mySocket.on("calling",function(data){
+    var decide = confirm("Dr " + data.callerFirstname + " " + data.callerLastname  + " wants to have video chat with you now!!!");
+    if(decide){
+      localManager.setValue("caller",data.receiver);
+      localManager.setValue("receiver",data.caller);
+      mySocket.emit("in call connected",{to:data.from});
+      $window.location.href = "/patient/call";
+      console.log(data)      
+    } else {
+      mySocket.emit("call rejected",{to:data.from});
+    }
+  });
+
+  $scope.viewVideoAppointment = function(id){
+    var elemPos = $scope.holdVideoCallResponse.map(function(x){return x.message_id}).indexOf(id);
+    var found = $scope.holdVideoCallResponse[elemPos];
+  }
+
+
+  //loads up patient bell notificatio list
+  getNotification();
+
+  //loads up appointment notification list for patient
+  getAppointment();
+
+  //loads up message notification list for patient
+  getMessages();
 
 }]);
 
@@ -4936,8 +5362,8 @@ app.controller("chooseDoctorController",["$scope","$location","$http","$window",
 
 }]);
 
-app.controller("selectedDoctorToSendTestController",["$scope","$location","$http","multiData","templateService",
-  function($scope,$location,$http,multiData,templateService){
+app.controller("selectedDoctorToSendTestController",["$scope","$location","$http","multiData","templateService","mySocket",
+  function($scope,$location,$http,multiData,templateService,mySocket){
 
   $scope.test = templateService.holdTestToBeForwarded;
   $scope.doctor = templateService.holdSelectedDoctorToSendTest;
@@ -4969,7 +5395,7 @@ app.controller("selectedDoctorToSendTestController",["$scope","$location","$http
     headers : {'Content-Type': 'application/json'} 
     })
     .success(function(data) {
-      if(data.status) {
+      if(data.status) {       
         alert("Test rssult sent successfully!!!");
         switch($scope.test.type) {
           case "laboratory":
@@ -4981,7 +5407,12 @@ app.controller("selectedDoctorToSendTestController",["$scope","$location","$http
           default:
           break;
         }
-        
+        //notify doctor in real time
+        mySocket.emit("i sent test",{doctorId: $scope.doctor.doctor_id},function(response){
+          if(response.error){
+            alert(response.error);
+          }
+        });
       } else {
         alert("Oops! Something went wrong while sending test reusult. Try again...")
       }
@@ -5358,6 +5789,7 @@ function($scope,$location,$rootScope,$http,$interval,templateService,localManage
       if(type === "patient") {
         $rootScope.patientsDoctorList = data;
       } else if(type === "doctor"){
+        console.log(data)
         $rootScope.patientList = data;
       }
 
@@ -5376,6 +5808,7 @@ function($scope,$location,$rootScope,$http,$interval,templateService,localManage
       templateService.holdIdForSpecificDoc = id;
       localManager.setValue("hasChat",true);
       var page = "/patient-doctor/treatment/" + id;
+      localManager.setValue("holdPageForHandler",page);
       localManager.setValue("currentPageForPatients",page);
       $location.path(page);
       mySocket.removeAllListeners("new_msg");
@@ -5388,17 +5821,29 @@ function($scope,$location,$rootScope,$http,$interval,templateService,localManage
 
   } else if(user.typeOfUser === "Doctor") {
 
-    getList("/doctor/my-patients","doctor");
+    getList("/doctor/my-online-patients","doctor");
     $scope.userPatient = function(id){
       var callerId = templateService.holdDoctorIdForCommunication;
       localManager.setValue("receiver",id);
       localManager.setValue('caller',callerId);    
       templateService.holdIdForSpecificPatient = id;
       var page = "/doctor-patient/treatment/" + id;
+      localManager.setValue("holdPageForHandler",page);
       localManager.setValue("hasChat",true);
       localManager.setValue("currentPage",page);
       $location.path(page);
       mySocket.removeAllListeners("new_msg");
+
+      mySocket.on("acceptance notification",function(data){
+        data.type = "acceptance notification";
+        templateService.playAudio(1);
+        $rootScope.sender = data;
+        $scope.isReceivedRequest = true;
+        $timeout(function(){
+          $scope.isReceivedRequest = false;
+        },10000);
+        getList("/doctor/my-online-patients","doctor");
+      });
 
       //remove queue of received messages if any
       var elemPos = $rootScope.patientList.map(function(x){return x.patient_id}).indexOf(id);
@@ -5409,27 +5854,98 @@ function($scope,$location,$rootScope,$http,$interval,templateService,localManage
 
 }]);
 
-app.controller("presenceSocketController",["$rootScope","$scope","mySocket","localManager",function($rootScope,$scope,mySocket,localManager){
-   //var user = localManager.getValue("resolveUser");
-   mySocket.on("doctor presence",function(data){
-    var elemPos = $rootScope.patientsDoctorList.map(function(x){return x.doctor_id}).indexOf(data.doctor_id);
-    var found = $rootScope.patientsDoctorList[elemPos];
-    found.presence = data.presence;
-    $rootScope.dispalyPresence = data.presence;
-    console.log(found)
-   });
+//controls online presence icon to show who is online or offline. Note for doctors only ppatients that are online are displayed.
+app.controller("presenceSocketController",["$rootScope","$scope","mySocket","localManager","ModalService",
+  function($rootScope,$scope,mySocket,localManager,ModalService){
+   
+   var person = localManager.getValue("resolveUser");
 
-   mySocket.on("patient presence",function(data){
-    var elemPos = $rootScope.patientList.map(function(x){return x.patient_id}).indexOf(data.patient_id);
-    var found = $rootScope.patientList[elemPos];
-    found.presence = data.presence;
-    $rootScope.dispalyPresence = data.presence;
-   });
+   if(person.typeOfUser === "Patient"){
+     //patients  see doctors as the log in
+     mySocket.on("doctor presence",function(data){
+      var elemPos = $rootScope.patientsDoctorList.map(function(x){return x.doctor_id}).indexOf(data.doctor_id);
+      var found = $rootScope.patientsDoctorList[elemPos];
+      found.presence = data.presence;
+      $rootScope.dispalyPresence = data.presence;      
+     });
+   } else if(person.typeOfUser === "Doctor") {
+   //doctors see patients the log in. doctors can only see logged in patients but not all the patients at once.
+   // this could be modified later as to control the number of patients in the doctor's dashboard.
+    mySocket.on("patient presence",function(data){
+      var elemPos = $rootScope.patientList.map(function(x){return x.patient_id}).indexOf(data.patient.user_id);
+      var found = $rootScope.patientList[elemPos];
+      if(elemPos === -1 && data.presence === true){
+        var patient = {
+          patient_profile_pic_url: data.patient.profile_pic_url,
+          patient_firstname: data.patient.firstname,
+          patient_lastname: data.patient.lastname,
+          patient_id: data.patient.user_id,
+          presence: true
+        }
+        $rootScope.patientList.push(patient);
+        $rootScope.patientAvailability = data.presence; // note $rootScope.patientAvailability is use to control patient presence in the view.  
+      } else {
+        found.presence = data.presence;
+        $rootScope.dispalyPresence = data.presence;
+        $rootScope.patientAvailability = data.presence;  
+      }
+      
+     });
+    }
 
-   mySocket.on("receive request",function(data){
-    console.log(data);
-    alert("responsone says")
+   mySocket.on("receive request",function(data){    
+    alert("responsone says");
    })
+
+  
+  $scope.user = {};
+  // setting user presence online or offline.
+  $scope.user.presence = "online";
+  $scope.isOnline = true;
+  $scope.$watch("user.presence",function(newVal,oldVal){
+    if(newVal === "online"){
+      online();      
+    } else if(newVal === "offline"){
+      var warn = confirm("Turning offline you will not be able to receive massages and requests in real time");      
+      if(warn){        
+        console.log(warn)
+        offline();        
+      } else {
+        online();
+        $scope.user.presence = "online"
+      }
+    }
+  });
+
+  var online = function(){
+    $scope.isOnline = true;
+    mySocket.emit("set presence",{status:"online",userId:person.user_id},function(response){
+      if(response.status === true){
+        mySocket.emit("doctor connect",{userId:person.user_id})
+      }
+    });
+  }
+
+  var offline = function(){
+    $scope.isOnline = false;
+    mySocket.emit("set presence",{status:"offline",userId:person.user_id},function(response){
+      if(response.status === false){
+        mySocket.emit("doctor disconnect",{userId:person.user_id})
+      }
+    });
+  }
+
+  $scope.newPatient = function(){
+    ModalService.showModal({
+          templateUrl: 'patient-emergency-form.html',
+          controller: "newPatientModalController"
+      }).then(function(modal) {
+          modal.element.modal();
+          modal.close.then(function(result) {
+             
+      });
+    });
+  }
 
 }])
 
@@ -5437,13 +5953,12 @@ app.controller("createRoomController",["$scope","localManager","mySocket","$root
   function($scope,localManager,mySocket,$rootScope,templateService,$location){
   var user = localManager.getValue("resolveUser");
   $rootScope.chatStatus = localManager.getValue("hasChat");
-  var getCurrentPage = localManager.getValue("currentPageForPatients") || localManager.setValue("currentPage");
-  if(!$rootScope.chatStatus || getCurrentPage){
-    mySocket.emit('join',{userId: user.user_id}); 
-      
-  //when user is cuurently not in chat but messages can come and be stored in array
+  var getCurrentPage = localManager.getValue("currentPageForPatients") || localManager.getValue("currentPage");
+  var getHandlerPage = localManager.getValue("holdPageForHandler")
+  if(!$rootScope.chatStatus || getCurrentPage !== getHandlerPage){ 
+    mySocket.emit('join',{userId: user.user_id});  
+    //when user is cuurently not in chat but messages can come and be stored in array
     mySocket.on("new_msg", function(data) {
-      console.log(data)
       var date = + new Date();
       var msg = {};
       msg.time = date;
@@ -5549,7 +6064,7 @@ app.controller("joinRoomController3",["$scope","mySocket","localManager","$rootS
     });
   }
 //alerting for quest
-  mySocket.on("receive request",function(data){
+  mySocket.on("receive signal",function(data){
     alert("i received " + data.type + " request");    
     templateService.playAudio(1);
     $rootScope.sender = data;
@@ -5559,13 +6074,26 @@ app.controller("joinRoomController3",["$scope","mySocket","localManager","$rootS
     },10000);
   });
 
+  $scope.doctorResponse = function(){
+    var sendObject = {
+      to: "135920854",
+      time: 30000,
+      status: "accepted",
+      type: "Video Call",
+      firstname: "obinna",
+      profile_pic_url:""
+    }
+    mySocket.emit("signal response",sendObject);
+  }
+
 
 }]);
 
 
 //doctor's id is paased to this controller for ajax call;
-app.controller("myDoctorController",["$scope","$location","$http","$window","$rootScope","templateService","localManager","ModalService","mySocket",
-  function($scope,$location,$http,$window,$rootScope,templateService,localManager,ModalService,mySocket){
+app.controller("myDoctorController",["$scope","$location","$http","$window","$rootScope","templateService",
+  "localManager","ModalService","mySocket","$timeout",
+  function($scope,$location,$http,$window,$rootScope,templateService,localManager,ModalService,mySocket,$timeout){
   var doctor = {};
   var savePath = localManager.getValue("currentPageForPatients");
   var arr = savePath.split("/");  
@@ -5670,18 +6198,17 @@ app.controller("myDoctorController",["$scope","$location","$http","$window","$ro
       msg.isSent = false;
       msg.isReceived = false;
       $rootScope.message1.push(msg);
-      var getIndex = $rootScope.message1.length - 1;
+      var getIndex = $rootScope.message1.length - 1; //gets the index of the currently send text from the array
       msg.userId = user.user_id;
       msg.partnerId = doctor.id;     
       mySocket.emit("isSent",msg,function(status){
-        console.log(status)
         $rootScope.message1[getIndex].isSent = status;
-        mySocket.emit("save message",msg);
+        mySocket.emit("save message",msg);//this saves the message as double mark
       });
-      mySocket.emit("save message",msg);
+      mySocket.emit("save message",msg);//this saves the message as one mark
       mySocket.on("isReceived",function(status){
         $rootScope.message1[getIndex].isReceived = status;
-        mySocket.emit("save message",msg);
+        mySocket.emit("save message",msg);//this saves the message as received (ie blue) mark
       });
     });
     $scope.user.text1 = "";
@@ -5706,7 +6233,6 @@ app.controller("myDoctorController",["$scope","$location","$http","$window","$ro
     } else {
       alert("You have new message");
       var elemPos = $rootScope.patientsDoctorList.map(function(x){return x.doctor_id}).indexOf(data.from);
-      console.log(elemPos)
       var found = $rootScope.patientsDoctorList[elemPos];
       if(!found.queueLen) {
         found.queueLen = 1;
@@ -5715,20 +6241,21 @@ app.controller("myDoctorController",["$scope","$location","$http","$window","$ro
       }
       msg.userId = data.to;
       msg.partnerId = data.from;
-      mySocket.emit("save message",msg);
-      mySocket.emit("msg received",{to: data.from});
+      mySocket.emit("save message",msg);      
       templateService.playAudio(2);    
       //then push the message to the list of patients so that user can view later.
     }
+
+    mySocket.emit("msg received",{to: data.from});
 
   });
 
 
   $scope.$watch("user.text1",function(newVal,oldVal){
     if(newVal !== "" && newVal !== undefined){      
-      mySocket.emit("user typing",{to: "161792665",message:"Typing..."})
+      mySocket.emit("user typing",{to: doctor.id,message:"Typing..."})
     } else {
-      mySocket.emit("user typing",{to: "161792665",message:""})
+      mySocket.emit("user typing",{to: doctor.id,message:""})
     }
   });
 
@@ -5737,6 +6264,7 @@ app.controller("myDoctorController",["$scope","$location","$http","$window","$ro
     $scope.typing = data;
   });
 
+  
 
   function reqModal(docObj) {
     templateService.holdForSpecificDoc = docObj
@@ -5776,7 +6304,7 @@ app.controller("modalRequestForCommunicationController",["$scope","$resource","t
     var date = + new Date();
     var random = Math.floor(Math.random() * 99999);
     var msg = $scope.user.complain;
-    mySocket.emit("request",{
+    mySocket.emit("convseration signaling",{
       date:date,
       reqId: random,
       message:msg,
@@ -5786,6 +6314,10 @@ app.controller("modalRequestForCommunicationController",["$scope","$resource","t
       profile_pic_url: patient.profile_pic_url,
       firstname: patient.firstname,
       lastname: patient.lastname
+    },function(response){
+      if(response.error){
+        alert(response.error)
+      }
     });
       
     /*var checkPresence = $resource("/:id/communication-request",{id:$scope.docInfo.user_id},{sendReq:{method: "POST"}});
@@ -5823,7 +6355,6 @@ app.controller("modalRequestForCommunicationController",["$scope","$resource","t
       });
 
     }*/ 
-    
   }
 
   function getreaction(data){
@@ -5855,7 +6386,8 @@ app.controller("modalRequestForCommunicationController",["$scope","$resource","t
 
 //similar the mydoctorController
 app.controller("myPatientController",["$scope","$http","$location","$window","$rootScope","templateService","localManager",
-  "ModalService","Drugs","mySocket",function($scope,$http,$location,$window,$rootScope,templateService,localManager,ModalService,Drugs,mySocket){
+  "ModalService","Drugs","mySocket","$resource",
+  function($scope,$http,$location,$window,$rootScope,templateService,localManager,ModalService,Drugs,mySocket,$resource){
   var patient = {}; //patient obj.
   
   /*
@@ -5869,42 +6401,73 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
   var userId = arr[arr.length-1];
   var random = Math.floor(Math.random() * 999999999999 );
   patient.id = templateService.holdIdForSpecificPatient || userId;
-   $http({
-        method  : 'PUT',
-        url     : "/doctor/specific-patient",
-        data    : patient,
-        headers : {'Content-Type': 'application/json'} 
-        })
-      .success(function(data) {         
-        $scope.patientInfo = data;        
-        patient.prescriptionId = random;
-        patient.patient_id = patient.id;    
-        patient.firstname = $scope.patientInfo.firstname;
-        patient.lastname = $scope.patientInfo.lastname;
-        patient.gender = $scope.patientInfo.gender;
-        patient.age = $scope.patientInfo.age;
-        patient.address = $scope.patientInfo.address;
-        patient.city = $scope.patientInfo.city;
-        patient.country = $scope.patientInfo.country;
-        patient.patient_profile_pic_url = $scope.patientInfo.profile_pic_url;
-        patient.lab_analysis = $scope.patientInfo.lab_analysis;
-        patient.scan_analysis = $scope.patientInfo.scan_analysis;
-        patient.provisional_diagnosis = $scope.patientInfo.provisional_diagnosis;
-        patient.title = $scope.patientInfo.title;
-        patient.sender = "doctor";
-        var holdData = {
-          profilePic: data.profile_pic_url,
-          firstname: data.firstname,
-          lastname: data.lastname
-        }
-        templateService.holdForSpecificPatient = $scope.patientInfo;
-        localManager.setValue("patientInfoForCommunication", holdData);
-        
-    });
+  var user = localManager.getValue("resolveUser");
+
+  var getPatientData = $resource("/doctor/specific-patient")
+  getPatientData.get(patient,function(data){
+    console.log(data)        
+    $scope.patientInfo = data;        
+    patient.prescriptionId = random;
+    patient.patient_id = patient.id;    
+    patient.firstname = $scope.patientInfo.firstname;
+    patient.lastname = $scope.patientInfo.lastname;
+    patient.gender = $scope.patientInfo.gender;
+    patient.age = $scope.patientInfo.age;
+    patient.address = $scope.patientInfo.address;
+    patient.city = $scope.patientInfo.city;
+    patient.country = $scope.patientInfo.country;
+    patient.patient_profile_pic_url = $scope.patientInfo.profile_pic_url;
+    patient.lab_analysis = $scope.patientInfo.lab_analysis;
+    patient.scan_analysis = $scope.patientInfo.scan_analysis;
+    patient.provisional_diagnosis = $scope.patientInfo.provisional_diagnosis;
+    patient.title = $scope.patientInfo.title;
+    patient.sender = "doctor";
+    var holdData = {
+      profilePic: data.profile_pic_url,
+      firstname: data.firstname,
+      lastname: data.lastname
+    }
+    templateService.holdForSpecificPatient = $scope.patientInfo;
+    localManager.setValue("patientInfoForCommunication", holdData);    
+    $rootScope.patientAvailability = $scope.patientInfo.presence;
+  })
+
+
+   
 ///////////////////////////////////////////////////// for chat logic and sockets
+
   $scope.user = {};
 
-  var user = localManager.getValue("resolveUser");
+  
+  $scope.deleteChat = function(){
+      var check = confirm("All chats will be deleted. Do you wish to continue?");
+      if(check) {
+        var chatId = user.user_id + "/" + patient.id;
+        var sendObj = {
+          item: chatId,
+          dest: "messages"
+        }
+        $http({
+        method  : 'DELETE',
+        url     : "/user/delete-all-chat",
+        data    : sendObj,
+        headers : {'Content-Type': 'application/json'} 
+        })
+        .success(function(data) {
+          if(data === "deleted"){
+            $rootScope.message1.splice(0);
+          }
+          console.log("Chats " + data)
+        });
+      }
+    }
+
+  /*** this initializes the web socket for chat the patient to start send and receiving messages from doctor ****/
+
+  //$rootScope.message1 = [];
+  // checks to see if a user is already in chat
+  if($rootScope.chatStatus === true)
+    mySocket.emit('join',{userId: user.user_id}); 
 
   mySocket.emit('init chat',{userId: user.user_id,partnerId: patient.id},function(messages){
     $rootScope.message1 = messages || [];
@@ -5952,7 +6515,6 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
     } else {
       alert("You have new message");
       var elemPos = $rootScope.patientList.map(function(x){return x.patient_id}).indexOf(data.from);
-      console.log(elemPos)
       var found = $rootScope.patientList[elemPos];
       if(!found.queueLen) {
         found.queueLen = 1;
@@ -5961,11 +6523,11 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
       }
       msg.userId = data.to;
       msg.partnerId = data.from;
-      mySocket.emit("save message",msg);
-      mySocket.emit("msg received",{to: data.from});
+      mySocket.emit("save message",msg);      
       templateService.playAudio(2);    
       //then push the message to the list of patients so that user can view later.
     }
+    mySocket.emit("msg received",{to: data.from});
 
   });
 
@@ -5983,37 +6545,21 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
     $scope.typing = data;
   });
 
-  $scope.online = function(){
-    mySocket.emit("set presence",{status:"online",userId:user.user_id},function(response){
-      if(response.status === true){
-        mySocket.emit("doctor connect",{userId:user.user_id})
-      }
-    });
-  }
-
-  $scope.offline = function(){
-    mySocket.emit("set presence",{status:"offline",userId:user.user_id},function(response){
-      if(response.status === false){
-        mySocket.emit("doctor disconnect",{userId:user.user_id})
-      }
-    });
-  }
-
-  $scope.block = function(id){
-    mySocket.emit("block user",{userI: user.user_id,defaulter:id})
-  }
-
-  $scope.unblock = function(id){
-    mySocket.emit("unblock user",{userI: user.user_id,defaulter:id})
-  }
-/////////////////////////////////////////////////////
      
 
     var viewed = false;
 
-    
-    $scope.makeVideoCall = function(){  
-      $window.location.href = "/doctor/call";
+    $scope.makeCall = function(type){
+      var caller = genId();
+      var receiver = genId();
+      localManager.setValue("personToCall",patient.id);
+      localManager.setValue("receiver",receiver); 
+      localManager.setValue('caller',caller);
+      if(type === "video") {  
+        $window.location.href = "/doctor/call";
+      } else if(type === "audio"){
+        $window.location.href = "/doctor/audio/call";
+      }
     }
 
     $scope.writePrescription =function(){     
@@ -6027,14 +6573,12 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
     $scope.appointment = function(patientObj){
       templateService.holdId = patientObj.user_id; //sets id of the patient for the appointmentModal controller to use.
       //make sure templateSevice is always iniatialize elsewhere.
-     console.log(templateService.holdId)
       ModalService.showModal({
           templateUrl: 'calender-template.html',
           controller: "appointmentModalController"
       }).then(function(modal) {
           modal.element.modal();
-          modal.close.then(function(result) {
-             
+          modal.close.then(function(result) {             
           });
       });
     
@@ -6057,6 +6601,7 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
        $scope.isToViewLabPrescriptionReq = false;
       $scope.isToViewRadPrescriptionReq = false;
       $scope.isToViewSession = false;
+      $scope.isChat = false;
       //getPatientMedication("/doctor/get-patient/medical-record")
     }
 
@@ -6071,13 +6616,9 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
     }
 
     var getPatientMedication = function(url){
-      $http({
-        method  : 'PUT',
-        url     : url,
-        data    : patient,
-        headers : {'Content-Type': 'application/json'} 
-        })
-      .success(function(data) {      
+      var getMedication = $resource("/doctor/get-patient/medication");
+      var sendObj = {id:patient.id}
+      getMedication.get(sendObj,function(data){
         var myFoundPrescriptions = [];
         for(var i = data.medications.length-1; i >= 0; i--){
           if(data.medications[i].doctor_id === templateService.getid) {
@@ -6085,7 +6626,8 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
             $scope.wroteByThisDoctor = myFoundPrescriptions;
           }
         }        
-      });
+      })
+      
     }
 
     //creates drug object for the ng-repeat on the view.
@@ -6165,11 +6707,11 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
       $scope.isToViewLabPrescriptionReq = false;
       $scope.isToViewRadPrescriptionReq = false;
       $scope.isToViewSession = true;
+      $scope.isChat = false;
 
     }
 
     $scope.viewTreatmentSession = function (session) {
-      console.log(session)
       localManager.setValue("heldSessionData",session);        
       $window.location.href = "/treatment";
     }
@@ -6199,7 +6741,8 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
       $scope.isToPrescribe = false;
       $scope.isToViewLabPrescriptionReq = true;
       $scope.isToViewRadPrescriptionReq = false;
-      $scope.isToViewSession = false;      
+      $scope.isToViewSession = false; 
+      $scope.isChat = false;     
     }
 
     $scope.viewRadioPrescriptionRequest = function () {
@@ -6208,18 +6751,16 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
       $scope.isToViewLabPrescriptionReq = false;
       $scope.isToViewRadPrescriptionReq = true;
       $scope.isToViewSession = false;
+      $scope.isChat = false;
+      $scope.isChat = false;
     }
 
     var sessionList = [];
 
     function loadSession() {
-      $http({
-        method  : 'PUT',
-        url     : "/doctor/get-patient-sessions",
-        data    : patient,
-        headers : {'Content-Type': 'application/json'} 
-        })
-      .success(function(data) {   
+      var getSession = $resource("/doctor/get-patient-sessions");
+      var sendObj = {patient_id:patient.id}
+      getSession.query(sendObj,function(data){
         for(var i = 1; i < data.length; i++) {          
           if(sessionList.length >= 10)
             break;
@@ -6229,7 +6770,8 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
         $scope.sessionData = sessionList;
         if(data.length > 0);
           templateService.holdId = data[0].patient_id;
-      });
+      })
+      
     }
 
 
@@ -6340,12 +6882,37 @@ app.controller("myPatientController",["$scope","$http","$location","$window","$r
     }
 
 
+    var isClicked = true;
+
+    $scope.chatLive = function(){
+      if(isClicked){
+        $scope.isChat = true;
+        $scope.isToSeeRecord = false;
+      $scope.isToPrescribe = false;
+       $scope.isToViewLabPrescriptionReq = false;
+      $scope.isToViewRadPrescriptionReq = false;
+      $scope.isToViewSession = false;
+        isClicked = false;
+      } else {
+        isClicked = true;
+        $scope.isChat = false;
+      }
+    }
+
+    function genId() {
+      var text = "";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567899966600555777222";
+
+      for( var i=0; i < 12; i++ )
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+      return text;
+    }
 
 
 }]);
 
-app.controller("appointmentModalController",["$scope","$http","moment","templateService",
-  function($scope,$http,moment,templateService){
+app.controller("appointmentModalController",["$scope","$http","moment","templateService","mySocket",
+  function($scope,$http,moment,templateService,mySocket){
     
     $scope.day = moment();
 
@@ -6416,8 +6983,8 @@ app.controller("appointmentModalController",["$scope","$http","moment","template
  $scope.treatment.appointment = {};
 
     $scope.book = function(){
-      var data = templateService.holdForSpecificPatient; 
-      var date = new Date();
+      var data = templateService.holdBriefForSpecificPatient || templateService.holdForSpecificPatient; 
+      var date = + new Date();
       $scope.treatment.date = date;
       $scope.treatment.patient_id = data.patient_id || data.user_id;
       $scope.treatment.typeOfSession = "";
@@ -6444,18 +7011,19 @@ app.controller("appointmentModalController",["$scope","$http","moment","template
         $scope.treatment.summary = data.diagnosis.summary;
 
         $scope.treatment.provisional_diagnosis = data.diagnosis.provisional_diagnosis;
-        sendData($scope.treatment,"/doctor/session-update/save-changes","PUT")
+        sendData($scope.treatment,"/doctor/session-update/save-changes","PUT");
 
-      } else {   
-
+      } else {
+        templateService.holdBriefForSpecificPatient = null;
         $scope.treatment.appointment.firstname = data.firstname; 
         $scope.treatment.appointment.lastname = data.lastname;        
-        $scope.treatment.appointment.profilePic = data.profile_pic_url
-        sendData($scope.treatment,"/doctor/patient-session","POST")
-      }        
+        $scope.treatment.appointment.profilePic = data.profile_pic_url;
+        sendData($scope.treatment,"/doctor/patient-session","POST");
+      }
+
+
   
       console.log($scope.treatment);
-    
     }
 
     function sendData(data,url,method) {
@@ -6465,30 +7033,17 @@ app.controller("appointmentModalController",["$scope","$http","moment","template
         data    : data,
         headers : {'Content-Type': 'application/json'} 
         })
-      .success(function(data) {   
-        if(data)
+      .success(function(response) {   
+        if(response) {
           alert("Appointment booked, patient will be notified.")
+          mySocket.emit("realtime appointment notification",{to:data.patient_id})
+        }  
       });
     }
 
 }]);
 
 
-//try later
-/*app.controller("tryDirectiveController",function($scope){
-  $scope.person = {
-    name: "obi",
-    address: "12 chezoka"
-  }
-})
-
-app.directive("searchResult",function(){
-  return {
-    restrict: "AE",
-    templateUrl: "/assets/directive/calender-template.html",
-    replace: true
-  }
-})*/
 
 //this controller controls the form filled by the doctor when creating new session for a selected patient above.
 app.controller("fromModalSessionController",["$scope","$http","$window","localManager","templateService",
@@ -6807,9 +7362,14 @@ app.controller("prescriptionModalController",["$scope","$http","$window","localM
 
 }]);
 
-app.controller("communicationDoctorController",["$scope","$resource","localManager",function($scope,$resource,localManager){
+app.controller("videoCommunicationDoctorController",["$scope","$resource","$window","localManager","mySocket",
+  function($scope,$resource,$window,localManager,mySocket){
+
   $scope.getinfo = localManager.getValue("patientInfoForCommunication");
-  var presence = $resource("/user/conversation-availability",null,{sendRequest:{method: "PUT"}});
+  $scope.callWaitingList = localManager.getValue("videoCallerList");  //sets the list of requested patients for the call page.
+  var user = localManager.getValue("resolveUser");
+ 
+  /*var presence = $resource("/user/conversation-availability",null,{sendRequest:{method: "PUT"}});
   var time = + new Date();
   var user = localManager.getValue("resolveUser");
   var sendObj = {
@@ -6818,12 +7378,120 @@ app.controller("communicationDoctorController",["$scope","$resource","localManag
   }
   presence.sendRequest(sendObj,function(data){
     console.log(data)
-  });
+  });*/
+
+
+  
+
+  var receiverId = localManager.getValue("personToCall");
+  var caller = localManager.getValue("caller");
+  var receiver = localManager.getValue("receiver");
+  //var receiverId = localManager.getValue("receiver");
+  
+
+
+  //emits to bring patient in for call.
+  mySocket.emit("in call",{from:user.user_id,to:receiverId,callerFirstname: user.firstname, //remember to replace "135920854" with receiverId
+    callerPic:user.profile_pic_url,callerLastname: user.lastname,type:"Video Call",caller:caller,receiver:receiver});
+
+  $scope.inCallStatus = "Waiting for patient to connect...";
+  //handler to notify doc when a patient is on call paage
+  mySocket.on("patient in call connected",function(data){
+    if(data.status) {
+      $scope.inCallStatus = "is now connected!"
+    }
+  })
+
+  $scope.callAnother = function(patientId,firstname,lastname,pic){
+    var patient = {
+      id: patientId,
+      firstname: firstname,
+      lastname: lastname,
+      profilePic: pic
+    }
+
+    var caller = genId();
+    var receiver = genId();
+
+    localManager.setValue("personToCall",patientId);
+    localManager.setValue("patientInfoForCommunication",patient);
+    localManager.setValue("receiver",receiver);
+    localManager.setValue('caller',caller);
+    $window.location.href = "/doctor/call"; 
+  }
+
+  function genId() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567899966600555777222";
+    for( var i=0; i < 12; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+  }
+  
 }]);
 
-app.controller("communicationPatientController",["$scope","localManager",function($scope,localManager){
-  $scope.getinfo = localManager.getValue('doctorInfoforCommunication'); 
+app.controller("audioCommunicationDoctorController",["$scope","$resource","$window","localManager","mySocket",
+  function($scope,$resource,$window,localManager,mySocket){
+  $scope.getinfo = localManager.getValue("patientInfoForCommunication");
+  $scope.callWaitingList = localManager.getValue("audioCallerList");  //sets the list of requested patients for the call page.
+  var user = localManager.getValue("resolveUser");
+
+
+  var receiverId = localManager.getValue("personToCall");
+  var caller = localManager.getValue("caller");
+  var receiver = localManager.getValue("receiver");
+  //var receiverId = localManager.getValue("receiver");
+  
+
+
+  //emits to bring patient in for call.
+  mySocket.emit("in call",{from:user.user_id,to:receiverId,callerFirstname: user.firstname, //remember to replace "135920854" with receiverId
+    callerPic:user.profile_pic_url,callerLastname: user.lastname,type:"Audio Call",caller:caller,receiver:receiver});
+
+  $scope.inCallStatus = "Waiting for patient to connect...";
+  //handler to notify doc when a patient is on call paage
+  mySocket.on("patient in call connected",function(data){
+    if(data.status) {
+      $scope.inCallStatus = "is now connected!"
+    }
+  })
+
+  $scope.callAnother = function(patientId,firstname,lastname,pic){
+    var patient = {
+      id: patientId,
+      firstname: firstname,
+      lastname: lastname,
+      profilePic: pic
+    }
+
+    var caller = genId();
+    var receiver = genId();
+
+    localManager.setValue("personToCall",patientId);
+    localManager.setValue("patientInfoForCommunication",patient);
+    localManager.setValue("receiver",receiver);
+    localManager.setValue('caller',caller);
+    $window.location.href = "/doctor/audio/call"; 
+  }
+
+  function genId() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567899966600555777222";
+    for( var i=0; i < 12; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+  }
+  
 }]);
+
+app.controller("videoCommunicationPatientController",["$scope","localManager","mySocket",function($scope,localManager,mySocket){
+  $scope.getinfo = localManager.getValue('doctorInfoforCommunication'); 
+  var user = localManager.getValue("resolveUser");
+  mySocket.emit("in call connected",{to:$scope.getinfo.userId});
+
+}]);
+
+
 
 app.controller("VideoDiagnosisController",["$scope","$location","$window","$http","localManager","templateService","Drugs",
   function($scope,$location,$window,$http,localManager,templateService,Drugs){
@@ -6831,7 +7499,7 @@ app.controller("VideoDiagnosisController",["$scope","$location","$window","$http
   var patient = {};  
 
   var random = Math.floor(Math.random() * 999999999999 );
-  patient.id = localManager.getValue('receiver');
+  patient.id = localManager.getValue("personToCall");
    $http({
         method  : 'PUT',
         url     : "/doctor/specific-patient",
@@ -6855,22 +7523,7 @@ app.controller("VideoDiagnosisController",["$scope","$location","$window","$http
         patient.allergy = $scope.patientInfo.allergy;
         patient.title = $scope.patientInfo.title;
         patient.sender = "doctor";
-    });
-     
-
-  var viewed = false;
-
-  $scope.writePrescription = function(){
-
-      if(!viewed) {
-        $scope.isNewPrescription = true;
-        $scope.findPharmacy = false;
-        viewed = true;
-      } else {
-        $scope.isNewPrescription = false;
-        viewed = false;
-      }
-  }
+    })
 
     
 
@@ -9818,7 +10471,8 @@ app.controller("emScanTestController",["$scope","$location","$http","$window","t
 
 }]);
 
-app.controller("topHeaderController",["$scope","$window","localManager",function($scope,$window,localManager){
+app.controller("topHeaderController",["$scope","$window","$location","localManager","mySocket",
+  function($scope,$window,$location,localManager,mySocket){
   $scope.isMenu = false;
   $scope.isClicked = function(){
     if($scope.isMenu === false) {
@@ -9855,10 +10509,23 @@ app.controller("topHeaderController",["$scope","$window","localManager",function
   }
 
   $scope.logout = function(){
+    mySocket.emit("set presence",{status:"offline",userId:$scope.checkLogIn.user_id},function(response){
+      if(response.status === false){
+        if($scope.checkLogIn.typeOfUser === "Doctor"){
+          mySocket.emit("doctor disconnect",{userId:$scope.checkLogIn.user_id});
+        } else if($scope.checkLogIn.typeOfUser === "Patient") {
+          mySocket.emit("patient disconnect",$scope.checkLogIn);
+        }
+      }
+      destroyStorage();
+    });
+
+    $window.location.href = "/user/logout";
+  }
+
+  function destroyStorage() {
     localManager.removeItem("resolveUser")
     localManager.removeItem("userInfo");
-    localManager.removeItem("receiver");
-    localManager.removeItem('caller');
     localManager.removeItem("heldSessionData");
     localManager.removeItem("userInfo");
     localManager.removeItem("currentPage");
@@ -9874,9 +10541,12 @@ app.controller("topHeaderController",["$scope","$window","localManager",function
     localManager.removeItem("holdLabData");
     localManager.removeItem("holdScanData");
     localManager.removeItem("holdPrescriptions");
-    localManager.removeItem("hasChat"); 
-    $window.location.href = "/user/logout";
+    localManager.removeItem("hasChat");
+    localManager.removeItem("videoCallerList");
+    localManager.removeItem("audioCallerList"); 
   }
+ 
+   
 }])
 
 app.controller("displayController",["$scope","$location",function($scope,$location){

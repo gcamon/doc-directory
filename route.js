@@ -11,7 +11,7 @@ var emitter = new EventEmmiter();
 //var token = require("./twilio");
 //var randomUserName = require("./randos");
 
-var basicRoute = function (model,sms) {
+var basicRoute = function (model,sms,io) {
   
 
   router.get("/chat1",function(req,res){
@@ -667,7 +667,7 @@ var basicRoute = function (model,sms) {
         { "$push": { doctor_notification: requestData} },
         function(err,info) {
           if(err) throw err;
-          res.send("notified");
+          res.send({status:"notified"});
         }
         );
         } else {
@@ -679,7 +679,7 @@ var basicRoute = function (model,sms) {
     //this route gets all the notifications for the doctor that just logged in
     router.get("/doctor/notifications",function(req,res){
          if(req.user){
-         model.user.findOne({email:req.user.email},{doctor_notification:1,_id:0},function(err,data){                
+         model.user.findOne({user_id:req.user.user_id},{doctor_notification:1,_id:0},function(err,data){                
             res.send(data);
          })
         } else {
@@ -687,22 +687,19 @@ var basicRoute = function (model,sms) {
         }
     });
 
-
-
-
-     router.get("/doctor/get-patient-prescription-request",function(req,res){        
-         if(req.user){
-         model.user.findOne({email:req.user.email},{doctor_prescriptionRequest:1,_id:0},function(err,data){                
-            res.send(data);
-         })
-        } else {
-            res.send("not allowed");
-        }
+    router.get("/doctor/get-patient-prescription-request",function(req,res){        
+      if(req.user){
+       model.user.findOne({user_id:req.user.user_id},{doctor_prescriptionRequest:1,_id:0},function(err,data){                
+        res.send(data);
+       });
+      } else {
+        res.send("not allowed");
+      }
     });
 
     router.put("/doctor/acceptance",function(req,res){
-         if(req.user){  
-         console.log(req.body)         
+         if(req.user){ 
+                  
              model.user.findOne(
                 {
                     user_id: req.body.patientId
@@ -711,6 +708,9 @@ var basicRoute = function (model,sms) {
                     ewallet:1,
                     patient_mail: 1,
                     service_access: 1,
+                    user_id:1,
+                    phone:1,
+                    presence:1
                 }
             )
             .exec(
@@ -734,6 +734,16 @@ var basicRoute = function (model,sms) {
                       profile_pic_url: req.body.profile_pic_url,
                       specialty: req.body.specialty
                     });
+
+                    if(result.presence === true){
+                      io.sockets.to(result.user_id).emit("message notification",{status:true})
+                    } else {
+                      var msgBody = "Doctor accepted your consultation request! Visit http://applinic.com/login";
+                      var phoneNunber = "234" + result.phone;
+                      sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+                      }); //"2348096461927"
+                    }
 
                     result.save(function(err){
                       if(err) throw err;
@@ -766,7 +776,7 @@ router.put("/doctor/redirect-mail",function(req,res){
     //the data is sent as json and the controller that receives it on the front end is "patientPanelController" .
     router.get("/patient-panel/get-medical-record",function(req,res){
       if(req.user) {
-        model.user.findOne({email: req.user.email},{medical_records: 1,medications:1},function(err,data){
+        model.user.findOne({user_id: req.user.user_id},{medical_records: 1,medications:1},function(err,data){
           res.json({medical_records: data.medical_records,prescriptions: data.medications})
           //Note from model, medications holds all prescriptions while medical_records holds all laboratory and radiology tests
           // though there is prescription property on medical_record obj but not used yet.
@@ -781,7 +791,7 @@ router.put("/doctor/redirect-mail",function(req,res){
     //this route gets all referral for a pharmacy.
     router.get("/pharmacy/get-referral",function(req,res){
       if(req.user){
-        model.user.findOne({email:req.user.email},{referral:1},function(err,referral){
+        model.user.findOne({user_id:req.user.user_id},{referral:1},function(err,referral){
           res.send(referral);
         });        
       } else {
@@ -792,7 +802,7 @@ router.put("/doctor/redirect-mail",function(req,res){
     //this route gets a notifications for the fn getAllNotification for pharmacy on the client.
     
     //11/4/2016
-    router.put("/doctor/specific-patient",function(req,res){
+    router.get("/doctor/specific-patient",function(req,res){
       if(req.user){
         var projection = {
             firstname: 1,
@@ -806,10 +816,11 @@ router.put("/doctor/redirect-mail",function(req,res){
             body_weight: 1,
             medical_records: 1,
             user_id: 1,
-            type: 1
+            type: 1,
+            presence:1
 
         }
-        model.user.findOne({ user_id: req.body.id},projection,function(err,data){
+        model.user.findOne({ user_id: req.query.id},projection,function(err,data){
             if(err) throw err;
             res.send(data);
         });
@@ -819,9 +830,9 @@ router.put("/doctor/redirect-mail",function(req,res){
       }
     });
 
-    router.put("/doctor/get-patient/medication",function(req,res){
+    router.get("/doctor/get-patient/medication",function(req,res){
       if(req.user) {        
-        model.user.findOne({user_id: req.body.id},{medications:1},function(err,prescriptions){
+        model.user.findOne({user_id: req.query.id},{medications:1},function(err,prescriptions){
           if(err) throw err;
           prescriptions.user = req.user.user_id;
           res.json({medications:prescriptions.medications,user: req.user.user_id});
@@ -881,7 +892,7 @@ router.put("/doctor/redirect-mail",function(req,res){
     //where all his prescriptions has been send sent to.
     router.get("/patient/get-prescription/track-record",function(req,res){
       if(req.user){
-        model.user.findOne({email:req.user.email},{prescription_tracking:1,_id:0},function(err,data){
+        model.user.findOne({user_id:req.user.user_id},{prescription_tracking:1,_id:0},function(err,data){
           console.log(data.prescription_tracking);
           res.send(data.prescription_tracking);
         })
@@ -1254,7 +1265,7 @@ router.put("/doctor/redirect-mail",function(req,res){
     router.delete("/doctor/delete-prescriptionReq-test",function(req,res){
       console.log(req.body)
       if(req.user){
-        model.user.findOne({email: req.user.email},{doctor_prescriptionRequest:1}).exec(function(err,data){
+        model.user.findOne({user_id: req.user.user_id},{doctor_prescriptionRequest:1}).exec(function(err,data){
           if(err) throw err;
           var elementPos = data.doctor_prescriptionRequest.map(function(x){return x.ref_id}).indexOf(req.body.ref_id)
           var objFound = data.doctor_prescriptionRequest.splice(elementPos,1);          
@@ -1316,7 +1327,7 @@ router.put("/doctor/redirect-mail",function(req,res){
             });
         });
 
-        model.user.findOne({user_id: req.body.id},{patient_notification:1,firstname:1,lastname:1}).exec(function(err,data){
+        model.user.findOne({user_id: req.body.id},{patient_notification:1,firstname:1,lastname:1,presence:1,user_id:1,phone:1}).exec(function(err,data){
           if(err) throw err;
            
 
@@ -1332,7 +1343,16 @@ router.put("/doctor/redirect-mail",function(req,res){
             message: "You have new unread prescription"
           });
 
-          console.log(data.patient_notification)
+          if(data.presence === true){
+              io.sockets.to(data.user_id).emit("notification",{status:true})
+          } else {
+            var msgBody = "You have new unread prescription! Visit http://applinic.com/login"
+            var phoneNunber = "234" + data.phone;
+            sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+              
+            }); //"2348096461927"
+          }
+
 
           data.save(function(err,info){
             if(err) throw err;            
@@ -1365,7 +1385,7 @@ router.put("/doctor/redirect-mail",function(req,res){
           data.save(function(err,info){
             if(err) throw err;
           });
-          res.json({status: "success"})
+          res.json({status: "success",doctor_id:req.body.doctorId})
         });
       } else {
         res.end("Unauthorized access!!!");
@@ -1375,7 +1395,7 @@ router.put("/doctor/redirect-mail",function(req,res){
     //this route gets the lists of all prescription request from the doctor's patients
     router.get("/doctor/get-patient-request",function(req,res){
       if(req.user){
-        model.user.findOne({email: req.user.email},{doctor_prescriptionRequest:1,_id:0},function(err,data){
+        model.user.findOne({user_id: req.user.user_id},{doctor_prescriptionRequest:1,_id:0},function(err,data){
           res.send(data.doctor_prescriptionRequest);
         });
       } else {
@@ -1391,7 +1411,7 @@ router.put("/doctor/redirect-mail",function(req,res){
     //this router takes call of pahrmacy search for a patient prescription from the data base;
     router.put("/pharmacy/find-patient/prescription",function(req,res){
        if(req.user){     
-        model.user.findOne({email:req.user.email},{referral:1},function(err,data){
+        model.user.findOne({user_id:req.user.user_id},{referral:1},function(err,data){
             if (err) throw err;           
               switch(req.body.criteria) {
                 case "refIdCriteria":
@@ -1428,7 +1448,7 @@ router.put("/doctor/redirect-mail",function(req,res){
 
     router.put("/laboratory/find-patient/lab-test",function(req,res){
       if(req.user){     
-        model.user.findOne({email:req.user.email},{referral:1},function(err,data){
+        model.user.findOne({user_id:req.user.user_id},{referral:1},function(err,data){
             if (err) throw err;           
               switch(req.body.criteria) {
                 case "refIdCriteria":
@@ -1465,7 +1485,7 @@ router.put("/doctor/redirect-mail",function(req,res){
 
     router.get("/laboratory/get-referral",function(req,res){
       if(req.user){
-        model.user.findOne({password:req.user.password},{referral:1,_id:0},function(err,data){
+        model.user.findOne({user_id:req.user.user_id},{referral:1,_id:0},function(err,data){
           res.send(data.referral);
         })
       } else {
@@ -1476,7 +1496,7 @@ router.put("/doctor/redirect-mail",function(req,res){
 
     router.get("/radiology/get-referral", function(req,res){
        if(req.user){
-        model.user.findOne({password:req.user.password},{referral:1,_id:0},function(err,data){
+        model.user.findOne({user_id:req.user.user_id},{referral:1,_id:0},function(err,data){
           res.send(data.referral);
         })
       } else {
@@ -1520,7 +1540,8 @@ router.put("/doctor/redirect-mail",function(req,res){
 
         function updatePatient() {
           //here patient test result is updated.
-          model.user.findOne({user_id: req.body.laboratory.patient_id},{medical_records: 1,patient_notification:1}).exec(function(err,data){
+          model.user.findOne({user_id: req.body.laboratory.patient_id},{medical_records: 1,patient_notification:1,user_id:1,presence:1,phone:1})
+          .exec(function(err,data){
             if(err) throw err;
             var elementPos = data.medical_records.laboratory_test.map(function(x) {return x.session_id; }).indexOf(req.body.laboratory.session_id);
             var objectFound = data.medical_records.laboratory_test[elementPos];           
@@ -1543,6 +1564,15 @@ router.put("/doctor/redirect-mail",function(req,res){
               message: "Laboratory test result received."
             })
 
+            if(data.presence === true){
+              io.sockets.to(data.user_id).emit("notification",{status:true})
+            } else {
+              var msgBody = "Your laboratory test result is ready! Visit http://applinic.com/login"
+              var phoneNunber = "234" + data.phone;
+              sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+              }); //"2348096461927"
+            }
 
             data.save(function(err,info){
               if(err) res.send({status: "error"});           
@@ -1552,7 +1582,7 @@ router.put("/doctor/redirect-mail",function(req,res){
         }
 
         function updateTheCenter() {
-          model.user.findOne({email: req.user.email},{referral:1}).exec(function(err,data){
+          model.user.findOne({user_id: req.user.user_id},{referral:1}).exec(function(err,data){
             if(err) throw err;
             var elementPos = data.referral.map(function(x) {return x.session_id; }).indexOf(req.body.laboratory.session_id);
             var objectFound = data.referral[elementPos];
@@ -1572,7 +1602,8 @@ router.put("/doctor/redirect-mail",function(req,res){
     //this route is like above only it only updates the patient lab test on the patient dashboard. this is used for patient on em profile and 
     //patient who requested test without doctors approval.
     router.put("/laboratory/test-result/patient-test-update",function(req,res){
-      model.user.findOne({user_id: req.body.laboratory.patient_id},{medical_records: 1,patient_notification:1}).exec(function(err,data){
+      model.user.findOne({user_id: req.body.laboratory.patient_id},{medical_records: 1,patient_notification:1,user_id:1,presence:1,phone:1})
+      .exec(function(err,data){
         if(err) throw err;       
         var elementPos = data.medical_records.laboratory_test.map(function(x) {return x.ref_id; }).indexOf(req.body.ref_id);
         var objectFound = data.medical_records.laboratory_test[elementPos];           
@@ -1592,7 +1623,16 @@ router.put("/doctor/redirect-mail",function(req,res){
           message: "Laboratory test result received."
         });
 
-        
+        if(data.presence === true){
+          io.sockets.to(data.user_id).emit("notification",{status:true})
+        } else {
+          var msgBody = "Your laboratory test result is ready! Visit http://applinic.com/login"
+          var phoneNunber = "234" + data.phone;
+          sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+          }); //"2348096461927"
+        }
+
         data.save(function(err,info){
           if(err) res.send({status: "error"});           
           res.send({status: "success"});
@@ -1633,7 +1673,8 @@ router.put("/doctor/redirect-mail",function(req,res){
 
         function updatePatient() {         
           //here patient test result is updated.
-          model.user.findOne({user_id: req.body.radiology.patient_id},{medical_records: 1,patient_notification:1}).exec(function(err,data){
+          model.user.findOne({user_id: req.body.radiology.patient_id},{medical_records: 1,patient_notification:1,user_id:1,presence:1,phone:1})
+          .exec(function(err,data){
             if(err) throw err;
             var elementPos = data.medical_records.radiology_test.map(function(x) {return x.session_id; }).indexOf(req.body.radiology.session_id);
             var objectFound = data.medical_records.radiology_test[elementPos];           
@@ -1654,6 +1695,16 @@ router.put("/doctor/redirect-mail",function(req,res){
               message: "Radiology test result received."
             });
 
+            if(data.presence === true){
+              io.sockets.to(data.user_id).emit("notification",{status:true})
+            } else {
+              var msgBody = "Your radiology test result is ready! Visit http://applinic.com/login"
+              var phoneNunber = "234" + data.phone;
+              sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+              }); //"2348096461927"
+            }
+
             data.save(function(err,info){
               if(err) res.send({status: "error"});           
               res.send({status: "success"});
@@ -1662,7 +1713,7 @@ router.put("/doctor/redirect-mail",function(req,res){
         }
 
         function updateTheCenter() {
-          model.user.findOne({email: req.user.email},{referral:1}).exec(function(err,data){
+          model.user.findOne({user_id: req.user.user_id},{referral:1}).exec(function(err,data){
             if(err) throw err;
             var elementPos = data.referral.map(function(x) {return x.session_id; }).indexOf(req.body.radiology.session_id);
             var objectFound = data.referral[elementPos];
@@ -1683,8 +1734,8 @@ router.put("/doctor/redirect-mail",function(req,res){
     //this route is like above only it only updates the patient scan test on the patient dashboard. this is used for patient on em profile and 
     //patient who requested test without doctors approval.
     router.put("/radiology/test-result/patient-scan-update",function(req,res){
-      console.log(req.body)
-      model.user.findOne({user_id: req.body.radiology.patient_id},{medical_records: 1}).exec(function(err,data){
+      
+      model.user.findOne({user_id: req.body.radiology.patient_id},{medical_records: 1,patient_notification:1,user_id:1,presence:1,phone:1}).exec(function(err,data){
         if(err) throw err;
         var elementPos = data.medical_records.radiology_test.map(function(x) {return x.ref_id; }).indexOf(req.body.ref_id);
         var objectFound = data.medical_records.radiology_test[elementPos];           
@@ -1704,6 +1755,16 @@ router.put("/doctor/redirect-mail",function(req,res){
           session_id:req.body.radiology.session_id,
           message: "Radiology test result received."
         });
+
+        if(data.presence === true){
+          io.sockets.to(data.user_id).emit("notification",{status:true})
+        } else {
+          var msgBody = "Your radiology test result is ready! Visit http://applinic.com/login";
+          var phoneNunber = "234" + data.phone;
+          sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+          }); //"2348096461927"
+        }
 
 
         data.save(function(err,info){
@@ -1748,6 +1809,16 @@ router.put("/doctor/redirect-mail",function(req,res){
 
     });
 
+    router.get("/doctor/audio/call",function(req,res){
+      if(req.user){
+        res.render("audio-chat",{"person":req.user})
+      } else {
+        res.end("Unauthorized access!")
+      }
+
+    });
+
+
     router.get("/patient/call",function(req,res){
       if(req.user){
         res.render("video-chat2",{"person":req.user})
@@ -1756,6 +1827,16 @@ router.put("/doctor/redirect-mail",function(req,res){
       }
 
     });
+
+    router.get("/patient/audio/call",function(req,res){
+      if(req.user){
+        res.render("audio-chat2",{"person":req.user})
+      } else {
+        res.end("Unauthorized access!")
+      }
+
+    });
+
 
     router.get("/chat",function(req,res){
       
@@ -1893,18 +1974,21 @@ router.put("/doctor/redirect-mail",function(req,res){
       }
     });
 
-    router.put("/doctor/get-patient-sessions",function(req,res){
-    console.log(req.body)      
+    router.get("/doctor/get-patient-sessions",function(req,res){ 
       if(req.user){
-         model.user.findOne({email: req.user.email},{doctor_patient_session:1},function(err,data){
-          var data = data.doctor_patient_session;
+         model.user.findOne({user_id: req.user.user_id},{doctor_patient_session:1},function(err,data){       
+          var list = data.doctor_patient_session;
           var allSession = [];        
-          for(var i = 0; i < data.length; i++){
-            if(data[i].patient_id === req.body.patient_id){
-               allSession.push(data[i]);
+          for(var i = 0; i < list.length; i++){
+            if(list[i].patient_id === req.query.patient_id){
+               allSession.push(list[i]);
             }
           }
-          res.send(allSession);  
+          if(allSession.length > 0){
+            res.send(allSession);  
+          } else {
+            res.send([{}]); 
+          }
         });
       } else {
         res.end("Unauthorized access!!!")
@@ -1913,7 +1997,7 @@ router.put("/doctor/redirect-mail",function(req,res){
 
     router.get("/treatment",function(req,res){
       if(req.user){
-        model.user.findOne({email:req.user.email},function(err,user){
+        model.user.findOne({user_id:req.user.user_id},function(err,user){
           if(err) throw err;
           res.render("treatment",{"person":user});
         });     
@@ -2026,7 +2110,7 @@ router.put("/doctor/redirect-mail",function(req,res){
     //doctor finds the patient's lab tests if
     router.put("/doctor/get-test-result",function(req,res){
         if(req.user){         
-          model.user.findOne({email: req.user.email},{doctor_patient_session:1}).exec(function(err,data){
+          model.user.findOne({user_id: req.user.user_id},{doctor_patient_session:1}).exec(function(err,data){
             if(err) throw err;
             var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(req.body.id);
             var objectFound = data.doctor_patient_session[elementPos];
@@ -2079,7 +2163,7 @@ router.put("/doctor/redirect-mail",function(req,res){
     //doctors finds the patient's scan if any
     router.put("/doctor/get-scan-result",function(req,res){/////////////////////////////
         if(req.user){
-          model.user.findOne({email: req.user.email},{doctor_patient_session:1}).exec(function(err,data){
+          model.user.findOne({user_id: req.user.user_id},{doctor_patient_session:1}).exec(function(err,data){
             if(err) throw err;
             var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(req.body.id);
             var objectFound = data.doctor_patient_session[elementPos];
@@ -2171,7 +2255,7 @@ router.put("/doctor/redirect-mail",function(req,res){
         var random = Math.floor(Math.random() * 9999999);
         var testId = Math.floor(Math.random() * 9999999999999999);       
         model.user.findOne({user_id: req.body.user_id},
-          {diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1}).exec(function(err,result){                  
+          {diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1,presence:1}).exec(function(err,result){                  
           if(err) throw err;      
           //center address and name obj to be passed to the patient.
           var centerObj = {
@@ -2216,6 +2300,17 @@ router.put("/doctor/redirect-mail",function(req,res){
             message: "Please run the test for my patient"
           }
 
+          if(result.presence === true){
+            io.sockets.to(result.user_id).emit("notification",{status:true})
+          } else {
+            var msgBody = "You have new test request! Visit http://applinic.com/login"
+            var phoneNunber = "234" + result.phone;
+            sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+            }); //"2348096461927"
+          }
+
+
           result.referral.push(refObj);
           result.diagnostic_center_notification.push(refNotification);
 
@@ -2227,7 +2322,7 @@ router.put("/doctor/redirect-mail",function(req,res){
 
         var tellPatient = function(centerInfo){
           //remember sms will be sent to the patient
-          model.user.findOne({user_id: req.body.patient_id},{medical_records: 1,user_id:1,patient_notification:1}).exec(function(err,record){            
+          model.user.findOne({user_id: req.body.patient_id},{medical_records: 1,user_id:1,patient_notification:1,user_id,presence:1,phone:1}).exec(function(err,record){            
             if(err) throw err;     
             var recordObj = {
               center_name: centerInfo.name,
@@ -2258,6 +2353,16 @@ router.put("/doctor/redirect-mail",function(req,res){
               message: "You have unread pending lab test"
             }
 
+            if(record.presence === true){
+              io.sockets.to(record.user_id).emit("notification",{status:true})
+            } else {
+              var msgBody = "You have new test to run! Visit http://applinic.com/login"
+              var phoneNunber = "234" + record.phone;
+              sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+              }); //"2348096461927"
+            }
+
             record.patient_notification.unshift(noteObj);
             record.medical_records.laboratory_test.unshift(recordObj);
             record.save(function(err,info){
@@ -2273,7 +2378,7 @@ router.put("/doctor/redirect-mail",function(req,res){
         }
 
         var updateSession = function(session_id) {//////////////////////////////////////////////////////////////////////////
-          model.user.findOne({email: req.user.email},{doctor_patient_session:1}).exec(function(err,data){
+          model.user.findOne({user_id: req.user.user_id},{doctor_patient_session:1}).exec(function(err,data){
             if(err) throw err;           
             var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(session_id);
             var objFound = data.doctor_patient_session[elementPos];            
@@ -2301,7 +2406,8 @@ router.put("/doctor/redirect-mail",function(req,res){
 
     //this route takes care of  un ran test which was forwarded to another center by a center.
     router.post("/center/send-test",function(req,res){    
-        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1})
+        model.user.findOne({user_id: req.body.user_id},{
+          diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1,presence:1})
         .exec(function(err,result){
           if(err) throw err;
          
@@ -2346,6 +2452,17 @@ router.put("/doctor/redirect-mail",function(req,res){
             note_id: req.body.ref_id,
             sender_profile_pic_url: req.user.profile_pic_url,
             message: "Please run the test for my patient"
+          }
+
+
+          if(result.presence === true){
+            io.sockets.to(result.user_id).emit("notification",{status:true})
+          } else {
+            var msgBody = "You have new test request! Visit http://applinic.com/login"
+            var phoneNunber = "234" + result.phone;
+            sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+            }); //"2348096461927"
           }
 
           result.referral.push(refObj);
@@ -2399,7 +2516,7 @@ router.put("/doctor/redirect-mail",function(req,res){
 
     router.put("/radiology/find-patient/scan-test",function(req,res){
       if(req.user){     
-        model.user.findOne({email:req.user.email},{referral:1},function(err,data){
+        model.user.findOne({user_id:req.user.user_id},{referral:1},function(err,data){
             if (err) throw err;           
               switch(req.body.criteria) {
                 case "refIdCriteria":
@@ -2468,11 +2585,11 @@ router.put("/doctor/redirect-mail",function(req,res){
     
     //this route takes care doctor sending new test to a radiology.
     router.post("/doctor/radiology/send-test",function(req,res){  
-        if(req.user) {
-        console.log(req.body)  
+        if(req.user) { 
         var random = Math.floor(Math.random() * 9999999);
         var testId = Math.floor(Math.random() * 9999999999999999);       
-        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1})        
+        model.user.findOne({user_id: req.body.user_id},{
+          diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1,presence:1})        
         .exec(function(err,result){
           if(err) throw err;        
 
@@ -2519,7 +2636,15 @@ router.put("/doctor/redirect-mail",function(req,res){
             message: "Please run the test for my patient"
           }
 
-          
+          if(result.presence === true){
+            io.sockets.to(result.user_id).emit("notification",{status:true})
+          } else {
+            var msgBody = "You have new test request! Visit http://applinic.com/login"
+            var phoneNunber = "234" + result.phone;
+            sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+            }); //"2348096461927"
+          }
 
           result.referral.push(refObj);
           result.diagnostic_center_notification.push(refNotification);
@@ -2532,7 +2657,8 @@ router.put("/doctor/redirect-mail",function(req,res){
 
         var tellPatient = function(centerInfo){
           //remember sms will be sent to the patient
-          model.user.findOne({user_id: req.body.patient_id},{medical_records: 1,user_id:1,patient_notification:1}).exec(function(err,record){            
+          model.user.findOne({user_id: req.body.patient_id},{medical_records: 1,user_id:1,patient_notification:1,presence:1,phone:1})
+          .exec(function(err,record){            
             if(err) throw err;     
             var recordObj = {
               test_to_run: req.body.lab_test_list,
@@ -2563,6 +2689,16 @@ router.put("/doctor/redirect-mail",function(req,res){
               message: "You have unread pending radio test"
             }
 
+            if(record.presence === true){
+              io.sockets.to(record.user_id).emit("notification",{status:true})
+            } else {
+              var msgBody = "You have new test to run! Visit http://applinic.com/login";
+              var phoneNunber = "234" + record.phone;
+              sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+              }); //"2348096461927"
+            }
+
             record.patient_notification.unshift(noteObj)
             record.medical_records.radiology_test.unshift(recordObj);
             record.save(function(err,info){
@@ -2578,7 +2714,7 @@ router.put("/doctor/redirect-mail",function(req,res){
         }
 
         var updateSession = function(session_id) {
-          model.user.findOne({email: req.user.email},{doctor_patient_session:1}).exec(function(err,data){
+          model.user.findOne({user_id: req.user.user_id},{doctor_patient_session:1}).exec(function(err,data){
             if(err) throw err;           
             var elementPos = data.doctor_patient_session.map(function(x) {return x.session_id; }).indexOf(session_id);
             var objFound = data.doctor_patient_session[elementPos];
@@ -2653,6 +2789,16 @@ router.put("/doctor/redirect-mail",function(req,res){
             message: "Please run the test for my patient"
           }
 
+          if(result.presence === true){
+            io.sockets.to(result.user_id).emit("notification",{status:true})
+          } else {
+            var msgBody = "You have new test request! Visit http://applinic.com/login"
+            var phoneNunber = "234" + result.phone;
+            sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+            }); //"2348096461927"
+          }
+
           result.referral.push(refObj);
           result.diagnostic_center_notification.push(refNotification);
 
@@ -2724,7 +2870,7 @@ router.put("/doctor/redirect-mail",function(req,res){
 
     router.get("/center/notification",function(req,res){
       if(req.user) {
-        model.user.findOne({email:req.user.email},{diagnostic_center_notification:1},function(err,data){
+        model.user.findOne({user_id:req.user.user_id},{diagnostic_center_notification:1},function(err,data){
           if(err) throw err;
           res.send(data.diagnostic_center_notification);
         })
@@ -2735,7 +2881,7 @@ router.put("/doctor/redirect-mail",function(req,res){
 
     router.delete("/center/delete-notification",function(req,res){
       if(req.user){        
-        model.user.findOne({email: req.user.email},{diagnostic_center_notification:1}).exec(function(err,data){
+        model.user.findOne({user_id: req.user.user_id},{diagnostic_center_notification:1}).exec(function(err,data){
           if(err) throw err;
           req.body.forEach(function(note){
             console.log(note)
@@ -3142,7 +3288,8 @@ router.put("/doctor/redirect-mail",function(req,res){
           if(err) throw err;
         })
       } else {
-        model.user.findOne({user_id: req.body.user_id},{referral:1,diagnostic_center_notification:1,city:1,name:1,country:1,address:1})
+        model.user.findOne({user_id: req.body.user_id},{
+        referral:1,diagnostic_center_notification:1,city:1,name:1,country:1,address:1,user_id:1,presence:1,phone:1})
         .exec(function(err,pharmacy){         
           if(err) throw err;
 
@@ -3186,6 +3333,16 @@ router.put("/doctor/redirect-mail",function(req,res){
             sender_profile_pic_url: user.profile_pic_url,
             message: 'Hi, I need your services'
           };
+
+          if(pharmacy.presence === true){
+            io.sockets.to(pharmacy.user_id).emit("notification",{status:true})
+          } else {
+            var msgBody = "Someone needs your services! Visit http://applinic.com/login"
+            var phoneNunber = "234" + pharmacy.phone;
+            sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+            }); //"2348096461927"
+          }
 
           
           var preObj = {              
@@ -3353,7 +3510,8 @@ router.put("/test-search/laboratory/referral",function(req,res){
     model.user.findOne(person,{firstname:1,lastname:1,title:1,profile_pic_url:1,city:1,country:1,name:1,age:1,user_id:1})
     .exec(function(err,user){
       if(err) throw err;
-        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1})
+        model.user.findOne({user_id: req.body.user_id},{
+          diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1,presence:1})
         .exec(function(err,result){
         var firstname = user.firstname || user.name;
         try{
@@ -3397,6 +3555,16 @@ router.put("/test-search/laboratory/referral",function(req,res){
           note_id: req.body.ref_id,
           sender_profile_pic_url: user.profile_pic_url,
           message: "Please run the test for me"
+        }
+
+        if(result.presence === true){
+          io.sockets.to(result.user_id).emit("notification",{status:true})
+        } else {
+          var msgBody = "You have new test request! Visit http://applinic.com/login"
+          var phoneNunber = "234" + result.phone;
+          sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+          }); //"2348096461927"
         }
 
         
@@ -3563,7 +3731,8 @@ router.put("/scan-search/radiology/referral",function(req,res){
     model.user.findOne(person,{firstname:1,lastname:1,title:1,profile_pic_url:1,city:1,country:1,name:1,age:1,user_id:1})
     .exec(function(err,user){
       if(err) throw err;
-        model.user.findOne({user_id: req.body.user_id},{diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1})
+        model.user.findOne({user_id: req.body.user_id},{
+          diagnostic_center_notification:1,referral:1,address:1,name:1,city:1,country:1,phone:1,user_id:1,presence:1})
         .exec(function(err,result){         
         var firstname = user.firstname || user.name;
         var refData = {
@@ -3606,6 +3775,16 @@ router.put("/scan-search/radiology/referral",function(req,res){
           note_id: req.body.ref_id,
           sender_profile_pic_url: user.profile_pic_url,
           message: "Please run the test for me"
+        }
+
+        if(result.presence === true){
+          io.sockets.to(result.user_id).emit("notification",{status:true})
+        } else {
+          var msgBody = "You have new test request! Visit http://applinic.com/login"
+          var phoneNunber = "234" + result.phone;
+          sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+          }); //"2348096461927"
         }
 
         
@@ -3847,7 +4026,8 @@ router.post("/user/response/patients-histories",function(req,res){
         req.body.doctor_user_id = data.user_id;
         var elemPos = found.response.map(function(x){return x.doctor_user_id}).indexOf(data.user_id);
         if(elemPos === -1){          
-          model.user.findOne({user_id:req.body.patient_id},{patient_mail:1,accepted_doctors:1,firstname:1,lastname:1}).exec(function(err,patient){           
+          model.user.findOne({user_id:req.body.patient_id},
+            {patient_mail:1,accepted_doctors:1,firstname:1,lastname:1,user_id:1,phone:1,presence:1}).exec(function(err,patient){           
             if(err) throw err;
             var checkIsMyDoctor = patient.accepted_doctors.map(function(x){return x.doctor_id}).indexOf(data.user_id);
             
@@ -3868,7 +4048,17 @@ router.post("/user/response/patients-histories",function(req,res){
                   complaint_id: req.body.complaint_id,
                   message: msg,
                   profile_pic_url: data.profile_pic_url
-                });
+                });                
+              }
+
+              if(patient.presence === true){
+                io.sockets.to(patient.user_id).emit("message notification",{status:true})
+              } else {
+                var msgBody = "A Doctor responded to your history! Visit http://applinic.com/login"
+                var phoneNunber = "234" + patient.phone;
+                sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+                }); //"2348096461927"
               }
             } else {
               patient.save(function(err,info){})
@@ -3959,9 +4149,38 @@ router.get("/patient/get-my-doctors",function(req,res){
 });
 /***************  will be modified as above ************/
  //this route get all the doctor's patients to include which patient is online or not.
+ router.get("/doctor/my-online-patients",function(req,res){
+    if(req.user){
+      model.user.find({"accepted_doctors.doctor_id":req.user.user_id,type:"Patient"},
+        {user_id:1,_id:0,firstname:1,lastname:1,presence:1,profile_pic_url:1},function(err,data){
+        if(err) throw err;
+        var sendList = [];
+        var dataLen = data.length;
+        var count = 0;
+        model.user.findOne({user_id:req.user.user_id},{doctor_patients_list:1},function(err,list){
+          while(dataLen > count){
+            var elementPos = list.doctor_patients_list.map(function(x){return x.patient_id}).indexOf(data[count].user_id)
+              
+              if(data[count].presence === true){             
+                list.doctor_patients_list[elementPos].presence = true;
+                sendList.push(list.doctor_patients_list[elementPos]);
+              } 
+            
+            count++
+          } 
+          res.send(sendList);
+        });
+      })
+    } else {
+      res.end("Unauthorized access!!")
+    }
+  }); 
+
+  //this route gets all doctors accepted patient. just for other ourposes wihich may no include whether use is presence or not at first.
+
   router.get("/doctor/my-patients",function(req,res){
     if(req.user){
-      model.user.findOne({email:req.user.email},{doctor_patients_list:1,_id:0},function(err,data){
+      model.user.findOne({"accepted_doctors.doctor_id":req.user.user_id},{doctor_patients_list:1,_id:0},function(err,data){
         if(err) throw err;
         res.send(data);
       });
@@ -4013,7 +4232,7 @@ router.get("/doctor/:userId/get-all-request",function(req,res){
 });
 
 //this route adds user to the array of converstion presence
-router.put("/user/conversation-availability",function(req,res){
+/*router.put("/user/conversation-availability",function(req,res){
  if(req.user){
   
    model.communication.findOne({},{ongoing_conversation:1}).exec(function(err,data){
@@ -4055,7 +4274,7 @@ router.put("/user/conversation-availability",function(req,res){
  } else {
   res.send("Unauthorized access!!!");
  }
-});
+});*/
 
 
 //this route checks to see if doctor is logged in or in conversation array before any communication session is established.

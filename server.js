@@ -34,15 +34,12 @@ http.listen(port,function(){
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://127.0.0.1:27017/medicalmull");
 config.configuration(app,model);
-route(model,sms);
+route(model,sms,io); //note sockets is also used in some routes.
 mySocket(model,io)
 signupRoute(model,sms);
 loginRoute(model);
-payments(model,sms);
+payments(model,sms,io);
 placement(model,sms);
 
-var a = ["a","b","c","d"]
-a.splice(0);
-console.log(a)
 
 

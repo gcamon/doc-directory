@@ -7,7 +7,7 @@ var path = require("path");
 var Wallet = require("./wallet");
 
 
-var basicPaymentRoute = function(model,sms){
+var basicPaymentRoute = function(model,sms,io){
 
 	//this route creates the token for use ie creating vouchers
 	router.post("/users/token",function(req,res){
@@ -507,7 +507,10 @@ var basicPaymentRoute = function(model,sms){
 	                          doctor_patients_list:1,
 	                          phone: 1,
 	                          firstname:1,
-	                          lastname:1
+	                          lastname:1,
+	                          phone:1,
+	                          user_id:1,
+	                          presence:1
 	                        }
 	                      )
 	                      .exec(function(err,data){
@@ -517,6 +520,16 @@ var basicPaymentRoute = function(model,sms){
 	                          patient_id: req.user.user_id,
 	                          patient_profile_pic_url: result.profile_pic_url
 	                        });
+
+	                        if(data.presence === true){
+					                  io.sockets.to(data.user_id).emit("acceptance notification",{status:true})
+					                } else {
+					                  var msgBody = "Success! " +  result.firstname + " " + result.lastname + " is now your patient. Visit http://applinic.com/login"
+					                  var phoneNunber = "234" + data.phone;
+					                  sms.message.sendSms('Applinic',phoneNunber,msgBody,function(err,responseData){
+
+					                  }); //"2348096461927"
+					                }
 
 	                        msgInfo = "Transaction successful! Your account is debited. " + data.firstname + " " + data.lastname + " is now your doctor." 
 	                        data.save(function(err,info){
